@@ -68,7 +68,7 @@
     <thead><tr><th>분류</th><th style="text-align:left">지표</th><th>종가</th><th>전일 대비</th><th>기준일</th></tr></thead>
     <tbody id="indBody"><tr><td colspan="5" class="fl">불러오는 중...</td></tr></tbody>
   </table>
-  <div class="note">JKM은 OilPriceAPI의 영업일별 값, 국제유가(두바이·브렌트·WTI)는 한국석유공사 오피넷 일별 값입니다. 환율·배출권·REC는 준비 중입니다. 지표별로 기준일이 다를 수 있으며 휴장일에는 직전 영업일 값을 표시합니다. 자료 갱신: <span id="indUpdated">-</span></div>
+  <div class="note">JKM은 OilPriceAPI의 영업일별 값, 국제유가(두바이·브렌트·WTI)는 한국석유공사 오피넷 일별 값입니다. 배출권은 금융위원회 한국거래소 시세(공공데이터포털)입니다. 환율·REC는 준비 중입니다. 지표별로 기준일이 다를 수 있으며 휴장일에는 직전 영업일 값을 표시합니다. 자료 갱신: <span id="indUpdated">-</span></div>
 
   <h2>시간대별 SMP<small>육지 기준, 원/kWh</small></h2>
   <div class="chart-box"><canvas id="chart"></canvas></div>
@@ -146,8 +146,9 @@
     ['환율', 'fx', '원/달러 환율', '원', true],
     ['국제유가', 'dubai', '두바이유', '$/bbl'], ['국제유가', 'brent', '브렌트유', '$/bbl'], ['국제유가', 'wti', 'WTI', '$/bbl'],
     ['LNG', 'jkm', 'JKM', 'USD/MMBtu'],
-    ['탄소·REC', 'kau', '배출권(KAU)', '원/톤', true], ['탄소·REC', 'rec', 'REC(육지)', '원/REC', true]
+    ['탄소·REC', 'kau', '배출권(KAU)', '원/톤'], ['탄소·REC', 'rec', 'REC(육지)', '원/REC', true]
   ];
+  const fmtI = (v, unit) => unit.startsWith('원') ? Math.round(v).toLocaleString('ko-KR') : f2(v);
   async function initInd() {
     let st = null;
     try { st = await (await fetch('indicators.json?' + Date.now())).json(); } catch (e) {}
@@ -158,16 +159,16 @@
     document.getElementById('indBody').innerHTML = IND_ORDER.map(([grp, k, nm, unit, pending]) => {
       const first = !seen[grp]; seen[grp] = true;
       const g = first ? `<td class="grp" rowspan="${span[grp]}">${grp}</td>` : '';
-      const head = `${g}<td class="nm">${nm}<small>${unit}</small></td>`;
       const it = items[k];
+      const head = `${g}<td class="nm">${nm}<small>${unit}${it && it.item ? ' · ' + it.item : ''}</small></td>`;
       if (!it) return `<tr>${head}<td colspan="3" class="fl">${pending ? '준비 중' : '자료 없음'}</td></tr>`;
       let chg = '<span class="fl">-</span>';
       if (it.prev_value != null) {
         const d = it.value - it.prev_value, p = d / it.prev_value * 100, c = d > 0 ? 'up' : d < 0 ? 'dn' : 'fl', ar = d > 0 ? '▲' : d < 0 ? '▼' : '-';
-        chg = `<span class="${c}">${ar} ${Math.abs(d).toFixed(2)} (${p >= 0 ? '+' : ''}${p.toFixed(1)}%)</span>`;
+        chg = `<span class="${c}">${ar} ${fmtI(Math.abs(d), unit)} (${p >= 0 ? '+' : ''}${p.toFixed(1)}%)</span>`;
       }
       const dd = it.date ? it.date.replace(/-/g, '') : '';
-      return `<tr>${head}<td class="v">${f2(it.value)}</td><td>${chg}</td><td>${dd ? fmtShort(dd) : '-'}</td></tr>`;
+      return `<tr>${head}<td class="v">${fmtI(it.value, unit)}</td><td>${chg}</td><td>${dd ? fmtShort(dd) : '-'}</td></tr>`;
     }).join('');
   }
   initInd();

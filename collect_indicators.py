@@ -9,6 +9,7 @@ from datetime import datetime, timedelta, timezone
 KST = timezone(timedelta(hours=9))
 OUT = "indicators.json"
 OIL_KEY = os.environ.get("OILPRICE_API_KEY", "")
+DATA_KEY = urllib.parse.unquote(os.environ.get("DATA_GO_KR_KEY", ""))
 UA = {"User-Agent": "Mozilla/5.0", "Accept-Language": "ko"}
 
 
@@ -121,11 +122,60 @@ def fetch_opinet():
     return out
 
 
+def fetch_kau():
+    """금융위원회 배출권시세(공공데이터포털). 종가 clpr, 전일대비 vs 를 그대로 사용.
+    KAU 종목 중 최신일 거래량이 가장 큰 종목(당해 연도물)을 대표값으로 쓴다."""
+    ops = ["https://apis.data.go.kr/1160100/GetGeneralProductInfoService_V2/getCertifiedEmissionReductionPriceInfo_V2",
+           "https://apis.data.go.kr/1160100/service/GetGeneralProductInfoService_V2/getCertifiedEmissionReductionPriceInfo_V2"]
+    now = datetime.now(KST).date()
+    q = {"serviceKey": DATA_KEY, "pageNo": 1, "numOfRows": 300, "resultType": "json",
+         "beginBasDt": (now - timedelta(days=14)).strftime("%Y%m%d"), "likeItmsNm": "KAU"}
+    last = None
+    for base in ops:
+        try:
+            def call():
+                raw = urllib.request.urlopen(urllib.request.Request(base + "?" + urllib.parse.urlencode(q), headers=UA), timeout=40).read()
+                return json.loads(raw.decode("utf-8"))
+            j = retry(call, tries=2)
+            root = j.get("response", j)
+            head, body = root.get("header", {}), root.get("body", {})
+            items = body.get("items", {}) if isinstance(body, dict) else {}
+            if isinstance(items, dict):
+                items = items.get("item", [])
+            if isinstance(items, dict):
+                items = [items]
+            print(f">> [배출권 호출] code={head.get('resultCode')} msg={head.get('resultMsg')} 건수={body.get('totalCount') if isinstance(body, dict) else None}")
+            rows = []
+            for x in items or []:
+                try:
+                    rows.append((str(x["basDt"]), str(x.get("itmsNm", "")), float(x["clpr"]), float(x.get("vs") or 0), float(x.get("trqu") or 0)))
+                except (KeyError, ValueError, TypeError):
+                    pass
+            rows = [r for r in rows if r[2] > 0]
+            if not rows:
+                last = ValueError("배출권 자료 없음")
+                continue
+            latest = max(r[0] for r in rows)
+            cand = sorted([r for r in rows if r[0] == latest], key=lambda r: -r[4])
+            _, name, clpr, vs, _t = cand[0]
+            dt = f"{latest[:4]}-{latest[4:6]}-{latest[6:]}"
+            same = sorted([r for r in rows if r[1] == name and r[0] < latest])
+            prev_v, prev_d = (clpr - vs, None)
+            if same:
+                prev_d = f"{same[-1][0][:4]}-{same[-1][0][4:6]}-{same[-1][0][6:]}"
+            return {"kau": {"name": "배출권(KAU)", "item": name, "unit": "원/톤", "date": dt, "value": clpr,
+                            "prev_date": prev_d, "prev_value": prev_v}}
+        except Exception as e:
+            last = e
+            print(f">> [배출권 주소 실패] {base.split('/1160100/')[1][:40]} {type(e).__name__}: {str(e)[:100]}")
+    raise last or ValueError("배출권 자료 없음")
+
+
 def main():
     store = json.load(open(OUT, encoding="utf-8")) if os.path.exists(OUT) else {}
     items = store.get("items", {})
     ok = 0
-    for label, fn in (("JKM", fetch_jkm), ("오피넷 국제유가", fetch_opinet)):
+    for label, fn in (("JKM", fetch_jkm), ("오피넷 국제유가", fetch_opinet), ("배출권", fetch_kau)):
         try:
             got = fn()
             items.update(got)
