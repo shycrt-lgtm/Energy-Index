@@ -157,6 +157,8 @@ def fetch_kau():
                 continue
             latest = max(r[0] for r in rows)
             cand = sorted([r for r in rows if r[0] == latest], key=lambda r: -r[4])
+            print(f">> [배출권 종목별 {latest}] (종목, 종가, 대비, 거래량) 상위:", [(r[1], r[2], r[3], r[4]) for r in cand[:6]])
+            print(">> [배출권 조회된 종목 이름]", sorted({r[1] for r in rows}))
             _, name, clpr, vs, _t = cand[0]
             dt = f"{latest[:4]}-{latest[4:6]}-{latest[6:]}"
             same = sorted([r for r in rows if r[1] == name and r[0] < latest])
