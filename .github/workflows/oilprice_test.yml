@@ -5,23 +5,39 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: JKM 등 조회 시험
+      - name: 일별 가격 시험
         env:
           OILPRICE_API_KEY: ${{ secrets.OILPRICE_API_KEY }}
         run: |
           python3 - <<'PY'
           import os, json, urllib.request, urllib.error
           key = os.environ.get("OILPRICE_API_KEY", "")
-          print("키 등록 여부:", "있음" if key else "없음(Secret 이름을 확인하세요)")
-          for code in ["JKM_LNG_USD", "HENRY_HUB_NATURAL_GAS_USD", "BRENT_CRUDE_USD", "WTI_USD", "DUBAI_CRUDE_USD"]:
-              req = urllib.request.Request(
-                  "https://api.oilpriceapi.com/v1/prices/latest?by_code=" + code,
-                  headers={"Authorization": "Token " + key, "User-Agent": "Mozilla/5.0"})
+          def get(path):
+              req = urllib.request.Request("https://api.oilpriceapi.com" + path,
+                    headers={"Authorization": "Token " + key, "User-Agent": "Mozilla/5.0"})
               try:
-                  r = urllib.request.urlopen(req, timeout=30)
-                  print(f"[{code}] HTTP {r.status}", r.read().decode()[:400])
+                  r = urllib.request.urlopen(req, timeout=40)
+                  return r.status, r.read().decode()
               except urllib.error.HTTPError as e:
-                  print(f"[{code}] HTTP {e.code}", e.read().decode()[:300])
+                  return e.code, e.read().decode()
               except Exception as e:
-                  print(f"[{code}] 실패", type(e).__name__)
+                  return 0, type(e).__name__
+          def rows(txt):
+              try:
+                  d = json.loads(txt).get("data")
+              except Exception:
+                  return None
+              if isinstance(d, dict) and isinstance(d.get("prices"), list):
+                  d = d["prices"]
+              return d if isinstance(d, list) else ([d] if isinstance(d, dict) else None)
+          for code in ["JKM_LNG_USD", "BRENT_CRUDE_USD", "WTI_USD", "DUBAI_CRUDE_USD", "NATURAL_GAS_USD"]:
+              st, txt = get("/v1/prices/past_week?by_code=" + code)
+              rs = rows(txt)
+              print(f"== {code} past_week HTTP {st} 건수={len(rs) if rs else 0}")
+              if not rs:
+                  print("   응답:", txt[:300]); continue
+              for x in rs[:14]:
+                  print("  ", x.get("as_of") or x.get("created_at"), x.get("price"), x.get("unit"), "stale=" + str(x.get("stale")))
+          st, txt = get("/v1/prices/latest?by_code=NATURAL_GAS_USD")
+          print("== NATURAL_GAS_USD latest HTTP", st, txt[:350])
           PY
