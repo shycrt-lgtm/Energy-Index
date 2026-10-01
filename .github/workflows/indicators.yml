@@ -2,7 +2,10 @@ name: Indicators Collect
 on:
   schedule:
     - cron: '30 21 * * *'   # 매일 06:30 KST
-    - cron: '30 2 * * *'    # 매일 11:30 KST (환율·배출권 당일값 반영)
+    - cron: '30 0 * * *'    # 매일 09:30 KST (국제유가 전일값 반영)
+    - cron: '30 2 * * *'    # 매일 11:30 KST (환율 당일값 반영)
+    - cron: '30 5 * * *'    # 매일 14:30 KST (배출권 전일 거래값 공표 후)
+    - cron: '30 8 * * *'    # 매일 17:30 KST (늦게 올라오는 값 보완)
   workflow_dispatch:
 permissions:
   contents: write
