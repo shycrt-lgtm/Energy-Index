@@ -7,11 +7,19 @@ from datetime import datetime, timedelta, timezone
 
 KST = timezone(timedelta(hours=9))
 KEYWORDS = ["SMP 전력시장", "전력도매가격", "LNG 가격", "도시가스 요금", "집단에너지", "탄소배출권",
-            "한국가스공사", "한국전력", "전기위원회", "RE100", "전력거래소", "발전사업"]
+            "한국가스공사", "한국전력", "전기위원회", "RE100", "전력거래소", "발전사업",
+            "전력수급기본계획", "ESS 에너지저장 입찰", "RPS 신재생", "태양광 PPA", "전기차 충전", "VPP 가상발전소", "용량시장"]
 PER_KEYWORD = 15      # 키워드당 가져올 최대 건수
 MAX_AGE_H = 36        # 이 시간보다 오래된 기사는 제외
 TOP_N = 10
-SIM = 0.72            # 제목 유사도 기준(이 이상이면 같은 기사로 봄)
+SIM = 0.60            # 제목 글자 유사도 기준(이 이상이면 같은 기사로 봄)
+JAC = 0.35            # 두 글자 조각 겹침 비율 기준(이 이상이면 같은 기사로 봄)
+# 시장과 관련 깊은 낱말(제목에 있으면 가산) / 시장과 무관한 행사·인사·홍보 낱말(제목에 있으면 감점)
+CORE = ["SMP", "전력시장", "전력도매", "도매가격", "계통한계", "LNG", "천연가스", "도시가스", "가스요금", "전기요금", "요금",
+        "가격", "배출권", "탄소", "REC", "열병합", "집단에너지", "한전", "한국전력", "전력거래소", "가스공사", "수급",
+        "정산", "상한제", "재생에너지", "RE100", "발전", "전력", "유가", "환율", "에너지", "송전", "전기위원회", "산업부", "기후부", "전력수급기본계획", "ESS", "RPS", "PPA", "태양광", "충전", "VPP", "가상발전소", "에너지저장", "입찰", "용량시장"]
+NOISE_HARD = ["연봉", "채용", "인사", "부고", "결혼", "장학", "봉사", "기부", "특징주", "목표주가", "주가", "수상", "표창", "시상", "동정", "인사말", "학생", "대학교", "국립대"]
+NOISE_SOFT = ["설명회", "업무협약", "MOU", "협약", "포럼", "세미나", "워크숍", "개최", "성료", "간담회", "발대식", "캠페인"]
 
 def retry(fn, n=3, wait=3):
     for i in range(n):
@@ -53,6 +61,21 @@ def norm(t):
     t = re.sub(r"[^0-9A-Za-z가-힣]", "", t)                       # 특수문자·공백 제거
     return t.lower()
 
+def grams(n):
+    return {n[i:i+2] for i in range(len(n) - 1)} or {n}
+
+def same(a, b, ga, gb):
+    if a == b:
+        return True
+    if difflib.SequenceMatcher(None, a, b).ratio() >= SIM:
+        return True
+    return len(ga & gb) / max(1, len(ga | gb)) >= JAC
+
+def score(g):
+    t = g["item"]["title"]
+    core = sum(1 for w in CORE if w.lower() in t.lower())
+    return min(core, 4) * 3 + min(g["more"], 3) - 6 * sum(1 for w in NOISE_HARD if w in t) - 2 * sum(1 for w in NOISE_SOFT if w in t), core
+
 def dedup(items):
     # 1) 링크 중복 제거
     seen, uniq = set(), []
@@ -68,13 +91,13 @@ def dedup(items):
         if not nx:
             continue
         for g in groups:
-            if nx == g["n"] or difflib.SequenceMatcher(None, nx, g["n"]).ratio() >= SIM:
+            if same(nx, g["n"], grams(nx), g["g"]):
                 g["more"] += 1
                 if x["source"] and x["source"] != g["item"]["source"]:
                     g["srcs"].add(x["source"])
                 break
         else:
-            groups.append({"n": nx, "item": x, "more": 0, "srcs": {x["source"]}})
+            groups.append({"n": nx, "g": grams(nx), "item": x, "more": 0, "srcs": {x["source"]}})
     return groups
 
 def main():
@@ -95,8 +118,9 @@ def main():
     if not allit:
         print(">> [뉴스] 수집된 기사가 없어 기존 파일을 유지합니다."); raise SystemExit(1 if ok == 0 else 0)
     groups = dedup(allit)
-    # 여러 매체가 다룬 기사(= 중요도 높음) 우선, 같으면 최신순
-    groups.sort(key=lambda g: (-g["more"], -g["item"]["pub"].timestamp()))
+    # 시장 관련도(낱말 점수) + 여러 매체가 다룬 정도로 점수를 매겨 상위만 선택, 같으면 최신순
+    groups = [g for g in groups if score(g)[1] >= 1 and score(g)[0] > 0]
+    groups.sort(key=lambda g: (-score(g)[0], -g["item"]["pub"].timestamp()))
     top = groups[:TOP_N]
     top.sort(key=lambda g: -g["item"]["pub"].timestamp())      # 화면에는 최신순
     items = [{"title": g["item"]["title"], "source": g["item"]["source"], "link": g["item"]["link"],
