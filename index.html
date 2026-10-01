@@ -26,7 +26,7 @@
   .card .mm { font-size:12px; color:#475569; margin-top:4px; line-height:1.6; }
   .hi { color:#d93f3c; font-weight:700; } .lo { color:#005587; font-weight:700; }
   .pending { color:var(--gray); font-size:14px; font-weight:700; padding:10px 0; }
-  .chart-box { position:relative; height:380px; border:1px solid var(--line); border-top:0; padding:12px; }
+  .chart-box { position:relative; height:380px; border:1px solid var(--line); padding:12px; }
   .err { margin-top:12px; background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:10px 14px; font-size:13px; font-weight:700; display:none; }
   .note { margin-top:8px; font-size:12px; color:#64748b; line-height:1.7; }
   .head { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:16px; }
@@ -40,10 +40,11 @@
   table.ind th { background:#f8fafc; color:#334155; font-weight:700; }
   table.ind td.nm { text-align:left; font-weight:700; color:#0f172a; }
   table.ind td.nm small { font-weight:500; color:var(--mute); margin-left:4px; }
+  table.ind td.grp { background:#f8fafc; font-weight:700; color:#334155; white-space:nowrap; }
   table.ind td.v { font-weight:800; font-size:16px; }
   .up { color:#d93f3c; font-weight:700; } .dn { color:#005587; font-weight:700; } .fl { color:var(--mute); }
   .foot { margin-top:36px; font-size:12px; color:#94a3b8; }
-  @media (max-width:640px){ .cards{grid-template-columns:1fr;} .card{border-right:0;border-bottom:1px solid var(--line);} h1{font-size:24px;}
+  @media (max-width:640px){ table.ind th, table.ind td { padding:8px 6px; font-size:12px; } table.ind td.v { font-size:14px; } table.ind td.nm small { display:block; margin:0; } .cards{grid-template-columns:1fr;} .card{border-right:0;border-bottom:1px solid var(--line);} h1{font-size:24px;}
     .menu{width:100%;} a.item{flex:1;min-width:0;padding:12px 24px 12px 12px;font-size:15px;line-height:1.35;text-align:center;} a.item i{right:8px;font-size:20px;} a.item em{display:block;} }
 </style>
 </head>
@@ -62,18 +63,20 @@
     </div>
   </div>
 
-  <h2>시간대별 SMP<small>육지 기준, 원/kWh</small></h2>
-  <div class="cards" id="cards"></div>
-  <div class="chart-box"><canvas id="chart"></canvas></div>
-  <div id="err" class="err"></div>
-  <div class="note">오늘 SMP는 전일 하루전시장 결과로 발표된 값입니다. 가중평균은 시간대별 수요예측(MW) 가중 기준입니다. 자료 갱신: <span id="updated">-</span></div>
-
   <h2>주요 시장지표<small>전일 종가 기준</small></h2>
   <table class="ind">
-    <thead><tr><th style="text-align:left">구분</th><th>종가</th><th>전일 대비</th><th>기준일</th></tr></thead>
-    <tbody id="indBody"><tr><td colspan="4" class="fl">불러오는 중...</td></tr></tbody>
+    <thead><tr><th>분류</th><th style="text-align:left">지표</th><th>종가</th><th>전일 대비</th><th>기준일</th></tr></thead>
+    <tbody id="indBody"><tr><td colspan="5" class="fl">불러오는 중...</td></tr></tbody>
   </table>
-  <div class="note">JKM은 OilPriceAPI의 영업일별 값, 국제유가(두바이·브렌트·WTI)는 한국석유공사 오피넷 일별 값입니다. 지표별로 기준일이 다를 수 있으며 휴장일에는 직전 영업일 값을 표시합니다. 자료 갱신: <span id="indUpdated">-</span></div>
+  <div class="note">JKM은 OilPriceAPI의 영업일별 값, 국제유가(두바이·브렌트·WTI)는 한국석유공사 오피넷 일별 값입니다. 환율·배출권·REC는 준비 중입니다. 지표별로 기준일이 다를 수 있으며 휴장일에는 직전 영업일 값을 표시합니다. 자료 갱신: <span id="indUpdated">-</span></div>
+
+  <h2>시간대별 SMP<small>육지 기준, 원/kWh</small></h2>
+  <div class="chart-box"><canvas id="chart"></canvas></div>
+  <div id="err" class="err"></div>
+  <div class="note">오늘 SMP는 전일 하루전시장 결과로 발표된 값입니다. 자료 갱신: <span id="updated">-</span></div>
+
+  <h2>에너지시장 뉴스</h2>
+  <div class="note" style="margin-top:0"><span class="fl">준비 중입니다. (주요 헤드라인 8~10건과 링크를 표시할 예정)</span></div>
 
   <div class="foot">출처: 한국전력거래소, 한국가스공사, 공공데이터포털</div>
 </div>
@@ -117,14 +120,6 @@
     }
     document.getElementById('updated').textContent = store.updated ? store.updated + ' (KST)' : '-';
 
-    document.getElementById('cards').innerHTML = KEYS.map((k, i) => {
-      const day = store.days[k], head = `<div class="d">${NAMES[i]} · ${fmtShort(k)}</div>`;
-      if (!day) return `<div class="card">${head}<div class="pending">자료 없음</div></div>`;
-      const s = stats(day);
-      return `<div class="card">${head}<div class="avg">${f2(s.wavg)}<span>원/kWh 가중평균</span></div>
-        <div class="mm"><span class="hi">최고 ${f2(s.mx)}원 (${s.mxH}시)</span> · <span class="lo">최저 ${f2(s.mn)}원 (${s.mnH}시)</span></div></div>`;
-    }).join('');
-
     const labels = Array.from({ length: 24 }, (_, i) => (i + 1) + '시');
     const datasets = KEYS.map((k, i) => store.days[k] ? ({
       label: `${NAMES[i]} ${fmtShort(k)}`, data: store.days[k].smp,
@@ -146,22 +141,33 @@
   }
   init();
 
-  const IND_ORDER = [['jkm','JKM LNG','USD/MMBtu'], ['dubai','두바이유','$/bbl'], ['brent','브렌트유','$/bbl'], ['wti','WTI','$/bbl']];
+  // [분류, 키, 지표명, 단위, 준비중 여부]
+  const IND_ORDER = [
+    ['환율', 'fx', '원/달러 환율', '원', true],
+    ['국제유가', 'dubai', '두바이유', '$/bbl'], ['국제유가', 'brent', '브렌트유', '$/bbl'], ['국제유가', 'wti', 'WTI', '$/bbl'],
+    ['LNG', 'jkm', 'JKM', 'USD/MMBtu'],
+    ['탄소·REC', 'kau', '배출권(KAU)', '원/톤', true], ['탄소·REC', 'rec', 'REC(육지)', '원/REC', true]
+  ];
   async function initInd() {
     let st = null;
     try { st = await (await fetch('indicators.json?' + Date.now())).json(); } catch (e) {}
     const items = (st && st.items) || {};
     document.getElementById('indUpdated').textContent = st && st.updated ? st.updated + ' (KST)' : '-';
-    document.getElementById('indBody').innerHTML = IND_ORDER.map(([k, nm, unit]) => {
+    const span = {}; IND_ORDER.forEach(r => span[r[0]] = (span[r[0]] || 0) + 1);
+    const seen = {};
+    document.getElementById('indBody').innerHTML = IND_ORDER.map(([grp, k, nm, unit, pending]) => {
+      const first = !seen[grp]; seen[grp] = true;
+      const g = first ? `<td class="grp" rowspan="${span[grp]}">${grp}</td>` : '';
+      const head = `${g}<td class="nm">${nm}<small>${unit}</small></td>`;
       const it = items[k];
-      if (!it) return `<tr><td class="nm">${nm}<small>${unit}</small></td><td colspan="3" class="fl">자료 없음</td></tr>`;
+      if (!it) return `<tr>${head}<td colspan="3" class="fl">${pending ? '준비 중' : '자료 없음'}</td></tr>`;
       let chg = '<span class="fl">-</span>';
       if (it.prev_value != null) {
         const d = it.value - it.prev_value, p = d / it.prev_value * 100, c = d > 0 ? 'up' : d < 0 ? 'dn' : 'fl', ar = d > 0 ? '▲' : d < 0 ? '▼' : '-';
         chg = `<span class="${c}">${ar} ${Math.abs(d).toFixed(2)} (${p >= 0 ? '+' : ''}${p.toFixed(1)}%)</span>`;
       }
       const dd = it.date ? it.date.replace(/-/g, '') : '';
-      return `<tr><td class="nm">${nm}<small>${unit}</small></td><td class="v">${f2(it.value)}</td><td>${chg}</td><td>${dd ? fmtShort(dd) : '-'}</td></tr>`;
+      return `<tr>${head}<td class="v">${f2(it.value)}</td><td>${chg}</td><td>${dd ? fmtShort(dd) : '-'}</td></tr>`;
     }).join('');
   }
   initInd();
