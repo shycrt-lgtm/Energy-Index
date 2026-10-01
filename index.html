@@ -34,6 +34,11 @@
   a.item i { position:absolute; right:14px; top:50%; transform:translateY(-52%); font-style:normal; font-size:24px; font-weight:400; opacity:.7; }
   a.item:hover { background:#003366; transform:translateY(-2px); }
   a.item b { font-weight:800; } a.item em { font-style:normal; }
+  ol.news { list-style:none; margin:0; padding:0; border-top:1px solid var(--line); }
+  ol.news li { padding:10px 4px; border-bottom:1px solid var(--line); font-size:14px; line-height:1.45; }
+  ol.news a { color:#0f172a; font-weight:600; text-decoration:none; }
+  ol.news a:hover { text-decoration:underline; color:#001f3f; }
+  ol.news .meta { display:block; margin-top:2px; font-size:12px; color:var(--mute); }
   table.ind { width:100%; border-collapse:collapse; table-layout:fixed; }
   table.ind th { width:20%; }
   table.ind th, table.ind td { border:1px solid var(--line); padding:10px 12px; font-size:14px; text-align:center; }
@@ -70,8 +75,9 @@
   </table>
   <div class="note">JKM은 OilPriceAPI의 영업일별 값, 국제유가(두바이·브렌트·WTI)는 한국석유공사 오피넷 일별 값입니다. 배출권은 한국거래소 시세(금융위원회), REC는 한국전력거래소 현물시장 육지 평균가이며 REC는 거래일에만 값이 있어 기준일이 며칠 전일 수 있습니다. 환율은 한국수출입은행 매매기준율(영업일 기준, 조회 불가 시 ECB 기준환율로 대체하며 지표명 옆에 출처 표기)입니다. SMP는 육지 기준이며 전일 하루전시장에서 확정된 오늘 값(가중평균은 수요예측 가중, 최고·최저는 해당 시각 표시)이고 전일 대비는 어제 SMP와의 차이입니다. 지표별로 기준일이 다를 수 있으며 휴장일에는 직전 영업일 값을 표시합니다. 자료 갱신: <span id="indUpdated">-</span></div>
 
-  <h2>에너지시장 뉴스</h2>
-  <div class="note" style="margin-top:0"><span class="fl">준비 중입니다. (주요 헤드라인 8~10건과 링크를 표시할 예정)</span></div>
+  <h2>에너지시장 뉴스<small id="newsUpd"></small></h2>
+  <ol class="news" id="newsList"><li class="fl">불러오는 중...</li></ol>
+  <div class="note">구글 뉴스에서 에너지 관련 키워드로 모은 최근 기사이며, 같은 내용의 기사는 하나로 합쳐 보여줍니다. 제목을 누르면 원문으로 이동합니다.</div>
 
   <div class="foot">출처: 한국전력거래소, 한국가스공사, 공공데이터포털</div>
 </div>
@@ -133,6 +139,20 @@
     }).join('');
   }
   initInd();
+  async function initNews() {
+    const ul = document.getElementById('newsList');
+    let nj = null;
+    try { nj = await (await fetch('news.json?' + Date.now())).json(); } catch (e) {}
+    if (!nj || !nj.items || !nj.items.length) { ul.innerHTML = '<li class="fl">뉴스를 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.</li>'; return; }
+    const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    document.getElementById('newsUpd').textContent = nj.updated ? '갱신 ' + nj.updated : '';
+    ul.innerHTML = nj.items.map(x => {
+      const t = x.pub ? x.pub.slice(5, 7).replace(/^0/, '') + '.' + x.pub.slice(8, 10).replace(/^0/, '') + ' ' + x.pub.slice(11, 16) : '';
+      const more = x.more > 0 ? ` · 유사 기사 ${x.more}건 포함` : '';
+      return `<li><a href="${esc(x.link)}" target="_blank" rel="noopener noreferrer">${esc(x.title)}</a><span class="meta">${esc(x.source || '')}${t ? ' · ' + t : ''}${more}</span></li>`;
+    }).join('');
+  }
+  initNews();
 </script>
 </body>
 </html>
