@@ -3,47 +3,134 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>에너지사업총괄 모니터링</title>
+<title>에너지 시장 주요지표</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
-  :root { --navy:#001f3f; --line:#e5e7eb; --mute:#64748b; }
+  :root { --navy:#001f3f; --line:#e5e7eb; --mute:#64748b; --gray:#94a3b8; }
   * { box-sizing:border-box; }
   body { margin:0; font-family:'Noto Sans KR','Malgun Gothic',sans-serif; color:#1a1a1a; background:#fff; }
-  .wrap { max-width:900px; margin:0 auto; padding:32px 16px 48px; }
-  .top { border-top:4px solid var(--navy); padding-top:16px; margin-bottom:28px; }
-  h1 { margin:0; font-size:30px; font-weight:900; color:#0f172a; }
+  .wrap { max-width:1000px; margin:0 auto; padding:28px 16px 48px; }
+  .top { border-top:4px solid var(--navy); padding-top:14px; }
+  h1 { margin:0; font-size:30px; font-weight:900; color:#0f172a; letter-spacing:-0.02em; }
   .sub { margin-top:6px; font-size:14px; color:var(--mute); }
-  .menu { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
-  a.item { display:block; padding:24px 22px; border:1px solid var(--line); border-top:3px solid var(--navy); text-decoration:none; color:inherit; background:#fff; transition:box-shadow .15s, transform .15s; }
-  a.item:hover { box-shadow:0 8px 20px -8px rgba(0,31,63,.35); transform:translateY(-2px); }
-  .ico { font-size:30px; }
-  .tt { margin-top:10px; font-size:19px; font-weight:800; color:var(--navy); }
-  .ds { margin-top:6px; font-size:13px; line-height:1.6; color:var(--mute); }
-  .tag { display:inline-block; margin-top:12px; padding:2px 8px; font-size:11px; font-weight:700; border:1px solid #cbd5e1; color:#475569; }
-  .foot { margin-top:40px; font-size:12px; color:#94a3b8; }
-  @media (max-width:640px){ .menu{grid-template-columns:1fr;} h1{font-size:24px;} }
+  .sub b { color:#1e293b; }
+  h2 { font-size:18px; font-weight:700; color:var(--navy); margin:30px 0 10px; padding-bottom:8px; border-bottom:2px solid var(--line); }
+  h2 small { font-size:12px; font-weight:500; color:var(--mute); margin-left:8px; }
+  .cards { display:grid; grid-template-columns:repeat(2,1fr); border:1px solid var(--line); }
+  .card { padding:12px 16px; border-right:1px solid var(--line); }
+  .card:last-child { border-right:0; background:#f8fafc; }
+  .card .d { font-size:12px; font-weight:700; color:var(--mute); }
+  .card .avg { font-size:24px; font-weight:900; color:#0f172a; margin-top:2px; }
+  .card .avg span { font-size:12px; font-weight:500; color:var(--mute); margin-left:3px; }
+  .card .mm { font-size:12px; color:#475569; margin-top:4px; line-height:1.6; }
+  .hi { color:#d93f3c; font-weight:700; } .lo { color:#005587; font-weight:700; }
+  .pending { color:var(--gray); font-size:14px; font-weight:700; padding:10px 0; }
+  .chart-box { position:relative; height:380px; border:1px solid var(--line); border-top:0; padding:12px; }
+  .err { margin-top:12px; background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:10px 14px; font-size:13px; font-weight:700; display:none; }
+  .note { margin-top:8px; font-size:12px; color:#64748b; line-height:1.7; }
+  .head { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:16px; }
+  .menu { display:flex; gap:10px; }
+  a.item { position:relative; display:flex; align-items:center; justify-content:center; min-width:190px; padding:18px 36px 18px 24px; background:var(--navy); color:#fff; font-size:17px; font-weight:800; text-decoration:none; letter-spacing:-0.01em; box-shadow:0 2px 6px rgba(0,31,63,.25); transition:background .15s, transform .15s; }
+  a.item i { position:absolute; right:14px; top:50%; transform:translateY(-52%); font-style:normal; font-size:24px; font-weight:400; opacity:.7; }
+  a.item:hover { background:#003366; transform:translateY(-2px); }
+  a.item b { font-weight:800; } a.item em { font-style:normal; }
+  .foot { margin-top:36px; font-size:12px; color:#94a3b8; }
+  @media (max-width:640px){ .cards{grid-template-columns:1fr;} .card{border-right:0;border-bottom:1px solid var(--line);} h1{font-size:24px;}
+    .menu{width:100%;} a.item{flex:1;min-width:0;padding:12px 24px 12px 12px;font-size:15px;line-height:1.35;text-align:center;} a.item i{right:8px;font-size:20px;} a.item em{display:block;} }
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="top">
-    <h1>에너지사업총괄 모니터링</h1>
-    <div class="sub">집단에너지·LNG발전 | 메뉴를 선택하세요</div>
+    <div class="head">
+      <div>
+        <h1>에너지 시장 주요지표</h1>
+        <div class="sub">기준일: <b id="baseDate">-</b> | <b>에너지사업총괄</b></div>
+      </div>
+      <div class="menu">
+        <a class="item" href="https://shycrt-lgtm.github.io/KPX-Daily-Report/"><b>전력시장 <em>전일실적</em></b><i>›</i></a>
+        <a class="item" href="https://shycrt-lgtm.github.io/tms-monitor/"><b>발전상황 <em>모니터링</em></b><i>›</i></a>
+      </div>
+    </div>
   </div>
-  <div class="menu">
-    <a class="item" href="https://shycrt-lgtm.github.io/KPX-Daily-Report/">
-      <div class="ico">📊</div>
-      <div class="tt">전력시장 전일실적</div>
-      <div class="ds">전일 SMP, 발전원별 발전량, 최대부하·예비율, LNG 가격 요약 (매일 아침 자동 갱신)</div>
-      <span class="tag">매일 08:30 갱신</span>
-    </a>
-    <a class="item" href="https://shycrt-lgtm.github.io/tms-monitor/">
-      <div class="ico">🏭</div>
-      <div class="tt">주요 발전소 발전상황 모니터링</div>
-      <div class="ds">굴뚝(TMS) 자료로 본 발전소별 전일 운전시간과 현재 가동 여부</div>
-      <span class="tag">30분 단위 수집</span>
-    </a>
-  </div>
+
+  <h2>시간대별 SMP<small>육지 기준, 원/kWh</small></h2>
+  <div class="cards" id="cards"></div>
+  <div class="chart-box"><canvas id="chart"></canvas></div>
+  <div id="err" class="err"></div>
+  <div class="note">오늘 SMP는 전일 하루전시장 결과로 발표된 값입니다. 가중평균은 시간대별 수요예측(MW) 가중 기준입니다. 자료 갱신: <span id="updated">-</span></div>
+
   <div class="foot">출처: 한국전력거래소, 한국가스공사, 공공데이터포털</div>
 </div>
+
+<script>
+  const DATA_URL = 'https://shycrt-lgtm.github.io/KPX-Daily-Report/smp_live.json';
+  const kst = new Date(Date.now() + 9 * 3600 * 1000);
+  const ymd = off => new Date(Date.UTC(kst.getUTCFullYear(), kst.getUTCMonth(), kst.getUTCDate() + off)).toISOString().slice(0,10).replace(/-/g, '');
+  const KEYS = [ymd(-1), ymd(0)], NAMES = ['하루전', '오늘'];
+  const nowHour = kst.getUTCHours();
+  const dow = k => '일월화수목금토'[new Date(Date.UTC(+k.slice(0,4), +k.slice(4,6)-1, +k.slice(6,8))).getUTCDay()];
+  const fmtLong = k => `${k.slice(0,4)}년 ${k.slice(4,6)}월 ${k.slice(6,8)}일(${dow(k)})`;
+  const fmtShort = k => `${+k.slice(4,6)}.${+k.slice(6,8)}(${dow(k)})`;
+  const f2 = v => Number(v).toFixed(2);
+  document.getElementById('baseDate').textContent = fmtLong(KEYS[1]);
+
+  function stats(day) {
+    const s = day.smp, w = day.mlfd;
+    const wavg = (w && w.length === s.length) ? s.reduce((a, v, i) => a + v * w[i], 0) / w.reduce((a, v) => a + v, 0) : s.reduce((a, v) => a + v, 0) / s.length;
+    const mx = Math.max(...s), mn = Math.min(...s);
+    return { wavg, mx, mn, mxH: s.indexOf(mx) + 1, mnH: s.indexOf(mn) + 1 };
+  }
+  const nowLine = {
+    id: 'nowLine',
+    afterDraw(chart) {
+      if (!chart.$showNow) return;
+      const x = chart.scales.x.getPixelForValue(nowHour), { top, bottom } = chart.chartArea, c = chart.ctx;
+      c.save(); c.beginPath(); c.setLineDash([4, 4]); c.strokeStyle = 'rgba(217,63,60,0.7)'; c.lineWidth = 1;
+      c.moveTo(x, top); c.lineTo(x, bottom); c.stroke(); c.setLineDash([]);
+      c.fillStyle = '#d93f3c'; c.font = 'bold 11px sans-serif'; c.textAlign = 'center'; c.fillText('현재', x, top - 4); c.restore();
+    }
+  };
+
+  async function init() {
+    let store = null;
+    try { store = await (await fetch(DATA_URL + '?' + Date.now())).json(); } catch (e) {}
+    if (!store || !store.days) {
+      const el = document.getElementById('err');
+      el.style.display = 'block'; el.textContent = 'SMP 자료를 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.';
+      store = { days: {} };
+    }
+    document.getElementById('updated').textContent = store.updated ? store.updated + ' (KST)' : '-';
+
+    document.getElementById('cards').innerHTML = KEYS.map((k, i) => {
+      const day = store.days[k], head = `<div class="d">${NAMES[i]} · ${fmtShort(k)}</div>`;
+      if (!day) return `<div class="card">${head}<div class="pending">자료 없음</div></div>`;
+      const s = stats(day);
+      return `<div class="card">${head}<div class="avg">${f2(s.wavg)}<span>원/kWh 가중평균</span></div>
+        <div class="mm"><span class="hi">최고 ${f2(s.mx)}원 (${s.mxH}시)</span> · <span class="lo">최저 ${f2(s.mn)}원 (${s.mnH}시)</span></div></div>`;
+    }).join('');
+
+    const labels = Array.from({ length: 24 }, (_, i) => (i + 1) + '시');
+    const datasets = KEYS.map((k, i) => store.days[k] ? ({
+      label: `${NAMES[i]} ${fmtShort(k)}`, data: store.days[k].smp,
+      borderColor: i === 1 ? '#001f3f' : '#94a3b8', backgroundColor: i === 1 ? '#001f3f' : '#94a3b8',
+      borderWidth: i === 1 ? 3.5 : 2, borderDash: i === 1 ? [] : [6, 4], pointRadius: i === 1 ? 3 : 0, tension: 0.1
+    }) : null).filter(Boolean);
+    const chart = new Chart(document.getElementById('chart'), {
+      type: 'line', data: { labels, datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false, layout: { padding: { top: 20 } },
+        interaction: { mode: 'index', intersect: false },
+        plugins: { legend: { labels: { usePointStyle: true } }, tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${f2(c.raw)}원/kWh` } } },
+        scales: { x: { grid: { display: false } }, y: { title: { display: true, text: '원/kWh' }, grace: '10%' } }
+      },
+      plugins: [nowLine]
+    });
+    chart.$showNow = !!store.days[KEYS[1]];
+    chart.update('none');
+  }
+  init();
+</script>
 </body>
 </html>
