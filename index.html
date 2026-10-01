@@ -34,7 +34,8 @@
   a.item i { position:absolute; right:14px; top:50%; transform:translateY(-52%); font-style:normal; font-size:24px; font-weight:400; opacity:.7; }
   a.item:hover { background:#003366; transform:translateY(-2px); }
   a.item b { font-weight:800; } a.item em { font-style:normal; }
-  table.ind { width:100%; border-collapse:collapse; }
+  table.ind { width:100%; border-collapse:collapse; table-layout:fixed; }
+  table.ind th { width:20%; }
   table.ind th, table.ind td { border:1px solid var(--line); padding:10px 12px; font-size:14px; text-align:center; }
   table.ind th { background:#f8fafc; color:#334155; font-weight:700; }
   table.ind td.nm { text-align:left; font-weight:700; color:#0f172a; }
@@ -62,9 +63,9 @@
     </div>
   </div>
 
-  <h2>주요 시장지표<small>전일 종가 기준 (SMP는 당일 적용)</small></h2>
+  <h2>주요 시장지표<small>전일 기준 (SMP는 당일 적용)</small></h2>
   <table class="ind">
-    <thead><tr><th>분류</th><th style="text-align:left">지표</th><th>종가</th><th>전일 대비</th><th>기준일</th></tr></thead>
+    <thead><tr><th>분류</th><th style="text-align:left">지표</th><th>가격</th><th>기준일</th><th>전일 대비</th></tr></thead>
     <tbody id="indBody"><tr><td colspan="5" class="fl">불러오는 중...</td></tr></tbody>
   </table>
   <div class="note">JKM은 OilPriceAPI의 영업일별 값, 국제유가(두바이·브렌트·WTI)는 한국석유공사 오피넷 일별 값입니다. 배출권은 한국거래소 시세(금융위원회), REC는 한국전력거래소 현물시장 육지 평균가이며 REC는 거래일에만 값이 있어 기준일이 며칠 전일 수 있습니다. 환율은 한국수출입은행 매매기준율(영업일 기준, 조회 불가 시 ECB 기준환율로 대체하며 지표명 옆에 출처 표기)입니다. SMP는 육지 기준이며 전일 하루전시장에서 확정된 오늘 값(가중평균은 수요예측 가중, 최고·최저는 해당 시각 표시)이고 전일 대비는 어제 SMP와의 차이입니다. 지표별로 기준일이 다를 수 있으며 휴장일에는 직전 영업일 값을 표시합니다. 자료 갱신: <span id="indUpdated">-</span></div>
@@ -120,7 +121,7 @@
       const first = !seen[grp]; seen[grp] = true;
       const g = first ? `<td class="grp" rowspan="${span[grp]}">${grp}</td>` : '';
       const it = items[k];
-      const head = `${g}<td class="nm">${nm}<small>${unit}${it && it.item ? ' · ' + it.item : ''}${it && it.hr ? ' · ' + it.hr + '시' : ''}</small></td>`;
+      const head = `${g}<td class="nm">${nm}<small>${[unit === '원' ? '' : unit, it && it.item ? it.item : '', it && it.hr ? it.hr + '시' : ''].filter(Boolean).join(' · ')}</small></td>`;
       if (!it) return `<tr>${head}<td colspan="3" class="fl">${pending ? '준비 중' : '자료 없음'}</td></tr>`;
       let chg = '<span class="fl">-</span>';
       if (it.prev_value != null) {
@@ -128,7 +129,7 @@
         chg = `<span class="${c}">${ar} ${fmtI(Math.abs(d), unit)} (${p >= 0 ? '+' : ''}${p.toFixed(1)}%)</span>`;
       }
       const dd = it.date ? it.date.replace(/-/g, '') : '';
-      return `<tr>${head}<td class="v">${fmtI(it.value, unit)}</td><td>${chg}</td><td>${dd ? fmtShort(dd) : '-'}</td></tr>`;
+      return `<tr>${head}<td class="v">${fmtI(it.value, unit)}</td><td>${dd ? fmtShort(dd) : '-'}</td><td>${chg}</td></tr>`;
     }).join('');
   }
   initInd();
