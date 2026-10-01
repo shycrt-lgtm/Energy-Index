@@ -1,0 +1,27 @@
+name: Oilprice Test
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: JKM 등 조회 시험
+        env:
+          OILPRICE_API_KEY: ${{ secrets.OILPRICE_API_KEY }}
+        run: |
+          python3 - <<'PY'
+          import os, json, urllib.request, urllib.error
+          key = os.environ.get("OILPRICE_API_KEY", "")
+          print("키 등록 여부:", "있음" if key else "없음(Secret 이름을 확인하세요)")
+          for code in ["JKM_LNG_USD", "HENRY_HUB_NATURAL_GAS_USD", "BRENT_CRUDE_USD", "WTI_USD", "DUBAI_CRUDE_USD"]:
+              req = urllib.request.Request(
+                  "https://api.oilpriceapi.com/v1/prices/latest?by_code=" + code,
+                  headers={"Authorization": "Token " + key, "User-Agent": "Mozilla/5.0"})
+              try:
+                  r = urllib.request.urlopen(req, timeout=30)
+                  print(f"[{code}] HTTP {r.status}", r.read().decode()[:400])
+              except urllib.error.HTTPError as e:
+                  print(f"[{code}] HTTP {e.code}", e.read().decode()[:300])
+              except Exception as e:
+                  print(f"[{code}] 실패", type(e).__name__)
+          PY
