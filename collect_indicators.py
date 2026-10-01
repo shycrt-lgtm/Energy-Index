@@ -311,6 +311,12 @@ def main():
     json.dump({"updated": datetime.now(KST).strftime("%Y-%m-%d %H:%M"), "items": items},
               open(OUT, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     print(">> indicators.json 저장 완료")
+    # 날짜별 보관본(history/): 화면에서 과거 일자를 고르면 이 파일을 읽는다. 같은 날 여러 번 실행되면 마지막 값으로 덮어쓴다.
+    os.makedirs("history", exist_ok=True)
+    day = datetime.now(KST).strftime("%Y%m%d")
+    with open(f"history/ind_{day}.json", "w", encoding="utf-8") as f:
+        json.dump({"updated": datetime.now(KST).strftime("%Y-%m-%d %H:%M"), "items": items}, f, ensure_ascii=False, indent=1)
+    print(f">> history/ind_{day}.json 보관 완료")
 
 
 if __name__ == "__main__":

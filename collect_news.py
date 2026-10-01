@@ -135,6 +135,12 @@ def main():
               "pub": g["item"]["pub"].strftime("%Y-%m-%d %H:%M"), "more": g["more"]} for g in top]
     json.dump({"updated": now.strftime("%Y-%m-%d %H:%M"), "items": items},
               open("news.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    import os
+    os.makedirs("history", exist_ok=True)                      # 날짜별 보관본 (같은 날 마지막 실행이 남음)
+    day = now.strftime("%Y%m%d")
+    json.dump({"updated": now.strftime("%Y-%m-%d %H:%M"), "items": items},
+              open(f"history/news_{day}.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+    print(f">> [뉴스] history/news_{day}.json 보관")
     print(f">> [뉴스] 수집 {len(allit)}건 -> 중복 제거 후 {len(groups)}건 -> 상위 {len(items)}건 저장")
     for i, x in enumerate(items, 1):
         print(f"   {i}. [{x['source']}] {x['title']} (같은 내용 +{x['more']})")
