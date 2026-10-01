@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>에너지 시장 주요지표</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root { --navy:#001f3f; --line:#e5e7eb; --mute:#64748b; --gray:#94a3b8; }
@@ -26,7 +25,7 @@
   .card .mm { font-size:12px; color:#475569; margin-top:4px; line-height:1.6; }
   .hi { color:#d93f3c; font-weight:700; } .lo { color:#005587; font-weight:700; }
   .pending { color:var(--gray); font-size:14px; font-weight:700; padding:10px 0; }
-  .chart-box { position:relative; height:380px; border:1px solid var(--line); padding:12px; }
+  .chart-box-unused { position:relative; height:380px; border:1px solid var(--line); padding:12px; }
   .err { margin-top:12px; background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:10px 14px; font-size:13px; font-weight:700; display:none; }
   .note { margin-top:8px; font-size:12px; color:#64748b; line-height:1.7; }
   .head { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:16px; }
@@ -63,17 +62,12 @@
     </div>
   </div>
 
-  <h2>주요 시장지표<small>전일 종가 기준</small></h2>
+  <h2>주요 시장지표<small>전일 종가 기준 (SMP는 당일 적용)</small></h2>
   <table class="ind">
     <thead><tr><th>분류</th><th style="text-align:left">지표</th><th>종가</th><th>전일 대비</th><th>기준일</th></tr></thead>
     <tbody id="indBody"><tr><td colspan="5" class="fl">불러오는 중...</td></tr></tbody>
   </table>
-  <div class="note">JKM은 OilPriceAPI의 영업일별 값, 국제유가(두바이·브렌트·WTI)는 한국석유공사 오피넷 일별 값입니다. 배출권은 한국거래소 시세(금융위원회), REC는 한국전력거래소 현물시장 육지 평균가이며 REC는 거래일에만 값이 있어 기준일이 며칠 전일 수 있습니다. 환율은 한국수출입은행 매매기준율(영업일 기준, 조회 불가 시 ECB 기준환율로 대체하며 지표명 옆에 출처 표기)입니다. 지표별로 기준일이 다를 수 있으며 휴장일에는 직전 영업일 값을 표시합니다. 자료 갱신: <span id="indUpdated">-</span></div>
-
-  <h2>시간대별 SMP<small>육지 기준, 원/kWh</small></h2>
-  <div class="chart-box"><canvas id="chart"></canvas></div>
-  <div id="err" class="err"></div>
-  <div class="note">오늘 SMP는 전일 하루전시장 결과로 발표된 값입니다. 자료 갱신: <span id="updated">-</span></div>
+  <div class="note">JKM은 OilPriceAPI의 영업일별 값, 국제유가(두바이·브렌트·WTI)는 한국석유공사 오피넷 일별 값입니다. 배출권은 한국거래소 시세(금융위원회), REC는 한국전력거래소 현물시장 육지 평균가이며 REC는 거래일에만 값이 있어 기준일이 며칠 전일 수 있습니다. 환율은 한국수출입은행 매매기준율(영업일 기준, 조회 불가 시 ECB 기준환율로 대체하며 지표명 옆에 출처 표기)입니다. SMP는 육지 기준이며 전일 하루전시장에서 확정된 오늘 값(가중평균은 수요예측 가중, 최고·최저는 해당 시각 표시)이고 전일 대비는 어제 SMP와의 차이입니다. 지표별로 기준일이 다를 수 있으며 휴장일에는 직전 영업일 값을 표시합니다. 자료 갱신: <span id="indUpdated">-</span></div>
 
   <h2>에너지시장 뉴스</h2>
   <div class="note" style="margin-top:0"><span class="fl">준비 중입니다. (주요 헤드라인 8~10건과 링크를 표시할 예정)</span></div>
@@ -82,14 +76,14 @@
 </div>
 
 <script>
-  const DATA_URL = 'https://shycrt-lgtm.github.io/KPX-Daily-Report/smp_live.json';
+  const SMP_URL = 'https://shycrt-lgtm.github.io/KPX-Daily-Report/smp_live.json';
   const kst = new Date(Date.now() + 9 * 3600 * 1000);
   const ymd = off => new Date(Date.UTC(kst.getUTCFullYear(), kst.getUTCMonth(), kst.getUTCDate() + off)).toISOString().slice(0,10).replace(/-/g, '');
-  const KEYS = [ymd(-1), ymd(0)], NAMES = ['하루전', '오늘'];
-  const nowHour = kst.getUTCHours();
+  const KEYS = [ymd(-1), ymd(0)];
   const dow = k => '일월화수목금토'[new Date(Date.UTC(+k.slice(0,4), +k.slice(4,6)-1, +k.slice(6,8))).getUTCDay()];
   const fmtLong = k => `${k.slice(0,4)}년 ${k.slice(4,6)}월 ${k.slice(6,8)}일(${dow(k)})`;
   const fmtShort = k => `${+k.slice(4,6)}.${+k.slice(6,8)}(${dow(k)})`;
+  const ymdDash = k => `${k.slice(0,4)}-${k.slice(4,6)}-${k.slice(6,8)}`;
   const f2 = v => Number(v).toFixed(2);
   document.getElementById('baseDate').textContent = fmtLong(KEYS[1]);
 
@@ -99,60 +93,26 @@
     const mx = Math.max(...s), mn = Math.min(...s);
     return { wavg, mx, mn, mxH: s.indexOf(mx) + 1, mnH: s.indexOf(mn) + 1 };
   }
-  const nowLine = {
-    id: 'nowLine',
-    afterDraw(chart) {
-      if (!chart.$showNow) return;
-      const x = chart.scales.x.getPixelForValue(nowHour), { top, bottom } = chart.chartArea, c = chart.ctx;
-      c.save(); c.beginPath(); c.setLineDash([4, 4]); c.strokeStyle = 'rgba(217,63,60,0.7)'; c.lineWidth = 1;
-      c.moveTo(x, top); c.lineTo(x, bottom); c.stroke(); c.setLineDash([]);
-      c.fillStyle = '#d93f3c'; c.font = 'bold 11px sans-serif'; c.textAlign = 'center'; c.fillText('현재', x, top - 4); c.restore();
-    }
-  };
-
-  async function init() {
-    let store = null;
-    try { store = await (await fetch(DATA_URL + '?' + Date.now())).json(); } catch (e) {}
-    if (!store || !store.days) {
-      const el = document.getElementById('err');
-      el.style.display = 'block'; el.textContent = 'SMP 자료를 불러오지 못했습니다. 잠시 후 다시 확인해 주세요.';
-      store = { days: {} };
-    }
-    document.getElementById('updated').textContent = store.updated ? store.updated + ' (KST)' : '-';
-
-    const labels = Array.from({ length: 24 }, (_, i) => (i + 1) + '시');
-    const datasets = KEYS.map((k, i) => store.days[k] ? ({
-      label: `${NAMES[i]} ${fmtShort(k)}`, data: store.days[k].smp,
-      borderColor: i === 1 ? '#001f3f' : '#94a3b8', backgroundColor: i === 1 ? '#001f3f' : '#94a3b8',
-      borderWidth: i === 1 ? 3.5 : 2, borderDash: i === 1 ? [] : [6, 4], pointRadius: i === 1 ? 3 : 0, tension: 0.1
-    }) : null).filter(Boolean);
-    const chart = new Chart(document.getElementById('chart'), {
-      type: 'line', data: { labels, datasets },
-      options: {
-        responsive: true, maintainAspectRatio: false, layout: { padding: { top: 20 } },
-        interaction: { mode: 'index', intersect: false },
-        plugins: { legend: { labels: { usePointStyle: true } }, tooltip: { callbacks: { label: c => ` ${c.dataset.label}: ${f2(c.raw)}원/kWh` } } },
-        scales: { x: { grid: { display: false } }, y: { title: { display: true, text: '원/kWh' }, grace: '10%' } }
-      },
-      plugins: [nowLine]
-    });
-    chart.$showNow = !!store.days[KEYS[1]];
-    chart.update('none');
-  }
-  init();
-
   // [분류, 키, 지표명, 단위, 준비중 여부]
   const IND_ORDER = [
     ['환율', 'fx', '원/달러', '원'], ['환율', 'fx_jpy', '원/100엔', '원'],
     ['국제유가', 'dubai', '두바이유', '$/bbl'], ['국제유가', 'brent', '브렌트유', '$/bbl'], ['국제유가', 'wti', 'WTI', '$/bbl'],
     ['LNG', 'jkm', 'JKM', 'USD/MMBtu'],
-    ['탄소·REC', 'kau', '배출권(KAU)', '원/톤'], ['탄소·REC', 'rec', 'REC(육지)', '원/REC']
+    ['탄소·REC', 'kau', '배출권(KAU)', '원/톤'], ['탄소·REC', 'rec', 'REC(육지)', '원/REC'],
+    ['SMP', 'smp_avg', '가중평균', '원/kWh'], ['SMP', 'smp_max', '최고', '원/kWh'], ['SMP', 'smp_min', '최저', '원/kWh']
   ];
   const fmtI = (v, unit) => ['원/톤', '원/REC'].includes(unit) ? Math.round(v).toLocaleString('ko-KR') : (Math.abs(v) >= 1000 ? v.toLocaleString('ko-KR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : f2(v));
   async function initInd() {
     let st = null;
     try { st = await (await fetch('indicators.json?' + Date.now())).json(); } catch (e) {}
     const items = (st && st.items) || {};
+    let smp = null;
+    try { smp = await (await fetch(SMP_URL + '?' + Date.now())).json(); } catch (e) {}
+    if (smp && smp.days && smp.days[KEYS[1]]) {
+      const t = stats(smp.days[KEYS[1]]), p = smp.days[KEYS[0]] ? stats(smp.days[KEYS[0]]) : null;
+      const mk = (nm, key, hr) => ({ name: nm, unit: '원/kWh', date: ymdDash(KEYS[1]), value: t[key], prev_value: p ? p[key] : null, hr });
+      items.smp_avg = mk('가중평균', 'wavg'); items.smp_max = mk('최고', 'mx', t.mxH); items.smp_min = mk('최저', 'mn', t.mnH);
+    }
     document.getElementById('indUpdated').textContent = st && st.updated ? st.updated + ' (KST)' : '-';
     const span = {}; IND_ORDER.forEach(r => span[r[0]] = (span[r[0]] || 0) + 1);
     const seen = {};
@@ -160,7 +120,7 @@
       const first = !seen[grp]; seen[grp] = true;
       const g = first ? `<td class="grp" rowspan="${span[grp]}">${grp}</td>` : '';
       const it = items[k];
-      const head = `${g}<td class="nm">${nm}<small>${unit}${it && it.item ? ' · ' + it.item : ''}</small></td>`;
+      const head = `${g}<td class="nm">${nm}<small>${unit}${it && it.item ? ' · ' + it.item : ''}${it && it.hr ? ' · ' + it.hr + '시' : ''}</small></td>`;
       if (!it) return `<tr>${head}<td colspan="3" class="fl">${pending ? '준비 중' : '자료 없음'}</td></tr>`;
       let chg = '<span class="fl">-</span>';
       if (it.prev_value != null) {
