@@ -9,6 +9,7 @@ from datetime import datetime, timedelta, timezone
 KST = timezone(timedelta(hours=9))
 OUT = "indicators.json"
 OIL_KEY = os.environ.get("OILPRICE_API_KEY", "")
+EXIM_KEY = os.environ.get("KOREAEXIM_KEY", "")
 DATA_KEY = urllib.parse.unquote(os.environ.get("DATA_GO_KR_KEY", ""))
 UA = {"User-Agent": "Mozilla/5.0", "Accept-Language": "ko"}
 
@@ -173,11 +174,79 @@ def fetch_kau():
     raise last or ValueError("배출권 자료 없음")
 
 
+def fetch_fx():
+    """한국수출입은행 환율(USD 매매기준율 deal_bas_r). 당일 값은 영업일 11시경 갱신되므로
+    아침에는 직전 영업일 값이 최신이 된다. 최근 7일을 거슬러 올라가 유효한 값 2개를 찾는다."""
+    if not EXIM_KEY:
+        raise ValueError("KOREAEXIM_KEY 미등록")
+    today = datetime.now(KST).date()
+    found = []
+    for back in range(0, 8):
+        d = today - timedelta(days=back)
+        if d.weekday() >= 5:
+            continue
+        url = ("https://oapi.koreaexim.go.kr/site/program/financial/exchangeJSON?"
+               + urllib.parse.urlencode({"authkey": EXIM_KEY, "searchdate": d.strftime("%Y%m%d"), "data": "AP01"}))
+        def call():
+            return json.loads(urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=40).read().decode("utf-8"))
+        j = retry(call, tries=2)
+        usd = [x for x in (j if isinstance(j, list) else []) if str(x.get("cur_unit", "")).startswith("USD")]
+        if not usd:
+            code = j[0].get("result") if isinstance(j, list) and j else None
+            print(f">> [환율] {d} 자료 없음 (result={code})")
+            continue
+        found.append((d.isoformat(), float(str(usd[0]["deal_bas_r"]).replace(",", ""))))
+        if len(found) == 2:
+            break
+    if not found:
+        raise ValueError("환율 자료 없음")
+    return {"fx": {"name": "원/달러 환율", "unit": "원", "date": found[0][0], "value": found[0][1],
+                   "prev_date": found[1][0] if len(found) > 1 else None,
+                   "prev_value": found[1][1] if len(found) > 1 else None}}
+
+
+def fetch_rec():
+    """한국전력거래소 REC 현물시장 정보(공공데이터포털). 육지 평균가(landAvgPrc).
+    거래가 있는 날(장운영일)에만 값이 있으므로, 날짜를 지정해 최근일부터 거슬러 올라가 2개 거래일을 찾는다."""
+    base = "https://apis.data.go.kr/B552115/RecMarketInfo2/getRecMarketInfo2"
+    today = datetime.now(KST).date()
+    found = []
+    for back in range(0, 25):
+        d = today - timedelta(days=back)
+        if d.weekday() >= 5:
+            continue
+        q = {"serviceKey": DATA_KEY, "pageNo": 1, "numOfRows": 5, "dataType": "json", "bzDd": d.strftime("%Y%m%d")}
+        def call():
+            return json.loads(urllib.request.urlopen(urllib.request.Request(base + "?" + urllib.parse.urlencode(q), headers=UA), timeout=40).read().decode("utf-8"))
+        j = retry(call, tries=2)
+        root = j.get("response", j)
+        body = root.get("body", {})
+        items = body.get("items", {}) if isinstance(body, dict) else {}
+        if isinstance(items, dict):
+            items = items.get("item", [])
+        if isinstance(items, dict):
+            items = [items]
+        rows = [x for x in (items or []) if x.get("landAvgPrc") not in (None, "")]
+        if not rows:
+            continue
+        try:
+            found.append((d.isoformat(), float(rows[0]["landAvgPrc"])))
+        except (TypeError, ValueError):
+            continue
+        if len(found) == 2:
+            break
+    if not found:
+        raise ValueError("REC 자료 없음")
+    return {"rec": {"name": "REC(육지)", "item": "평균가", "unit": "원/REC", "date": found[0][0], "value": found[0][1],
+                    "prev_date": found[1][0] if len(found) > 1 else None,
+                    "prev_value": found[1][1] if len(found) > 1 else None}}
+
+
 def main():
     store = json.load(open(OUT, encoding="utf-8")) if os.path.exists(OUT) else {}
     items = store.get("items", {})
     ok = 0
-    for label, fn in (("JKM", fetch_jkm), ("오피넷 국제유가", fetch_opinet), ("배출권", fetch_kau)):
+    for label, fn in (("JKM", fetch_jkm), ("오피넷 국제유가", fetch_opinet), ("배출권", fetch_kau), ("REC", fetch_rec), ("환율", fetch_fx)):
         try:
             got = fn()
             items.update(got)

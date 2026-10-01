@@ -68,7 +68,7 @@
     <thead><tr><th>분류</th><th style="text-align:left">지표</th><th>종가</th><th>전일 대비</th><th>기준일</th></tr></thead>
     <tbody id="indBody"><tr><td colspan="5" class="fl">불러오는 중...</td></tr></tbody>
   </table>
-  <div class="note">JKM은 OilPriceAPI의 영업일별 값, 국제유가(두바이·브렌트·WTI)는 한국석유공사 오피넷 일별 값입니다. 배출권은 금융위원회 한국거래소 시세(공공데이터포털)입니다. 환율·REC는 준비 중입니다. 지표별로 기준일이 다를 수 있으며 휴장일에는 직전 영업일 값을 표시합니다. 자료 갱신: <span id="indUpdated">-</span></div>
+  <div class="note">JKM은 OilPriceAPI의 영업일별 값, 국제유가(두바이·브렌트·WTI)는 한국석유공사 오피넷 일별 값입니다. 배출권은 한국거래소 시세(금융위원회), REC는 한국전력거래소 현물시장 육지 평균가이며 REC는 거래일에만 값이 있어 기준일이 며칠 전일 수 있습니다. 환율은 준비 중입니다. 지표별로 기준일이 다를 수 있으며 휴장일에는 직전 영업일 값을 표시합니다. 자료 갱신: <span id="indUpdated">-</span></div>
 
   <h2>시간대별 SMP<small>육지 기준, 원/kWh</small></h2>
   <div class="chart-box"><canvas id="chart"></canvas></div>
@@ -146,9 +146,9 @@
     ['환율', 'fx', '원/달러 환율', '원', true],
     ['국제유가', 'dubai', '두바이유', '$/bbl'], ['국제유가', 'brent', '브렌트유', '$/bbl'], ['국제유가', 'wti', 'WTI', '$/bbl'],
     ['LNG', 'jkm', 'JKM', 'USD/MMBtu'],
-    ['탄소·REC', 'kau', '배출권(KAU)', '원/톤'], ['탄소·REC', 'rec', 'REC(육지)', '원/REC', true]
+    ['탄소·REC', 'kau', '배출권(KAU)', '원/톤'], ['탄소·REC', 'rec', 'REC(육지)', '원/REC']
   ];
-  const fmtI = (v, unit) => unit.startsWith('원') ? Math.round(v).toLocaleString('ko-KR') : f2(v);
+  const fmtI = (v, unit) => ['원/톤', '원/REC'].includes(unit) ? Math.round(v).toLocaleString('ko-KR') : (Math.abs(v) >= 1000 ? v.toLocaleString('ko-KR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : f2(v));
   async function initInd() {
     let st = null;
     try { st = await (await fetch('indicators.json?' + Date.now())).json(); } catch (e) {}
