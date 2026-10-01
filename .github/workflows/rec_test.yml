@@ -1,0 +1,36 @@
+name: REC Test
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: REC 현물시장 응답 확인
+        env:
+          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+        run: |
+          python3 - <<'PY'
+          import os, urllib.request, urllib.parse, urllib.error
+          from datetime import date, timedelta
+          key = urllib.parse.unquote(os.environ.get("DATA_GO_KR_KEY", ""))
+          base = "https://apis.data.go.kr/B552115/RecMarketInfo2/getRecMarketInfo2"
+          def call(extra):
+              q = {"serviceKey": key, "pageNo": 1, "numOfRows": 30, "dataType": "json"}
+              q.update(extra)
+              url = base + "?" + urllib.parse.urlencode(q)
+              try:
+                  r = urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"}), timeout=40)
+                  return r.status, r.read().decode("utf-8", "ignore")
+              except urllib.error.HTTPError as e:
+                  return e.code, e.read().decode("utf-8", "ignore")
+              except Exception as e:
+                  return 0, type(e).__name__ + " " + str(e)[:150]
+          st, txt = call({})
+          print("== bzDd 없이 HTTP", st, "길이", len(txt))
+          print(txt[:2500])
+          for back in (1, 2, 3):
+              d = (date.today() - timedelta(days=back)).strftime("%Y%m%d")
+              st, txt = call({"bzDd": d, "numOfRows": 5})
+              print(f"== bzDd={d} HTTP {st} 길이 {len(txt)}")
+              print(txt[:1200])
+          PY
