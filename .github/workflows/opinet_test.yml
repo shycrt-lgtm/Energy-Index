@@ -5,31 +5,25 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: 오피넷 국제유가 접속 시험
+      - name: 오피넷 국제유가 구조 점검
         run: |
           python3 - <<'PY'
-          import re, urllib.request, urllib.error
-          urls = [
-              "https://www.opinet.co.kr/glopcoilSelect.do",
-              "https://www.opinet.co.kr/gloilList.do",
-              "https://www.opinet.co.kr/user/main/mainView.do",
-          ]
-          for u in urls:
-              req = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0", "Accept-Language": "ko"})
-              try:
-                  r = urllib.request.urlopen(req, timeout=40)
-                  raw = r.read()
-                  txt = raw.decode("utf-8", "ignore")
-                  print(f"== {u} HTTP {r.status} 크기={len(raw)}")
-                  plain = re.sub(r"\s+", " ", re.sub(r"<script.*?</script>|<style.*?</style>|<[^>]+>", " ", txt, flags=re.S))
-                  i = plain.find("두바이")
-                  print("   '두바이' 포함:", i >= 0)
-                  if i >= 0:
-                      print("   주변:", plain[max(0, i-200):i+500])
-                  for m in re.findall(r"(?:action|href|url)\s*[=:]\s*[\"'](/[^\"']*(?:glo|oil|crude)[^\"']*)[\"']", txt, flags=re.I)[:15]:
-                      print("   링크 후보:", m)
-              except urllib.error.HTTPError as e:
-                  print(f"== {u} HTTP {e.code}")
-              except Exception as e:
-                  print(f"== {u} 실패 {type(e).__name__} {e}")
+          import re, urllib.request
+          u = "https://www.opinet.co.kr/glopcoilSelect.do"
+          req = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0", "Accept-Language": "ko"})
+          txt = urllib.request.urlopen(req, timeout=40).read().decode("utf-8", "ignore")
+          print("크기", len(txt))
+          plain = re.sub(r"\s+", " ", re.sub(r"<script.*?</script>|<style.*?</style>|<[^>]+>", " ", txt, flags=re.S))
+          print("[본문 앞부분]", plain[:700])
+          for kw in ["Dubai", "두바이", "Brent", "브렌트", "WTI", "국제"]:
+              print(f"[{kw}] 위치:", [m.start() for m in re.finditer(kw, txt)][:5])
+          print("[form]")
+          for m in re.findall(r"<form[^>]*>", txt, flags=re.I)[:6]:
+              print("  ", m[:200])
+          print("[input 이름]", sorted(set(re.findall(r"<(?:input|select)[^>]*name=[\"']([^\"']+)", txt)))[:40])
+          print("[.do 주소들]", sorted(set(re.findall(r"[\"'](/[A-Za-z0-9_/\-]*\.do)[\"']", txt)))[:40])
+          print("[ajax/url]")
+          for m in re.findall(r"(?:url|action)\s*[:=]\s*[\"']([^\"']+)[\"']", txt)[:30]:
+              print("  ", m)
+          print("[js 파일]", sorted(set(re.findall(r"src=[\"']([^\"']+\.js[^\"']*)", txt)))[:20])
           PY
