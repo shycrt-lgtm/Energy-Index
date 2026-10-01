@@ -256,6 +256,43 @@ def fetch_fx():
     return fetch_fx_ecb()
 
 
+def fetch_rec():
+    """한국전력거래소 REC 현물시장 정보(공공데이터포털). 육지 평균가(landAvgPrc).
+    거래가 있는 날(장운영일)에만 값이 있으므로, 날짜를 지정해 최근일부터 거슬러 올라가 2개 거래일을 찾는다."""
+    base = "https://apis.data.go.kr/B552115/RecMarketInfo2/getRecMarketInfo2"
+    today = datetime.now(KST).date()
+    found = []
+    for back in range(0, 25):
+        d = today - timedelta(days=back)
+        if d.weekday() >= 5:
+            continue
+        q = {"serviceKey": DATA_KEY, "pageNo": 1, "numOfRows": 5, "dataType": "json", "bzDd": d.strftime("%Y%m%d")}
+        def call():
+            return json.loads(urllib.request.urlopen(urllib.request.Request(base + "?" + urllib.parse.urlencode(q), headers=UA), timeout=40).read().decode("utf-8"))
+        j = retry(call, tries=2)
+        root = j.get("response", j)
+        body = root.get("body", {})
+        items = body.get("items", {}) if isinstance(body, dict) else {}
+        if isinstance(items, dict):
+            items = items.get("item", [])
+        if isinstance(items, dict):
+            items = [items]
+        rows = [x for x in (items or []) if x.get("landAvgPrc") not in (None, "")]
+        if not rows:
+            continue
+        try:
+            found.append((d.isoformat(), float(rows[0]["landAvgPrc"])))
+        except (TypeError, ValueError):
+            continue
+        if len(found) == 2:
+            break
+    if not found:
+        raise ValueError("REC 자료 없음")
+    return {"rec": {"name": "REC(육지)", "item": "평균가", "unit": "원/REC", "date": found[0][0], "value": found[0][1],
+                    "prev_date": found[1][0] if len(found) > 1 else None,
+                    "prev_value": found[1][1] if len(found) > 1 else None}}
+
+
 def main():
     store = json.load(open(OUT, encoding="utf-8")) if os.path.exists(OUT) else {}
     items = store.get("items", {})
