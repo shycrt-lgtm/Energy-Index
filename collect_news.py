@@ -11,9 +11,9 @@ KEYWORDS = ["SMP 전력시장", "전력도매가격", "LNG 가격", "도시가�
             "전력수급기본계획", "ESS 에너지저장 입찰", "RPS 신재생", "태양광 PPA", "전기차 충전", "VPP 가상발전소", "용량시장"]
 PER_KEYWORD = 15      # 키워드당 가져올 최대 건수
 MAX_AGE_H = 36        # 이 시간보다 오래된 기사는 제외
-TOP_N = 10
-SIM = 0.60            # 제목 글자 유사도 기준(이 이상이면 같은 기사로 봄)
-JAC = 0.35            # 두 글자 조각 겹침 비율 기준(이 이상이면 같은 기사로 봄)
+TOP_N = 15
+SIM = 0.50            # 제목 글자 유사도 기준(이 이상이면 같은 기사로 봄)
+JAC = 0.25            # 두 글자 조각 겹침 비율 기준(이 이상이면 같은 기사로 봄)
 # 시장과 관련 깊은 낱말(제목에 있으면 가산) / 시장과 무관한 행사·인사·홍보 낱말(제목에 있으면 감점)
 CORE = ["SMP", "전력시장", "전력도매", "도매가격", "계통한계", "LNG", "천연가스", "도시가스", "가스요금", "전기요금", "요금",
         "가격", "배출권", "탄소", "REC", "열병합", "집단에너지", "한전", "한국전력", "전력거래소", "가스공사", "수급",
@@ -120,8 +120,16 @@ def main():
     groups = dedup(allit)
     # 시장 관련도(낱말 점수) + 여러 매체가 다룬 정도로 점수를 매겨 상위만 선택, 같으면 최신순
     groups = [g for g in groups if score(g)[1] >= 1 and score(g)[0] > 0]
-    groups.sort(key=lambda g: (-score(g)[0], -g["item"]["pub"].timestamp()))
-    top = groups[:TOP_N]
+    # 같은 기관(제목 맨 앞 낱말)이 주어인 기사가 한쪽으로 몰리지 않도록, 이미 뽑힌 수만큼 점수를 깎아 가며 한 건씩 선택
+    def lead(g):
+        m = re.search(r"[A-Za-z가-힣]{2,}", re.sub(r"\[[^\]]*\]", " ", g["item"]["title"]))
+        return m.group(0)[:3] if m else ""
+    top, cnt = [], {}
+    pool = list(groups)
+    while pool and len(top) < TOP_N:
+        best = max(pool, key=lambda g: (score(g)[0] - 4 * cnt.get(lead(g), 0), g["item"]["pub"].timestamp()))
+        pool.remove(best); top.append(best)
+        cnt[lead(best)] = cnt.get(lead(best), 0) + 1
     top.sort(key=lambda g: -g["item"]["pub"].timestamp())      # 화면에는 최신순
     items = [{"title": g["item"]["title"], "source": g["item"]["source"], "link": g["item"]["link"],
               "pub": g["item"]["pub"].strftime("%Y-%m-%d %H:%M"), "more": g["more"]} for g in top]
