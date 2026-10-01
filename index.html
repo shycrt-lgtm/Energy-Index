@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>에너지사업총괄 모니터링</title>
+<style>
+  :root { --navy:#001f3f; --line:#e5e7eb; --mute:#64748b; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Noto Sans KR','Malgun Gothic',sans-serif; color:#1a1a1a; background:#fff; }
+  .wrap { max-width:900px; margin:0 auto; padding:32px 16px 48px; }
+  .top { border-top:4px solid var(--navy); padding-top:16px; margin-bottom:28px; }
+  h1 { margin:0; font-size:30px; font-weight:900; color:#0f172a; }
+  .sub { margin-top:6px; font-size:14px; color:var(--mute); }
+  .menu { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+  a.item { display:block; padding:24px 22px; border:1px solid var(--line); border-top:3px solid var(--navy); text-decoration:none; color:inherit; background:#fff; transition:box-shadow .15s, transform .15s; }
+  a.item:hover { box-shadow:0 8px 20px -8px rgba(0,31,63,.35); transform:translateY(-2px); }
+  .ico { font-size:30px; }
+  .tt { margin-top:10px; font-size:19px; font-weight:800; color:var(--navy); }
+  .ds { margin-top:6px; font-size:13px; line-height:1.6; color:var(--mute); }
+  .tag { display:inline-block; margin-top:12px; padding:2px 8px; font-size:11px; font-weight:700; border:1px solid #cbd5e1; color:#475569; }
+  .foot { margin-top:40px; font-size:12px; color:#94a3b8; }
+  @media (max-width:640px){ .menu{grid-template-columns:1fr;} h1{font-size:24px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>에너지사업총괄 모니터링</h1>
+    <div class="sub">집단에너지·LNG발전 | 메뉴를 선택하세요</div>
+  </div>
+  <div class="menu">
+    <a class="item" href="https://shycrt-lgtm.github.io/KPX-Daily-Report/">
+      <div class="ico">📊</div>
+      <div class="tt">전력시장 전일실적</div>
+      <div class="ds">전일 SMP, 발전원별 발전량, 최대부하·예비율, LNG 가격 요약 (매일 아침 자동 갱신)</div>
+      <span class="tag">매일 08:30 갱신</span>
+    </a>
+    <a class="item" href="https://shycrt-lgtm.github.io/tms-monitor/">
+      <div class="ico">🏭</div>
+      <div class="tt">주요 발전소 발전상황 모니터링</div>
+      <div class="ds">굴뚝(TMS) 자료로 본 발전소별 전일 운전시간과 현재 가동 여부</div>
+      <span class="tag">30분 단위 수집</span>
+    </a>
+  </div>
+  <div class="foot">출처: 한국전력거래소, 한국가스공사, 공공데이터포털</div>
+</div>
+</body>
+</html>
