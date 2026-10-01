@@ -10,11 +10,19 @@
   * { box-sizing:border-box; }
   body { margin:0; font-family:'Noto Sans KR','Malgun Gothic',sans-serif; color:#1a1a1a; background:#fff; }
   .wrap { max-width:1000px; margin:0 auto; padding:28px 16px 48px; }
-  .top { border-top:4px solid var(--navy); padding-top:14px; }
-  h1 { margin:0; font-size:30px; font-weight:900; color:#0f172a; letter-spacing:-0.02em; }
-  .sub { margin-top:6px; font-size:14px; color:var(--mute); }
-  .sub b { color:#1e293b; }
+  .site-header{position:sticky;top:0;z-index:100;background:#001f3f;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+  .site-header .in{max-width:1000px;margin:0 auto;padding:18px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .site-header h1{margin:0;font-size:28px;font-weight:900;letter-spacing:-.02em;color:#fff}
+  .site-header .sub{margin:4px 0 0;font-size:13px;color:#b6c2d1}
+  .site-header .sub b{color:#fff;font-weight:700}
+  .menu{display:flex;gap:10px;flex-wrap:wrap}
+  .menu a{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:2px;background:#e5e7eb;color:#1e293b;font-size:14px;font-weight:700;text-decoration:none;transition:background .15s}
+  .menu a:hover{background:#f1f5f9}
+  .menu a.on{background:#cbd5e1}
+  .menu a span{font-size:16px;line-height:1}
   h2 { font-size:18px; font-weight:700; color:var(--navy); margin:30px 0 10px; padding-bottom:8px; border-bottom:2px solid var(--line); }
+  h2 { display:flex; align-items:center; }
+  h2::before { content:''; flex:none; width:6px; height:18px; margin-right:9px; background:var(--navy); }
   h2 small { font-size:12px; font-weight:500; color:var(--mute); margin-left:8px; }
   .cards { display:grid; grid-template-columns:repeat(2,1fr); border:1px solid var(--line); }
   .card { padding:12px 16px; border-right:1px solid var(--line); }
@@ -28,10 +36,6 @@
   .chart-box-unused { position:relative; height:380px; border:1px solid var(--line); padding:12px; }
   .err { margin-top:12px; background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:10px 14px; font-size:13px; font-weight:700; display:none; }
   .note { margin-top:8px; font-size:12px; color:#64748b; line-height:1.7; }
-  .head { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:16px; }
-  .menu { display:flex; gap:10px; }
-  a.item { position:relative; display:flex; align-items:center; justify-content:center; min-width:190px; padding:18px 36px 18px 24px; background:var(--navy); color:#fff; font-size:17px; font-weight:800; text-decoration:none; letter-spacing:-0.01em; box-shadow:0 2px 6px rgba(0,31,63,.25); transition:background .15s, transform .15s; }
-  a.item i { position:absolute; right:14px; top:50%; transform:translateY(-52%); font-style:normal; font-size:24px; font-weight:400; opacity:.7; }
   a.item:hover { background:#003366; transform:translateY(-2px); }
   a.item b { font-weight:800; } a.item em { font-style:normal; }
   ol.news { list-style:none; margin:0; padding:0; border-top:1px solid var(--line); }
@@ -49,33 +53,34 @@
   table.ind td.v { font-weight:800; font-size:16px; }
   .up { color:#d93f3c; font-weight:700; } .dn { color:#005587; font-weight:700; } .fl { color:var(--mute); }
   .foot { margin-top:36px; font-size:12px; color:#94a3b8; }
-  @media (max-width:640px){ table.ind th, table.ind td { padding:8px 6px; font-size:12px; } table.ind td.v { font-size:14px; } table.ind td.nm small { display:block; margin:0; } .cards{grid-template-columns:1fr;} .card{border-right:0;border-bottom:1px solid var(--line);} h1{font-size:24px;}
-    .menu{width:100%;} a.item{flex:1;min-width:0;padding:12px 24px 12px 12px;font-size:15px;line-height:1.35;text-align:center;} a.item i{right:8px;font-size:20px;} a.item em{display:block;} }
+  @media (max-width:640px){ table.ind th, table.ind td { padding:8px 6px; font-size:12px; } table.ind td.v { font-size:14px; } table.ind td.nm small { display:block; margin:0; } .wrap{padding-top:20px}
+    .site-header h1{font-size:22px} .menu{width:100%} .menu a{flex:1;justify-content:center;padding:10px 12px;font-size:13px} }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="top">
-    <div class="head">
-      <div>
-        <h1>에너지 시장 주요지표</h1>
-        <div class="sub">기준일: <b id="baseDate">-</b> | <b>에너지사업총괄</b></div>
-      </div>
-      <div class="menu">
-        <a class="item" href="https://shycrt-lgtm.github.io/KPX-Daily-Report/"><b>전력시장 <em>전일실적</em></b><i>›</i></a>
-        <a class="item" href="https://shycrt-lgtm.github.io/tms-monitor/"><b>발전상황 <em>모니터링</em></b><i>›</i></a>
-      </div>
+<header class="site-header">
+  <div class="in">
+    <div>
+      <h1>에너지 시장 주요정보</h1>
+      <p class="sub">기준일: <b id="baseDate">-</b> | 에너지사업총괄</p>
     </div>
+    <nav class="menu">
+      <a href="https://shycrt-lgtm.github.io/KPX-Daily-Report/">전력시장 전일실적 <span>›</span></a>
+      <a href="https://shycrt-lgtm.github.io/tms-monitor/">발전상황 모니터링 <span>›</span></a>
+    </nav>
   </div>
+</header>
+
+<div class="wrap">
 
   <h2>주요 시장지표<small>전일 기준 (SMP는 당일 적용)</small></h2>
   <table class="ind">
     <thead><tr><th>분류</th><th style="text-align:left">지표</th><th>가격</th><th>기준일</th><th>전일 대비</th></tr></thead>
     <tbody id="indBody"><tr><td colspan="5" class="fl">불러오는 중...</td></tr></tbody>
   </table>
-  <div class="note">JKM은 OilPriceAPI의 영업일별 값, 국제유가(두바이·브렌트·WTI)는 한국석유공사 오피넷 일별 값입니다. 배출권은 한국거래소 시세(금융위원회), REC는 한국전력거래소 현물시장 육지 평균가이며 REC는 거래일에만 값이 있어 기준일이 며칠 전일 수 있습니다. 환율은 한국수출입은행 매매기준율(영업일 기준, 조회 불가 시 ECB 기준환율로 대체하며 지표명 옆에 출처 표기)입니다. SMP는 육지 기준이며 전일 하루전시장에서 확정된 오늘 값(가중평균은 수요예측 가중, 최고·최저는 해당 시각 표시)이고 전일 대비는 어제 SMP와의 차이입니다. 지표별로 기준일이 다를 수 있으며 휴장일에는 직전 영업일 값을 표시합니다. 자료 갱신: <span id="indUpdated">-</span></div>
+  <div class="note">JKM은 OilPriceAPI의 영업일별 값, 국제유가는 한국석유공사 일별 값입니다. 배출권은 한국거래소 시세, REC는 한국전력거래소 현물시장 육지 평균가이며 REC는 거래일에만 값이 있어 기준일이 며칠 전일 수 있습니다. 환율은 한국수출입은행 매매기준율(영업일 기준, 조회 불가 시 ECB 기준환율로 대체하며 지표명 옆에 출처 표기)입니다. SMP는 육지 기준이며 하루전시장에서 확정된 오늘 값(가중평균은 수요예측 가중, 최고·최저는 해당 시각 표시)입니다. 지표별로 기준일이 다를 수 있으며 휴장일에는 직전 영업일 값을 표시합니다. 자료 갱신: <span id="indUpdated">-</span></div>
 
-  <h2>에너지시장 뉴스<small id="newsUpd"></small></h2>
+  <h2>에너지 뉴스<small id="newsUpd"></small></h2>
   <ol class="news" id="newsList"><li class="fl">불러오는 중...</li></ol>
   <div class="note">구글 뉴스에서 에너지 관련 키워드로 모은 최근 기사이며, 같은 내용의 기사는 하나로 합쳐 보여줍니다. 제목을 누르면 원문으로 이동합니다.</div>
 
