@@ -35,6 +35,13 @@
   a.item i { position:absolute; right:14px; top:50%; transform:translateY(-52%); font-style:normal; font-size:24px; font-weight:400; opacity:.7; }
   a.item:hover { background:#003366; transform:translateY(-2px); }
   a.item b { font-weight:800; } a.item em { font-style:normal; }
+  table.ind { width:100%; border-collapse:collapse; }
+  table.ind th, table.ind td { border:1px solid var(--line); padding:10px 12px; font-size:14px; text-align:center; }
+  table.ind th { background:#f8fafc; color:#334155; font-weight:700; }
+  table.ind td.nm { text-align:left; font-weight:700; color:#0f172a; }
+  table.ind td.nm small { font-weight:500; color:var(--mute); margin-left:4px; }
+  table.ind td.v { font-weight:800; font-size:16px; }
+  .up { color:#d93f3c; font-weight:700; } .dn { color:#005587; font-weight:700; } .fl { color:var(--mute); }
   .foot { margin-top:36px; font-size:12px; color:#94a3b8; }
   @media (max-width:640px){ .cards{grid-template-columns:1fr;} .card{border-right:0;border-bottom:1px solid var(--line);} h1{font-size:24px;}
     .menu{width:100%;} a.item{flex:1;min-width:0;padding:12px 24px 12px 12px;font-size:15px;line-height:1.35;text-align:center;} a.item i{right:8px;font-size:20px;} a.item em{display:block;} }
@@ -60,6 +67,13 @@
   <div class="chart-box"><canvas id="chart"></canvas></div>
   <div id="err" class="err"></div>
   <div class="note">오늘 SMP는 전일 하루전시장 결과로 발표된 값입니다. 가중평균은 시간대별 수요예측(MW) 가중 기준입니다. 자료 갱신: <span id="updated">-</span></div>
+
+  <h2>주요 시장지표<small>전일 종가 기준</small></h2>
+  <table class="ind">
+    <thead><tr><th style="text-align:left">구분</th><th>종가</th><th>전일 대비</th><th>기준일</th></tr></thead>
+    <tbody id="indBody"><tr><td colspan="4" class="fl">불러오는 중...</td></tr></tbody>
+  </table>
+  <div class="note">JKM은 OilPriceAPI의 영업일별 값, 국제유가(두바이·브렌트·WTI)는 한국석유공사 오피넷 일별 값입니다. 지표별로 기준일이 다를 수 있으며 휴장일에는 직전 영업일 값을 표시합니다. 자료 갱신: <span id="indUpdated">-</span></div>
 
   <div class="foot">출처: 한국전력거래소, 한국가스공사, 공공데이터포털</div>
 </div>
@@ -131,6 +145,26 @@
     chart.update('none');
   }
   init();
+
+  const IND_ORDER = [['jkm','JKM LNG','USD/MMBtu'], ['dubai','두바이유','$/bbl'], ['brent','브렌트유','$/bbl'], ['wti','WTI','$/bbl']];
+  async function initInd() {
+    let st = null;
+    try { st = await (await fetch('indicators.json?' + Date.now())).json(); } catch (e) {}
+    const items = (st && st.items) || {};
+    document.getElementById('indUpdated').textContent = st && st.updated ? st.updated + ' (KST)' : '-';
+    document.getElementById('indBody').innerHTML = IND_ORDER.map(([k, nm, unit]) => {
+      const it = items[k];
+      if (!it) return `<tr><td class="nm">${nm}<small>${unit}</small></td><td colspan="3" class="fl">자료 없음</td></tr>`;
+      let chg = '<span class="fl">-</span>';
+      if (it.prev_value != null) {
+        const d = it.value - it.prev_value, p = d / it.prev_value * 100, c = d > 0 ? 'up' : d < 0 ? 'dn' : 'fl', ar = d > 0 ? '▲' : d < 0 ? '▼' : '-';
+        chg = `<span class="${c}">${ar} ${Math.abs(d).toFixed(2)} (${p >= 0 ? '+' : ''}${p.toFixed(1)}%)</span>`;
+      }
+      const dd = it.date ? it.date.replace(/-/g, '') : '';
+      return `<tr><td class="nm">${nm}<small>${unit}</small></td><td class="v">${f2(it.value)}</td><td>${chg}</td><td>${dd ? fmtShort(dd) : '-'}</td></tr>`;
+    }).join('');
+  }
+  initInd();
 </script>
 </body>
 </html>
