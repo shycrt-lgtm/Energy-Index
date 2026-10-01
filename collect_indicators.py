@@ -54,13 +54,21 @@ def fetch_jkm():
 
 
 def opinet_csv(text):
+    """행: (yymmdd, 두바이, 브렌트, WTI). 날짜는 '260930' 또는 '26년09월30일' 두 형식을 모두 허용"""
     rows = []
     for line in csv.reader(io.StringIO(text)):
-        if len(line) >= 4 and re.fullmatch(r"\d{6}", line[0].strip()):
-            try:
-                rows.append((line[0].strip(), float(line[1]), float(line[2]), float(line[3])))
-            except ValueError:
-                pass
+        if len(line) < 4:
+            continue
+        d = line[0].strip()
+        m = re.fullmatch(r"(\d{2})\D+(\d{1,2})\D+(\d{1,2})\D*", d)
+        if m:
+            d = f"{m.group(1)}{int(m.group(2)):02d}{int(m.group(3)):02d}"
+        if not re.fullmatch(r"\d{6}", d):
+            continue
+        try:
+            rows.append((d, float(line[1]), float(line[2]), float(line[3])))
+        except ValueError:
+            pass
     return sorted(rows)
 
 
