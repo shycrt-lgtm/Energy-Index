@@ -174,13 +174,29 @@ def fetch_kau():
     raise last or ValueError("배출권 자료 없음")
 
 
-def fetch_fx():
-    """한국수출입은행 환율(USD 매매기준율 deal_bas_r). 당일 값은 영업일 11시경 갱신되므로
-    아침에는 직전 영업일 값이 최신이 된다. 최근 7일을 거슬러 올라가 유효한 값 2개를 찾는다."""
+def _fx_items(rows, label):
+    """rows: [(날짜, 원/달러, 원/100엔)] 최신순 → 환율 항목 2개"""
+    out = {}
+    for key, name, idx in (("fx", "원/달러 환율", 1), ("fx_jpy", "원/100엔 환율", 2)):
+        vals = [(r[0], r[idx]) for r in rows if r[idx] is not None]
+        if not vals:
+            continue
+        out[key] = {"name": name, "item": label, "unit": "원", "date": vals[0][0], "value": vals[0][1],
+                    "prev_date": vals[1][0] if len(vals) > 1 else None,
+                    "prev_value": vals[1][1] if len(vals) > 1 else None}
+    if not out:
+        raise ValueError("환율 자료 없음")
+    return out
+
+
+def fetch_fx_exim():
+    """한국수출입은행 환율(매매기준율 deal_bas_r): USD, JPY(100). 당일 값은 영업일 11시경 갱신되므로
+    아침에는 직전 영업일 값이 최신이 된다. 최근 8일을 거슬러 올라가 유효한 날 2개를 찾는다."""
     if not EXIM_KEY:
         raise ValueError("KOREAEXIM_KEY 미등록")
     today = datetime.now(KST).date()
     found = []
+    num = lambda v: float(str(v).replace(",", ""))
     for back in range(0, 8):
         d = today - timedelta(days=back)
         if d.weekday() >= 5:
@@ -190,56 +206,54 @@ def fetch_fx():
         def call():
             return json.loads(urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=40).read().decode("utf-8"))
         j = retry(call, tries=2)
-        usd = [x for x in (j if isinstance(j, list) else []) if str(x.get("cur_unit", "")).startswith("USD")]
+        j = j if isinstance(j, list) else []
+        usd = [x for x in j if str(x.get("cur_unit", "")).startswith("USD")]
+        jpy = [x for x in j if str(x.get("cur_unit", "")).startswith("JPY")]
         if not usd:
-            code = j[0].get("result") if isinstance(j, list) and j else None
-            print(f">> [환율] {d} 자료 없음 (result={code})")
+            print(f">> [환율] {d} 자료 없음")
             continue
-        found.append((d.isoformat(), float(str(usd[0]["deal_bas_r"]).replace(",", ""))))
+        found.append((d.isoformat(), num(usd[0]["deal_bas_r"]), num(jpy[0]["deal_bas_r"]) if jpy else None))
         if len(found) == 2:
             break
     if not found:
         raise ValueError("환율 자료 없음")
-    return {"fx": {"name": "원/달러 환율", "unit": "원", "date": found[0][0], "value": found[0][1],
-                   "prev_date": found[1][0] if len(found) > 1 else None,
-                   "prev_value": found[1][1] if len(found) > 1 else None}}
+    return _fx_items(found, "매매기준율")
 
 
-def fetch_rec():
-    """한국전력거래소 REC 현물시장 정보(공공데이터포털). 육지 평균가(landAvgPrc).
-    거래가 있는 날(장운영일)에만 값이 있으므로, 날짜를 지정해 최근일부터 거슬러 올라가 2개 거래일을 찾는다."""
-    base = "https://apis.data.go.kr/B552115/RecMarketInfo2/getRecMarketInfo2"
+def fetch_fx_ecb():
+    """Frankfurter(ECB 기준환율). 인증키 불필요, 일별 이력 제공. USD/KRW, JPY는 100엔당 원으로 환산."""
     today = datetime.now(KST).date()
-    found = []
-    for back in range(0, 25):
-        d = today - timedelta(days=back)
-        if d.weekday() >= 5:
-            continue
-        q = {"serviceKey": DATA_KEY, "pageNo": 1, "numOfRows": 5, "dataType": "json", "bzDd": d.strftime("%Y%m%d")}
-        def call():
-            return json.loads(urllib.request.urlopen(urllib.request.Request(base + "?" + urllib.parse.urlencode(q), headers=UA), timeout=40).read().decode("utf-8"))
-        j = retry(call, tries=2)
-        root = j.get("response", j)
-        body = root.get("body", {})
-        items = body.get("items", {}) if isinstance(body, dict) else {}
-        if isinstance(items, dict):
-            items = items.get("item", [])
-        if isinstance(items, dict):
-            items = [items]
-        rows = [x for x in (items or []) if x.get("landAvgPrc") not in (None, "")]
-        if not rows:
-            continue
+    q = urllib.parse.urlencode({"base": "USD", "symbols": "KRW,JPY"})
+    last = None
+    for base in ("https://api.frankfurter.dev/v1/", "https://api.frankfurter.app/"):
         try:
-            found.append((d.isoformat(), float(rows[0]["landAvgPrc"])))
-        except (TypeError, ValueError):
-            continue
-        if len(found) == 2:
-            break
-    if not found:
-        raise ValueError("REC 자료 없음")
-    return {"rec": {"name": "REC(육지)", "item": "평균가", "unit": "원/REC", "date": found[0][0], "value": found[0][1],
-                    "prev_date": found[1][0] if len(found) > 1 else None,
-                    "prev_value": found[1][1] if len(found) > 1 else None}}
+            url = f"{base}{(today - timedelta(days=12)).isoformat()}..{today.isoformat()}?{q}"
+            def call():
+                return json.loads(urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=40).read().decode("utf-8"))
+            j = retry(call, tries=2)
+            rows = []
+            for d in sorted((j.get("rates") or {}), reverse=True):
+                v = j["rates"][d]
+                if "KRW" in v:
+                    rows.append((d, float(v["KRW"]), (float(v["KRW"]) / float(v["JPY"]) * 100) if v.get("JPY") else None))
+            if not rows:
+                raise ValueError("환율 자료 없음")
+            print(f">> [환율 ECB] {rows[0][0]} USD {rows[0][1]:.2f}, 100엔 {rows[0][2]:.2f}" if rows[0][2] else f">> [환율 ECB] {rows[0]}")
+            return _fx_items(rows, "ECB 기준")
+        except Exception as e:
+            last = e
+            print(f">> [환율 ECB 주소 실패] {base} {type(e).__name__}: {str(e)[:100]}")
+    raise last or ValueError("환율 자료 없음")
+
+
+def fetch_fx():
+    """수출입은행 키가 있으면 공식 매매기준율을 먼저, 없거나 실패하면 ECB 기준환율을 쓴다."""
+    if EXIM_KEY:
+        try:
+            return fetch_fx_exim()
+        except Exception as e:
+            print(f">> [환율 수출입은행 실패] {type(e).__name__}: {str(e)[:100]} → ECB 기준환율로 대체")
+    return fetch_fx_ecb()
 
 
 def main():
