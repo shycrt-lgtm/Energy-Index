@@ -69,16 +69,16 @@ def fetch_opinet():
     cj = http.cookiejar.CookieJar()
     op = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
     H = {**UA, "Referer": base + "/glopcoilSelect.do"}
+    op.open(urllib.request.Request(base + "/glopcoilSelect.do", headers=H), timeout=40).read()
+    now = datetime.now(KST).date()
+    s, e = (now - timedelta(days=14)).strftime("%Y%m%d"), now.strftime("%Y%m%d")
 
-    def call():
-        op.open(urllib.request.Request(base + "/glopcoilSelect.do", headers=H), timeout=40).read()
-        now = datetime.now(KST).date()
-        s, e = (now - timedelta(days=14)).strftime("%Y%m%d"), now.strftime("%Y%m%d")
-        data = [("TERM", "D"), ("OILSRTCD1", "001"), ("OILSRTCD2", "002"), ("OILSRTCD3", "003"),
-                ("OILSRTCD", "001"), ("OILSRTCD", "002"), ("OILSRTCD", "003"),
-                ("STDDATE", s), ("ENDDATE", e), ("SEL_DIV", "div_dar"),
-                ("STA_Y", s[:4]), ("STA_M", s[4:6]), ("STA_D", s[6:]),
-                ("END_Y", e[:4]), ("END_M", e[4:6]), ("END_D", e[6:])]
+    def post(sel, multi):
+        data = [("TERM", "D"), ("OILSRTCD1", "001"), ("OILSRTCD2", "002"), ("OILSRTCD3", "003")]
+        data += [("OILSRTCD", c) for c in (("001", "002", "003") if multi else ("001",))]
+        data += [("STDDATE", s), ("ENDDATE", e), ("SEL_DIV", sel),
+                 ("STA_Y", s[:4]), ("STA_M", s[4:6]), ("STA_D", s[6:]),
+                 ("END_Y", e[:4]), ("END_M", e[4:6]), ("END_D", e[6:])]
         raw = op.open(urllib.request.Request(base + "/glopcoil_csv.do", data=urllib.parse.urlencode(data).encode(),
                                              headers=H), timeout=40).read()
         for enc in ("utf-8", "cp949"):
@@ -87,17 +87,28 @@ def fetch_opinet():
             except UnicodeDecodeError:
                 pass
         return raw.decode("utf-8", "ignore")
-    rows = opinet_csv(retry(call))
+
+    rows = []
+    for sel, multi in (("div_dar", False), ("div_dar", True), ("D", False)):
+        try:
+            txt = retry(lambda: post(sel, multi), tries=2)
+        except Exception as ex:
+            print(f">> [오피넷 시도 SEL_DIV={sel} 다중={multi}] 통신 실패 {type(ex).__name__}")
+            continue
+        r = opinet_csv(txt)
+        print(f">> [오피넷 시도 SEL_DIV={sel} 다중={multi}] 응답 {len(txt)}자, 행 {len(r)}개, 앞부분: {txt[:120]!r}")
+        if r and all(20 <= v <= 400 for v in r[-1][1:]):
+            rows = r
+            break
+        if r:
+            print(">> [오피넷] $/Bbl 범위를 벗어난 값 → 다른 조건으로 재시도 (마지막 행:", r[-1], ")")
     if not rows:
         raise ValueError("오피넷 자료 없음")
     cur, prev = rows[-1], (rows[-2] if len(rows) > 1 else None)
     ymd = lambda t: "20" + t[:2] + "-" + t[2:4] + "-" + t[4:]
     out = {}
     for i, (key, name) in enumerate((("dubai", "두바이유"), ("brent", "브렌트유"), ("wti", "WTI")), start=1):
-        v = cur[i]
-        if not (20 <= v <= 400):       # $/Bbl 범위 점검 (원 단위 등 오입력 방지)
-            raise ValueError(f"{name} 값이 $/Bbl 범위를 벗어남: {v}")
-        out[key] = {"name": name, "unit": "$/bbl", "date": ymd(cur[0]), "value": v,
+        out[key] = {"name": name, "unit": "$/bbl", "date": ymd(cur[0]), "value": cur[i],
                     "prev_date": ymd(prev[0]) if prev else None, "prev_value": prev[i] if prev else None}
     return out
 
