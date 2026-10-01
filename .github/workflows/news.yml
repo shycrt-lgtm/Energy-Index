@@ -1,0 +1,26 @@
+name: News Collect
+on:
+  schedule:
+    - cron: '30 21 * * *'   # 매일 06:30 KST
+    - cron: '0 3 * * *'     # 매일 12:00 KST
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  news:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Collect news
+        run: python collect_news.py
+      - name: Commit news.json
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add news.json
+          git diff --cached --quiet || git commit -m "Auto: news [$(TZ=Asia/Seoul date '+%Y-%m-%d %H:%M')]"
+          git pull --rebase origin main
+          git push
