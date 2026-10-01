@@ -1,464 +1,260 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>전력시장 전일실적 대시보드</title>
-  <style>/* Tailwind 미리 빌드(열 때 계산 없음) */*,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.19 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.pointer-events-none{pointer-events:none}.absolute{position:absolute}.relative{position:relative}.right-1{right:.25rem}.mx-auto{margin-left:auto;margin-right:auto}.mb-1{margin-bottom:.25rem}.ml-2{margin-left:.5rem}.mt-0{margin-top:0}.mt-0\.5{margin-top:.125rem}.mt-1{margin-top:.25rem}.mt-2{margin-top:.5rem}.mt-3{margin-top:.75rem}.block{display:block}.flex{display:flex}.inline-flex{display:inline-flex}.table{display:table}.grid{display:grid}.hidden{display:none}.h-4{height:1rem}.w-28{width:7rem}.w-4{width:1rem}.w-full{width:100%}.border-collapse{border-collapse:collapse}.transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.cursor-pointer{cursor:pointer}.grid-cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-end{align-items:flex-end}.items-center{align-items:center}.items-baseline{align-items:baseline}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.gap-0{gap:0}.gap-1{gap:.25rem}.gap-1\.5{gap:.375rem}.gap-2{gap:.5rem}.gap-x-1{-moz-column-gap:.25rem;column-gap:.25rem}.space-y-2>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.5rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.5rem*var(--tw-space-y-reverse))}.overflow-x-auto{overflow-x:auto}.rounded{border-radius:.25rem}.rounded-lg{border-radius:.5rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-l{border-left-width:1px}.border-l-4{border-left-width:4px}.border-rose-200{--tw-border-opacity:1;border-color:rgb(254 205 211/var(--tw-border-opacity,1))}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240/var(--tw-border-opacity,1))}.bg-\[\#001f3f\]{--tw-bg-opacity:1;background-color:rgb(0 31 63/var(--tw-bg-opacity,1))}.bg-rose-50{--tw-bg-opacity:1;background-color:rgb(255 241 242/var(--tw-bg-opacity,1))}.bg-rose-50\/30{background-color:rgba(255,241,242,.3)}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252/var(--tw-bg-opacity,1))}.bg-transparent{background-color:transparent}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255/var(--tw-bg-opacity,1))}.p-3{padding:.75rem}.p-4{padding:1rem}.p-6{padding:1.5rem}.px-1{padding-left:.25rem;padding-right:.25rem}.px-1\.5{padding-left:.375rem;padding-right:.375rem}.px-3{padding-left:.75rem;padding-right:.75rem}.px-4{padding-left:1rem;padding-right:1rem}.py-0{padding-top:0;padding-bottom:0}.py-0\.5{padding-top:.125rem;padding-bottom:.125rem}.py-1{padding-top:.25rem;padding-bottom:.25rem}.py-1\.5{padding-top:.375rem;padding-bottom:.375rem}.py-3{padding-top:.75rem;padding-bottom:.75rem}.pb-1{padding-bottom:.25rem}.pl-2{padding-left:.5rem}.pl-4{padding-left:1rem}.pr-6{padding-right:1.5rem}.text-center{text-align:center}.text-2xl{font-size:1.5rem;line-height:2rem}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-base{font-size:1rem;line-height:1.5rem}.text-sm{font-size:.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:.75rem;line-height:1rem}.font-black{font-weight:900}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.leading-relaxed{line-height:1.625}.tracking-tight{letter-spacing:-.025em}.text-\[\#d93f3c\]{--tw-text-opacity:1;color:rgb(217 63 60/var(--tw-text-opacity,1))}.text-emerald-600{--tw-text-opacity:1;color:rgb(5 150 105/var(--tw-text-opacity,1))}.text-rose-600{--tw-text-opacity:1;color:rgb(225 29 72/var(--tw-text-opacity,1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139/var(--tw-text-opacity,1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105/var(--tw-text-opacity,1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85/var(--tw-text-opacity,1))}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59/var(--tw-text-opacity,1))}.text-slate-900{--tw-text-opacity:1;color:rgb(15 23 42/var(--tw-text-opacity,1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255/var(--tw-text-opacity,1))}.shadow{--tw-shadow:0 1px 3px 0 rgba(0,0,0,.1),0 1px 2px -1px rgba(0,0,0,.1);--tw-shadow-colored:0 1px 3px 0 var(--tw-shadow-color),0 1px 2px -1px var(--tw-shadow-color)}.shadow,.shadow-sm{box-shadow:var(--tw-ring-offset-shadow,0 0 #0000),var(--tw-ring-shadow,0 0 #0000),var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgba(0,0,0,.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color)}.outline-none{outline:2px solid transparent;outline-offset:2px}.transition{transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,-webkit-backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter;transition-property:color,background-color,border-color,text-decoration-color,fill,stroke,opacity,box-shadow,transform,filter,backdrop-filter,-webkit-backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}.hover\:bg-slate-800:hover{--tw-bg-opacity:1;background-color:rgb(30 41 59/var(--tw-bg-opacity,1))}@media (min-width:768px){.md\:grid-cols-7{grid-template-columns:repeat(7,minmax(0,1fr))}.md\:items-end{align-items:flex-end}.md\:border-b-0{border-bottom-width:0}.md\:border-r{border-right-width:1px}.md\:text-sm{font-size:.875rem;line-height:1.25rem}}</style>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <script>
-    // 라이브러리를 받는 동안 데이터 요청을 먼저 시작한다 (화면 표시를 기다리지 않음)
-    window.getJson = function (u) { return fetch(u, { cache: 'no-cache' }).then(function (res) { if (!res.ok) throw new Error(u + ' ' + res.status); return res.json(); }); };
-    window.FULL_LOADED = false;
-    window.__DATA_P = Promise.all([
-      getJson('data_recent.json').catch(function () { window.FULL_LOADED = true; return getJson('data.json'); }),
-      getJson('smp_live.json').catch(function () { return null; })
-    ]);
-  </script>
-  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Noto Sans KR', sans-serif; background-color: #ffffff; color: #1a1a1a; }
-    .site-header{line-height:1.4;position:sticky;top:0;z-index:100;background:#001f3f;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.18)}
-    .site-header .in{max-width:1000px;margin:0 auto;padding:18px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
-    .site-header h1{line-height:1.2;margin:0;font-size:28px;font-weight:900;letter-spacing:-.02em;color:#fff}
-    .site-header .sub{margin:4px 0 0;font-size:13px;color:#b6c2d1}
-    .site-header .sub b{color:#fff;font-weight:700}
-    .menu{display:flex;gap:10px;flex-wrap:wrap}
-    .menu a{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:190px;height:44px;padding:0;border-radius:2px;background:#e5e7eb;color:#1e293b;font-size:14px;font-weight:700;text-decoration:none;transition:background .15s}
-    .menu a:hover{background:#f1f5f9}
-    .menu a span{font-size:16px;line-height:1}
-    @media (max-width:640px){ .site-header h1{font-size:22px} .menu{width:100%} .menu a{flex:1;width:auto;height:40px;padding:0 12px;font-size:13px} }
-    .mckinsey-border { border-top: 4px solid #001f3f; }
-    .chart-container { position: relative; height: 450px; width: 100%; border: 1px solid #e5e7eb; padding: 1rem; background-color: #ffffff; }
-    table th, table td { border: 1px solid #e5e7eb; padding: 12px; text-align: center; font-size: 0.875rem; }
-    table th { background-color: #f8fafc; font-weight: 700; color: #334155; }
-    .text-holiday { color: #dc2626 !important; font-weight: 700; }
-    body h2 { display:flex; align-items:center; font-size:18px; font-weight:700; color:#001f3f; margin:30px 0 10px; padding-bottom:8px; border-bottom:2px solid #e5e7eb; }
-    body h2::before { content:''; flex:none; width:6px; height:18px; margin-right:9px; background:#001f3f; }
-    .flatpickr-calendar { border: 1px solid #cbd5e1; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.15); }
-    .flatpickr-calendar .flatpickr-day.holiday-day, .flatpickr-calendar .flatpickr-day.weekend-day { color: #dc2626 !important; font-weight: 700 !important; }
-    .flatpickr-calendar .flatpickr-day.holiday-day::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background-color: #dc2626; }
-    .flatpickr-calendar .flatpickr-day.selected.holiday-day, .flatpickr-calendar .flatpickr-day.selected.weekend-day { background: #001f3f !important; color: #ffffff !important; }
-    .flatpickr-calendar .flatpickr-weekday:first-child, .flatpickr-calendar .flatpickr-weekday:last-child { color: #dc2626 !important; font-weight: 700; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>에너지 시장 주요지표</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#001f3f; --line:#e5e7eb; --mute:#64748b; --gray:#94a3b8; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:'Noto Sans KR','Malgun Gothic',sans-serif; color:#1a1a1a; background:#fff; }
+  .wrap { max-width:1000px; margin:0 auto; padding:28px 16px 48px; }
+  .site-header{line-height:1.4;position:sticky;top:0;z-index:100;background:#001f3f;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+  .site-header .in{max-width:1000px;margin:0 auto;padding:18px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .site-header h1{line-height:1.2;margin:0;font-size:28px;font-weight:900;letter-spacing:-.02em;color:#fff}
+  .site-header .sub{margin:4px 0 0;font-size:13px;color:#b6c2d1}
+  .site-header .sub b{color:#fff;font-weight:700}
+  .menu{display:flex;gap:10px;flex-wrap:wrap}
+  .menu a{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:190px;height:44px;padding:0;border-radius:2px;background:#e5e7eb;color:#1e293b;font-size:14px;font-weight:700;text-decoration:none;transition:background .15s}
+  .menu a:hover{background:#f1f5f9}
+  .menu a.on{background:#cbd5e1}
+  .menu a span{font-size:16px;line-height:1}
+  h2 { font-size:18px; font-weight:700; color:var(--navy); margin:30px 0 10px; padding-bottom:8px; border-bottom:2px solid var(--line); }
+  h2 { display:flex; align-items:center; }
+  h2::before { content:''; flex:none; width:6px; height:18px; margin-right:9px; background:var(--navy); }
+  h2 small { font-size:12px; font-weight:500; color:var(--mute); margin-left:8px; }
+  .cards { display:grid; grid-template-columns:repeat(2,1fr); border:1px solid var(--line); }
+  .card { padding:12px 16px; border-right:1px solid var(--line); }
+  .card:last-child { border-right:0; background:#f8fafc; }
+  .card .d { font-size:12px; font-weight:700; color:var(--mute); }
+  .card .avg { font-size:24px; font-weight:900; color:#0f172a; margin-top:2px; }
+  .card .avg span { font-size:12px; font-weight:500; color:var(--mute); margin-left:3px; }
+  .card .mm { font-size:12px; color:#475569; margin-top:4px; line-height:1.6; }
+  .hi { color:#d93f3c; font-weight:700; } .lo { color:#005587; font-weight:700; }
+  .pending { color:var(--gray); font-size:14px; font-weight:700; padding:10px 0; }
+  .chart-box-unused { position:relative; height:380px; border:1px solid var(--line); padding:12px; }
+  .err { margin-top:12px; background:#fef2f2; border:1px solid #fecaca; color:#991b1b; padding:10px 14px; font-size:13px; font-weight:700; display:none; }
+  .note { margin-top:8px; font-size:12px; color:#64748b; line-height:1.7; }
+  a.item:hover { background:#003366; transform:translateY(-2px); }
+  a.item b { font-weight:800; } a.item em { font-style:normal; }
+  .pick-row { display:flex; justify-content:flex-end; margin-bottom:-6px; }
+  .pick { display:flex; align-items:center; gap:8px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:6px 12px; box-shadow:0 1px 2px rgba(0,0,0,.05); }
+  .pick label { font-size:14px; font-weight:700; color:#334155; cursor:pointer; }
+  .pick .box { position:relative; display:flex; align-items:center; }
+  .pick input { background:transparent; border:0; outline:0; font:inherit; font-size:14px; font-weight:700; color:#1e293b; width:112px; padding-right:24px; text-align:center; cursor:pointer; }
+  .pick svg { position:absolute; right:2px; width:16px; height:16px; color:#64748b; pointer-events:none; }
+  .pick .wd { font-size:12px; font-weight:700; padding:2px 6px; border:1px solid #e2e8f0; border-radius:4px; background:#fff; color:#64748b; }
+  .pick .wd.hol { color:#e11d48; background:#fff1f2; border-color:#fecdd3; }
+  .pick .sep { margin-left:4px; padding-left:8px; border-left:1px solid #e2e8f0; }
+  .pick button { background:#001f3f; color:#fff; border:0; border-radius:4px; padding:7px 12px; font:inherit; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+  .pick button:hover { background:#1e293b; }
+  .flatpickr-calendar { border:1px solid #cbd5e1; box-shadow:0 10px 25px -5px rgba(0,0,0,.15); }
+  .flatpickr-day.selected, .flatpickr-day.selected:hover { background:#001f3f; border-color:#001f3f; }
+  .flatpickr-day.weekend-day { color:#dc2626; font-weight:700; }
+  .flatpickr-weekday:first-child, .flatpickr-weekday:last-child { color:#dc2626; font-weight:700; }
+  .pastnote { margin-top:10px; padding:8px 12px; background:#fffbeb; border:1px solid #fde68a; color:#92400e; font-size:13px; font-weight:700; display:none; }
+  ol.news { list-style:none; margin:0; padding:0; border-top:1px solid var(--line); }
+  ol.news li { padding:12px 4px; border-bottom:1px solid var(--line); font-size:16px; line-height:1.45; }
+  ol.news a { color:#0f172a; font-weight:600; text-decoration:none; }
+  ol.news a:hover { text-decoration:underline; color:#001f3f; }
+  ol.news .meta { display:block; margin-top:3px; font-size:13px; color:var(--mute); }
+  table.ind { width:100%; border-collapse:collapse; table-layout:fixed; }
+  table.ind th { width:20%; }
+  table.ind th, table.ind td { border:1px solid var(--line); padding:10px 12px; font-size:14px; text-align:center; }
+  table.ind th { background:#f8fafc; color:#334155; font-weight:700; }
+  table.ind td.nm { text-align:left; font-weight:700; color:#0f172a; }
+  table.ind td.nm small { font-weight:500; color:var(--mute); margin-left:4px; }
+  table.ind td.grp { background:#f8fafc; font-weight:700; color:#334155; white-space:nowrap; }
+  table.ind td.v { font-weight:800; font-size:16px; }
+  .up { color:#d93f3c; font-weight:700; } .dn { color:#005587; font-weight:700; } .fl { color:var(--mute); }
+  .foot { margin-top:36px; font-size:12px; color:#94a3b8; }
+  @media (max-width:640px){ table.ind th, table.ind td { padding:8px 6px; font-size:12px; } table.ind td.v { font-size:14px; } table.ind td.nm small { display:block; margin:0; } .wrap{padding-top:20px}
+    .site-header h1{font-size:22px} .menu{width:100%} .menu a{flex:1;width:auto;height:40px;padding:0 12px;font-size:13px} }
+</style>
 </head>
 <body>
-  <header class="site-header">
-    <div class="in">
-      <div>
-        <h1>전력시장 전일실적</h1>
-        <p class="sub">기준일: <b id="headerDisplayDate">로딩 중...</b> | 육지 기준 | 에너지사업총괄</p>
-      </div>
-      <nav class="menu">
-        <a href="https://shycrt-lgtm.github.io/Energy-Index/">에너지 시장 주요정보 <span>›</span></a>
-        <a href="https://shycrt-lgtm.github.io/TMS/">TMS <span>›</span></a>
-      </nav>
+<header class="site-header">
+  <div class="in">
+    <div>
+      <h1>에너지 시장 주요정보</h1>
+      <p class="sub">기준일: <b id="baseDate">-</b> | 에너지사업총괄</p>
     </div>
-  </header>
+    <nav class="menu">
+      <a href="https://shycrt-lgtm.github.io/KPX-Daily-Report/">전력시장 전일실적 <span>›</span></a>
+      <a href="https://shycrt-lgtm.github.io/TMS/">TMS <span>›</span></a>
+    </nav>
+  </div>
+</header>
 
-  <div class="mx-auto" style="max-width:1000px;padding:28px 16px 48px">
-    <div class="flex justify-end">
-      <div class="flex flex-col md:items-end gap-2">
-        <div class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-lg shadow-sm">
-          <label for="historyDate" class="text-xs md:text-sm font-bold text-slate-700 cursor-pointer">조회일자:</label>
-          <div class="relative flex items-center">
-            <input type="text" id="historyDate" class="bg-transparent text-xs md:text-sm font-bold text-slate-800 outline-none cursor-pointer w-28 pr-6 text-center" readonly>
-            <svg class="w-4 h-4 text-slate-500 absolute right-1 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-          </div>
-          <span id="badgeWeekday" class="text-xs font-bold px-1.5 py-0.5 rounded border text-slate-500 bg-white border-slate-200">(-)</span>
-          <div class="ml-2 pl-2 border-l border-slate-200">
-            <button id="btnLatest" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#001f3f] hover:bg-slate-800 text-white text-xs font-bold rounded shadow transition">
-              <span id="btnLatestText">⚡ 최신 실적으로</span> &rarr;
-            </button>
-          </div>
-        </div>
+<div class="wrap">
+  <div class="pick-row">
+    <div class="pick">
+      <label for="viewDate">조회일자:</label>
+      <div class="box">
+        <input type="text" id="viewDate" readonly>
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
       </div>
-    </div>
-
-    <div>
-      <h2>전일실적 요약</h2>
-      <div class="grid grid-cols-2 md:grid-cols-7 gap-0 border border-slate-200">
-        <div class="p-3 border-b md:border-b-0 md:border-r border-slate-200 flex flex-col justify-center bg-slate-50">
-          <p class="text-xs font-bold text-slate-500 mb-1">LNG 단가 (당월)</p>
-          <div class="flex flex-wrap items-baseline gap-x-1"><span id="valLngPrice" class="text-xl font-black text-slate-800">-</span><span class="text-[11px] font-medium">원/Nm³</span></div>
-          <p id="valLngDiff" class="text-[11px] font-semibold mt-1 text-slate-500">-</p>
-          <p class="text-[10px] text-slate-500 mt-0.5 font-medium">전월평균 SMP: <span id="valPrevSmp" class="font-bold text-slate-700">-</span></p>
-        </div>
-        <div class="p-3 border-b md:border-b-0 md:border-r border-slate-200 flex flex-col justify-center">
-          <p class="text-xs font-bold text-slate-500 mb-1">가중평균 SMP</p>
-          <div class="flex flex-wrap items-baseline gap-x-1"><span id="valAvgSmp" class="text-xl font-black text-slate-900">-</span><span class="text-xs font-medium">원/kWh</span></div>
-          <p id="valAvgDiff" class="text-[11px] font-semibold mt-1 text-slate-500">-</p>
-        </div>
-        <div class="p-3 border-b md:border-b-0 md:border-r border-slate-200 flex flex-col justify-center bg-rose-50/30">
-          <p class="text-xs font-bold text-slate-500 mb-1">최고 SMP</p>
-          <div class="flex flex-wrap items-baseline gap-x-1"><span id="valMaxSmp" class="text-xl font-black text-[#d93f3c]">-</span><span class="text-xs font-medium">원/kWh</span></div>
-          <p id="valMaxDiff" class="text-[11px] font-semibold mt-1 text-slate-500">-</p>
-        </div>
-        <div class="p-3 border-b md:border-b-0 md:border-r border-slate-200 flex flex-col justify-center">
-          <p class="text-xs font-bold text-slate-500 mb-1">최저 SMP</p>
-          <div class="flex flex-wrap items-baseline gap-x-1"><span id="valMinSmp" class="text-xl font-black text-slate-900">-</span><span class="text-xs font-medium">원/kWh</span></div>
-          <p id="valMinDiff" class="text-[11px] font-semibold mt-1 text-slate-500">-</p>
-        </div>
-        <div class="p-3 border-b md:border-b-0 md:border-r border-slate-200 flex flex-col justify-center">
-          <p class="text-xs font-bold text-slate-500 mb-1">최대전력 (피크)</p>
-          <div class="flex flex-wrap items-baseline gap-x-1"><span id="valPeakMw" class="text-xl font-black text-slate-900">-</span><span class="text-xs font-medium">MW</span></div>
-        </div>
-        <div class="p-3 border-b md:border-b-0 md:border-r border-slate-200 flex flex-col justify-center">
-          <p class="text-xs font-bold text-slate-500 mb-1">최대전력 시간대</p>
-          <div class="flex flex-wrap items-baseline gap-x-1"><span id="valPeakTime" class="text-xl font-black text-slate-900">-</span></div>
-        </div>
-        <div class="p-3 flex flex-col justify-center">
-          <p class="text-xs font-bold text-slate-500 mb-1">공급예비율</p>
-          <div class="flex flex-wrap items-baseline gap-x-1"><span id="valResRatio" class="text-xl font-black text-emerald-600">-</span><span class="text-xs font-medium">%</span></div>
-        </div>
-      </div>
-      <div id="boxComment" class="mt-3 bg-slate-50 border border-slate-200 border-l-4 px-4 py-3 text-sm text-slate-800 leading-relaxed font-medium" style="border-left-color:#001f3f">로딩 중...</div>
-    </div>
-
-    <div>
-      <h2>시간대별 계통한계가격(SMP)</h2>
-      <div class="chart-container"><canvas id="smpChart"></canvas></div>
-      <p class="text-xs text-slate-500 mt-2">굵은 실선: 실적일(전일) SMP, 점선: 다음날(금일) SMP — 하루전시장에서 전일 발표된 값입니다. 금일 값은 자동 수집 후 표시됩니다.</p>
-    </div>
-    <div>
-      <h2>최근 7일 전력수급 및 SMP 실적</h2>
-      <div class="overflow-x-auto">
-        <table class="w-full border-collapse">
-          <thead>
-            <tr><th rowspan="2">구분</th><th colspan="3">SMP (원/kWh)</th><th colspan="4">전력수급 실적 (MW)</th></tr>
-            <tr><th>가중평균</th><th>최고</th><th>최저</th><th>공급능력</th><th>최대전력</th><th>피크</th><th>예비율</th></tr>
-          </thead>
-          <tbody id="table7DaysBody"></tbody>
-        </table>
-      </div>
-    </div>
-    <div>
-      <h2>발전원별 실시간 수급 구성 및 순부하</h2>
-      <div class="chart-container"><canvas id="generationChart"></canvas></div>
-    </div>
-    <div>
-      <h2>주요 발전원 시간대별 출력 추이</h2>
-      <div class="chart-container"><canvas id="sourceLineChart"></canvas></div>
-    </div>
-    <div>
-      <h2>SMP 스프레드</h2>
-      <div class="chart-container"><canvas id="spreadChart"></canvas></div>
-      <p class="text-[11px] text-slate-500 mt-2 px-1 tracking-tight">* 참고: 차트 안정성을 위해 양수 및 ESS의 충방전 총합을 순공급(Net Supply) 기준으로 환산 표기했습니다.</p>
+      <span id="viewWd" class="wd">(-)</span>
+      <div class="sep"><button id="btnToday" type="button">⚡ 오늘로 →</button></div>
     </div>
   </div>
+  <div id="pastNote" class="pastnote"></div>
 
-  <script>
-  window.addEventListener("DOMContentLoaded", function () {
-    if (window['chartjs-plugin-annotation']) Chart.register(window['chartjs-plugin-annotation']);
-    Chart.Tooltip.positioners.mouseFollow = function(elements, eventPosition) { return eventPosition ? { x: eventPosition.x, y: eventPosition.y } : false; };
-    const crosshairPlugin = {
-      id: 'crosshair',
-      afterDraw: chart => {
-        if (chart.tooltip && chart.tooltip._active && chart.tooltip._active.length) {
-          const activePoint = chart.tooltip._active[0];
-          const ctx = chart.ctx;
-          ctx.save(); ctx.beginPath();
-          ctx.moveTo(activePoint.element.x, chart.chartArea.top); ctx.lineTo(activePoint.element.x, chart.chartArea.bottom);
-          ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(100, 116, 139, 0.7)'; ctx.setLineDash([4, 4]); ctx.stroke(); ctx.restore();
-        }
+  <h2>주요 시장지표<small>전일 기준 (SMP는 당일 적용)</small></h2>
+  <table class="ind">
+    <thead><tr><th>분류</th><th style="text-align:left">지표</th><th>가격</th><th>기준일</th><th>전일 대비</th></tr></thead>
+    <tbody id="indBody"><tr><td colspan="5" class="fl">불러오는 중...</td></tr></tbody>
+  </table>
+  <div class="note">JKM은 OilPriceAPI의 영업일별 값, 국제유가는 한국석유공사 일별 값입니다. 배출권은 한국거래소 시세, REC는 한국전력거래소 현물시장 육지 평균가이며 REC는 거래일에만 값이 있어 기준일이 며칠 전일 수 있습니다. 환율은 한국수출입은행 매매기준율(영업일 기준, 조회 불가 시 ECB 기준환율로 대체하며 지표명 옆에 출처 표기)입니다. SMP는 육지 기준이며 하루전시장에서 확정된 오늘 값(가중평균은 수요예측 가중, 최고·최저는 해당 시각 표시)입니다. 지표별로 기준일이 다를 수 있으며 휴장일에는 직전 영업일 값을 표시합니다. 자료 갱신: <span id="indUpdated">-</span></div>
+
+  <h2>에너지 뉴스<small id="newsUpd"></small></h2>
+  <ol class="news" id="newsList"><li class="fl">불러오는 중...</li></ol>
+  <div class="note">구글 뉴스에서 에너지 관련 키워드로 모은 최근 기사이며, 같은 내용의 기사는 하나로 합쳐 보여줍니다. 제목을 누르면 원문으로 이동합니다.</div>
+
+  <div class="foot">출처: 한국전력거래소, 한국가스공사, 공공데이터포털</div>
+</div>
+
+<script>
+  const SMP_URL = 'https://shycrt-lgtm.github.io/KPX-Daily-Report/smp_live.json';
+  const KPX_RECENT = 'https://shycrt-lgtm.github.io/KPX-Daily-Report/data_recent.json';
+  const KPX_FULL = 'https://shycrt-lgtm.github.io/KPX-Daily-Report/data.json';
+  const MIN_KEY = '20261001';                 // 이 날짜부터 조회 가능
+  const kst = new Date(Date.now() + 9 * 3600 * 1000);
+  const addDay = (k, n) => new Date(Date.UTC(+k.slice(0,4), +k.slice(4,6)-1, +k.slice(6,8) + n)).toISOString().slice(0,10).replace(/-/g, '');
+  const TODAY = kst.toISOString().slice(0,10).replace(/-/g, '');
+  const dow = k => '일월화수목금토'[new Date(Date.UTC(+k.slice(0,4), +k.slice(4,6)-1, +k.slice(6,8))).getUTCDay()];
+  const fmtLong = k => `${k.slice(0,4)}년 ${k.slice(4,6)}월 ${k.slice(6,8)}일(${dow(k)})`;
+  const fmtShort = k => `${+k.slice(4,6)}.${+k.slice(6,8)}(${dow(k)})`;
+  const ymdDash = k => `${k.slice(0,4)}-${k.slice(4,6)}-${k.slice(6,8)}`;
+  const f2 = v => Number(v).toFixed(2);
+  const getJson = u => fetch(u + (u.includes('?') ? '&' : '?') + 't=' + Date.now()).then(r => { if (!r.ok) throw new Error(u + ' ' + r.status); return r.json(); });
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  function stats(day) {
+    const s = day.smp, w = day.mlfd;
+    const wavg = (w && w.length === s.length) ? s.reduce((a, v, i) => a + v * w[i], 0) / w.reduce((a, v) => a + v, 0) : s.reduce((a, v) => a + v, 0) / s.length;
+    const mx = Math.max(...s), mn = Math.min(...s);
+    return { wavg, mx, mn, mxH: s.indexOf(mx) + 1, mnH: s.indexOf(mn) + 1 };
+  }
+  // KPX 일별 자료(data_recent.json → 없으면 data.json)에서 해당 일자 SMP 요약
+  let KPX_CACHE = null, KPX_FULL_CACHE = null;
+  async function kpxDays(keys) {
+    try { KPX_CACHE = KPX_CACHE || await getJson(KPX_RECENT); } catch (e) { KPX_CACHE = { days: {} }; }
+    if (keys.every(k => KPX_CACHE.days[k])) return KPX_CACHE.days;
+    try { KPX_FULL_CACHE = KPX_FULL_CACHE || await getJson(KPX_FULL); } catch (e) { return KPX_CACHE.days; }
+    return Object.assign({}, KPX_FULL_CACHE.days, KPX_CACHE.days);
+  }
+  const fromKpx = d => ({ wavg: d.smp_avg, mx: d.smp_max, mn: d.smp_min, mxH: d.smp_max_idx + 1, mnH: d.smp_min_idx + 1 });
+
+  // [분류, 키, 지표명, 단위]
+  const IND_ORDER = [
+    ['환율', 'fx', '원/달러', '원'], ['환율', 'fx_jpy', '원/100엔', '원'],
+    ['국제유가', 'dubai', '두바이유', '$/bbl'], ['국제유가', 'brent', '브렌트유', '$/bbl'], ['국제유가', 'wti', 'WTI', '$/bbl'],
+    ['LNG', 'jkm', 'JKM', 'USD/MMBtu'],
+    ['탄소·REC', 'kau', '배출권', '원/톤'], ['탄소·REC', 'rec', 'REC(육지)', '원/REC'],
+    ['SMP', 'smp_avg', '가중평균', '원/kWh'], ['SMP', 'smp_max', '최고', '원/kWh'], ['SMP', 'smp_min', '최저', '원/kWh']
+  ];
+  const fmtI = (v, unit) => ['원/톤', '원/REC'].includes(unit) ? Math.round(v).toLocaleString('ko-KR') : (Math.abs(v) >= 1000 ? v.toLocaleString('ko-KR', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : f2(v));
+
+  async function loadIndicators(key) {
+    const isToday = key === TODAY;
+    let st = null;
+    try { st = await getJson(isToday ? 'indicators.json' : `history/ind_${key}.json`); } catch (e) {}
+    const items = Object.assign({}, (st && st.items) || {});
+    // SMP: 오늘은 실시간 파일, 과거는 KPX 일별 자료
+    let t = null, p = null;
+    const prevKey = addDay(key, -1);
+    let smpKey = key;
+    if (isToday) {
+      // 1) 실시간 파일(smp_live.json) 2) 없으면 KPX 일별 자료 3) 그래도 없으면 가장 최근 자료일로 표시(기준일 열에 날짜 표기)
+      let live = null;
+      try { live = await getJson(SMP_URL); } catch (e) {}
+      const ld = (live && live.days) || {};
+      let kd = {};
+      if (!ld[key]) { try { kd = await kpxDays([key, prevKey]); } catch (e) {} }
+      for (let i = 0; i <= 3 && !t; i++) {
+        const k = addDay(key, -i), pk = addDay(k, -1);
+        if (ld[k] && ld[k].smp && ld[k].smp.length) { t = stats(ld[k]); p = ld[pk] && ld[pk].smp ? stats(ld[pk]) : (kd[pk] ? fromKpx(kd[pk]) : null); smpKey = k; }
+        else if (kd[k]) { t = fromKpx(kd[k]); p = ld[pk] && ld[pk].smp ? stats(ld[pk]) : (kd[pk] ? fromKpx(kd[pk]) : null); smpKey = k; }
       }
-    };
-    Chart.register(crosshairPlugin);
-
-    let MASTER_DATA = null;
-    let charts = {};
-    const labels = Array.from({length: 24}, (_, i) => (i + 1) + "시");
-    const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
-
-    const commonOptions = {
-      responsive: true, maintainAspectRatio: false,
-      layout: { padding: { top: 40, right: 20, bottom: 20, left: 10 } },
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { labels: { usePointStyle: true, font: { family: 'Noto Sans KR', size: 12 },
-          generateLabels: function (chart) {
-            const items = Chart.defaults.plugins.legend.labels.generateLabels(chart);
-            items.forEach(it => {
-              const ds = chart.data.datasets[it.datasetIndex];
-              if (ds && ds.borderDash && ds.borderDash.length) { it.pointStyle = 'line'; it.lineDash = ds.borderDash; it.lineWidth = 2; }
-            });
-            return items;
-          } } },
-        tooltip: {
-          position: 'mouseFollow', backgroundColor: 'rgba(255, 255, 255, 0.95)',
-          titleColor: '#001f3f', bodyColor: '#1a1a1a', borderColor: '#e5e7eb', borderWidth: 1,
-          padding: 10, boxPadding: 4, usePointStyle: true,
-          titleFont: { family: 'Noto Sans KR', size: 13, weight: 'bold' }, bodyFont: { family: 'Noto Sans KR', size: 12 }
-        }
-      },
-      scales: { x: { grid: { display: false } }, y: { grid: { color: '#f1f5f9' }, grace: '20%' } }
-    };
-
-    function initCharts() {
-      charts.smp = new Chart(document.getElementById('smpChart'), {
-        type: 'line',
-        data: { labels: labels, datasets: [
-          { label: '전일 SMP', data: [], pointStyle: 'line', borderColor: '#005587', backgroundColor: '#005587', borderWidth: 3.5, pointRadius: 3, pointHoverRadius: 6, tension: 0.1, order: 1 },
-          { label: '금일 SMP', data: [], pointStyle: 'line', borderColor: '#64748b', backgroundColor: '#64748b', borderWidth: 2.5, borderDash: [6, 4], pointRadius: 0, pointHoverRadius: 5, tension: 0.1, hidden: true, order: 2 }
-        ] },
-        options: {
-          ...commonOptions,
-          scales: { x: { grid: { display: false } }, y: { grid: { color: '#f1f5f9' }, title: { display: true, text: '원/kWh' }, grace: '20%' } },
-          plugins: { ...commonOptions.plugins, tooltip: { ...commonOptions.plugins.tooltip, callbacks: { label: ctx => ' ' + ctx.dataset.label + ': ' + Number(ctx.raw).toFixed(2) + '원/kWh' } }, annotation: { annotations: {} } }
-        }
-      });
-
-      charts.gen = new Chart(document.getElementById('generationChart'), {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [
-            { type: 'line', label: '순부하 (태양광/풍력 제외)', data: [], pointStyle: 'line', borderColor: '#1a1a1a', borderDash: [4,4], borderWidth: 2, pointRadius: 0, fill: false, z: 10, stack: 'net' },
-            { label: '원자력', data: [], backgroundColor: '#f59e0b', borderColor: 'transparent', fill: true, pointRadius: 0, tension: 0.2, stack: 'area' },
-            { label: '석탄', data: [], backgroundColor: '#b45309', borderColor: 'transparent', fill: true, pointRadius: 0, tension: 0.2, stack: 'area' },
-            { label: '유류', data: [], backgroundColor: '#475569', borderColor: 'transparent', fill: true, pointRadius: 0, tension: 0.2, stack: 'area' },
-            { label: 'LNG', data: [], backgroundColor: '#fde047', borderColor: 'transparent', fill: true, pointRadius: 0, tension: 0.2, stack: 'area' },
-            { label: '수력', data: [], backgroundColor: '#38bdf8', borderColor: 'transparent', fill: true, pointRadius: 0, tension: 0.2, stack: 'area' },
-            { label: '양수발전', data: [], backgroundColor: '#0284c7', borderColor: 'transparent', fill: true, pointRadius: 0, tension: 0.2, stack: 'area' },
-            { label: 'ESS방전', data: [], backgroundColor: '#1d4ed8', borderColor: 'transparent', fill: true, pointRadius: 0, tension: 0.2, stack: 'area' },
-            { label: '풍력', data: [], backgroundColor: '#22c55e', borderColor: 'transparent', fill: true, pointRadius: 0, tension: 0.2, stack: 'area' },
-            { label: '태양광', data: [], backgroundColor: '#ef4444', borderColor: 'transparent', fill: true, pointRadius: 0, tension: 0.2, stack: 'area' },
-            { label: '양수펌핑(충전)', data: [], backgroundColor: '#94a3b8', borderColor: 'transparent', fill: true, pointRadius: 0, tension: 0.2, stack: 'area' },
-            { label: 'ESS충전', data: [], backgroundColor: '#cbd5e1', borderColor: 'transparent', fill: true, pointRadius: 0, tension: 0.2, stack: 'area' }
-          ]
-        },
-        options: { ...commonOptions, scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grace: '10%' } } }
-      });
-
-      charts.source = new Chart(document.getElementById('sourceLineChart'), {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [
-            { label: 'LNG', data: [], pointStyle: 'line', borderColor: '#005587', borderWidth: 2.5, pointRadius: 0, tension: 0.3 },
-            { label: '석탄', data: [], pointStyle: 'line', borderColor: '#d93f3c', borderWidth: 2.5, pointRadius: 0, tension: 0.3 },
-            { label: '태양광', data: [], pointStyle: 'line', borderColor: '#f59e0b', borderWidth: 2.5, pointRadius: 0, tension: 0.3 }
-          ]
-        },
-        options: { ...commonOptions, plugins: { ...commonOptions.plugins, annotation: { annotations: {} } } }
-      });
-
-      charts.spread = new Chart(document.getElementById('spreadChart'), {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [
-            { type: 'line', label: '유연성 자원 순공급 (양수/ESS)', yAxisID: 'y', data: [], pointStyle: 'line', borderColor: '#059669', borderWidth: 2.5, tension: 0.3 },
-            { type: 'line', label: '계통한계가격(SMP)', yAxisID: 'y1', data: [], pointStyle: 'line', borderColor: '#005587', borderDash: [4,4], borderWidth: 1.5, tension: 0.3 }
-          ]
-        },
-        options: {
-          ...commonOptions,
-          scales: {
-            x: { grid: { display: false } },
-            y: { type: 'linear', position: 'left', title: { display: true, text: 'MW' }, grace: '15%' },
-            y1: { type: 'linear', position: 'right', grid: { drawOnChartArea: false }, title: { display: true, text: '원/kWh' }, grace: '20%' }
-          },
-          plugins: { ...commonOptions.plugins, annotation: { annotations: {} } }
-        }
-      });
+    } else {
+      const days = await kpxDays([key, prevKey]);
+      if (days[key]) { t = fromKpx(days[key]); p = days[prevKey] ? fromKpx(days[prevKey]) : null; }
     }
-
-    // 발전량 비중(전력계통 기준) 한 줄 요약 — 선택한 일자의 발전량 자료(d.gen)로 매번 새로 생성
-    function genSummaryHtml(g) {
-      const num = v => Number(v) || 0;
-      const sum = a => (a || []).reduce((s, v) => s + num(v), 0);
-      const title = '<strong>발전량비중(전력계통) :</strong>';
-      if (!g || sum(g.nuclear) + sum(g.coal) + sum(g.gas) <= 0) return `<li>${title} 발전원별 자료 없음</li>`;
-      const groups = [
-        ['원자력', sum(g.nuclear)], ['석탄', sum(g.coal)], ['LNG', sum(g.gas)],
-        ['태양광·풍력', sum(g.solar) + sum(g.wind)],
-        ['기타(유류·수력·양수·ESS)', sum(g.oil) + sum(g.hydro) + sum(g.pump_gen) + sum(g.ess_dis)]
-      ];
-      const total = groups.reduce((s, x) => s + x[1], 0) || 1;
-      return `<li>${title} ${groups.map(x => `${x[0]} ${(x[1] / total * 100).toFixed(0)}%`).join(', ')}</li>`;
+    if (t) {
+      const mk = (nm, k, hr) => ({ name: nm, unit: '원/kWh', date: ymdDash(smpKey), value: t[k], prev_value: p ? p[k] : null, hr });
+      items.smp_avg = mk('가중평균', 'wavg'); items.smp_max = mk('최고', 'mx', t.mxH); items.smp_min = mk('최저', 'mn', t.mnH);
     }
-
-    let SMP_LIVE = null;
-    function addDaysKey(k, n) {
-      const d = new Date(Date.UTC(+k.slice(0,4), +k.slice(4,6) - 1, +k.slice(6,8) + n));
-      return d.toISOString().slice(0,10).replace(/-/g, '');
-    }
-    function todayKeyKST() {
-      return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0,10).replace(/-/g, '');
-    }
-
-    function renderDay(dateKey) {
-      if (!MASTER_DATA || !MASTER_DATA.days[dateKey]) return;
-      const d = MASTER_DATA.days[dateKey];
-      const hol = MASTER_DATA.holidays;
-
-      const dObj = new Date(parseInt(dateKey.slice(0,4)), parseInt(dateKey.slice(4,6))-1, parseInt(dateKey.slice(6,8)));
-      const wDay = weekdays[dObj.getDay()];
-      const isHol = dObj.getDay() === 0 || dObj.getDay() === 6 || !!hol[dateKey];
-      const hName = hol[dateKey] || (dObj.getDay() === 0 || dObj.getDay() === 6 ? "주말" : "");
-
-      document.getElementById('headerDisplayDate').textContent = `${dObj.getFullYear()}년 ${String(dObj.getMonth()+1).padStart(2,'0')}월 ${String(dObj.getDate()).padStart(2,'0')}일(${wDay})`;
-      document.getElementById('headerDisplayDate').className = isHol ? "text-rose-600 font-black" : "text-slate-800 font-bold";
-      
-      const badge = document.getElementById('badgeWeekday');
-      badge.textContent = `(${wDay})`;
-      badge.className = `text-xs font-bold px-1.5 py-0.5 rounded border ${isHol ? 'text-rose-600 bg-rose-50 border-rose-200' : 'text-slate-500 bg-white border-slate-200'}`;
-      if (hName) badge.title = hName; else badge.removeAttribute('title');
-      document.getElementById('historyDate').value = `${dateKey.slice(0,4)}-${dateKey.slice(4,6)}-${dateKey.slice(6,8)}`;
-
-      // LNG 단가·전월비·전월 평균 SMP는 data.json 값을 그대로 사용 (build_report.py에서 계산)
-      let displayLngPrice = d.lng_price;
-      let displayLngDiffText = d.diff_lng_text;
-      let displayLngDiffColor = d.diff_lng_color;
-      let displayPrevSmpStr = d.prev_smp_str;
-
-      document.getElementById('valLngPrice').textContent = Number(displayLngPrice).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
-      document.getElementById('valLngDiff').textContent = displayLngDiffText || "전월비 변동없음";
-      document.getElementById('valLngDiff').className = `text-[11px] font-semibold mt-1 ${displayLngDiffColor || 'text-slate-500'}`;
-      document.getElementById('valPrevSmp').textContent = displayPrevSmpStr || "-";
-
-      document.getElementById('valAvgSmp').textContent = d.smp_avg.toFixed(2);
-      document.getElementById('valAvgDiff').textContent = `전일비 ${d.diff_avg_txt}`;
-      document.getElementById('valAvgDiff').className = `text-[11px] font-semibold mt-1 ${d.diff_avg_color}`;
-      document.getElementById('valMaxSmp').textContent = d.smp_max.toFixed(2);
-      document.getElementById('valMaxDiff').textContent = `전일비 ${d.diff_max_txt}`;
-      document.getElementById('valMaxDiff').className = `text-[11px] font-semibold mt-1 ${d.diff_max_color}`;
-      document.getElementById('valMinSmp').textContent = d.smp_min.toFixed(2);
-      document.getElementById('valMinDiff').textContent = `전일비 ${d.diff_min_txt}`;
-      document.getElementById('valMinDiff').className = `text-[11px] font-semibold mt-1 ${d.diff_min_color}`;
-      document.getElementById('valPeakMw').textContent = Number(d.cap_peak).toLocaleString();
-      document.getElementById('valPeakTime').textContent = parseInt(d.cap_time, 10) + '시';
-      document.getElementById('valResRatio').textContent = Number(d.cap_res).toFixed(1);
-
-      const spread = d.smp_max - d.smp_min;
-      document.getElementById('boxComment').innerHTML = `
-        <ul class="space-y-2">
-          ${genSummaryHtml(d.gen)}
-          <li><strong>SMP 스프레드 :</strong> ${spread.toFixed(2)}원/kWh <span class="text-slate-600">(최고 ${d.smp_max.toFixed(2)}원/kWh · ${d.smp_max_idx + 1}시 − 최저 ${d.smp_min.toFixed(2)}원/kWh · ${d.smp_min_idx + 1}시)</span></li>
-        </ul>`;
-
-      let tableHtml = "";
-      d.recent_7.forEach((r, idx) => {
-        const bg = idx === 0 ? "bg-slate-50 font-bold" : "";
-        const txt = r.is_holiday ? "text-holiday" : "";
-        tableHtml += `<tr class="${bg}"><td class="${txt}">${r.date}</td><td>${r.avg.toFixed(2)}</td><td>${r.max.toFixed(2)}</td><td>${r.min.toFixed(2)}</td><td>${Number(r.cap).toLocaleString()}</td><td>${Number(r.peak).toLocaleString()}</td><td>${r.time}</td><td>${Number(r.res).toFixed(1)}%</td></tr>`;
-      });
-      document.getElementById('table7DaysBody').innerHTML = tableHtml;
-
-      charts.smp.data.datasets[0].data = d.smp_hourly;
-      {
-        // 선택한 일자의 다음날 SMP: data.json 에 있으면 그것을, 없으면 smp_live.json(전일·오늘)에서 찾는다
-        const nk = addDaysKey(dateKey, 1);
-        const nextArr = (MASTER_DATA.days[nk] && MASTER_DATA.days[nk].smp_hourly) || (SMP_LIVE && SMP_LIVE.days && SMP_LIVE.days[nk] && SMP_LIVE.days[nk].smp) || null;
-        const isToday = nk === todayKeyKST();
-        const md = k => `${+k.slice(4,6)}.${+k.slice(6,8)}`;
-        charts.smp.data.datasets[0].label = `전일 SMP`;
-        charts.smp.data.datasets[1].label = `금일 SMP`;
-        charts.smp.data.datasets[1].data = nextArr || [];
-        charts.smp.data.datasets[1].hidden = !nextArr;
+    return { st, items };
+  }
+  function renderInd({ st, items }) {
+    document.getElementById('indUpdated').textContent = st && st.updated ? st.updated + ' (KST)' : '-';
+    const span = {}; IND_ORDER.forEach(r => span[r[0]] = (span[r[0]] || 0) + 1);
+    const seen = {};
+    document.getElementById('indBody').innerHTML = IND_ORDER.map(([grp, k, nm, unit]) => {
+      const first = !seen[grp]; seen[grp] = true;
+      const g = first ? `<td class="grp" rowspan="${span[grp]}">${grp}</td>` : '';
+      const it = items[k];
+      const head = `${g}<td class="nm">${nm}<small>${[unit === '원' ? '' : unit, it && it.item ? it.item : '', it && it.hr ? it.hr + '시' : ''].filter(Boolean).join(' · ')}</small></td>`;
+      if (!it) return `<tr>${head}<td colspan="3" class="fl">자료 없음</td></tr>`;
+      let chg = '<span class="fl">-</span>';
+      if (it.prev_value != null) {
+        const d = it.value - it.prev_value, p = d / it.prev_value * 100, c = d > 0 ? 'up' : d < 0 ? 'dn' : 'fl', ar = d > 0 ? '▲' : d < 0 ? '▼' : '-';
+        chg = `<span class="${c}">${ar} ${fmtI(Math.abs(d), unit)} (${p >= 0 ? '+' : ''}${p.toFixed(1)}%)</span>`;
       }
-      const peakAnnotation = { type: 'box', xMin: d.peak_left, xMax: d.peak_right, backgroundColor: 'rgba(217, 63, 60, 0.08)', borderWidth: 0, label: { display: true, content: `${d.peak_band} 피크`, position: 'top', color: '#d93f3c', font: {size: 11, weight: 'bold'} } };
-      charts.smp.options.plugins.annotation.annotations = {
-        peakBox: peakAnnotation,
-        maxPt: { type: 'point', xValue: d.smp_max_idx, yValue: d.smp_max, backgroundColor: '#d93f3c', radius: 5, borderWidth: 2, borderColor: '#fff' },
-        maxLbl: { type: 'label', xValue: d.smp_max_idx, yValue: d.smp_max, content: ['최고 ' + d.smp_max.toFixed(2) + '원'], color: '#d93f3c', yAdjust: -15, font: { weight: 'bold' } },
-        minPt: { type: 'point', xValue: d.smp_min_idx, yValue: d.smp_min, backgroundColor: '#005587', radius: 5, borderWidth: 2, borderColor: '#fff' },
-        minLbl: { type: 'label', xValue: d.smp_min_idx, yValue: d.smp_min, content: ['최저 ' + d.smp_min.toFixed(2) + '원'], color: '#005587', yAdjust: -15, font: { weight: 'bold' } }
-      };
-      charts.smp.update('none');
+      const dd = it.date ? it.date.replace(/-/g, '') : '';
+      return `<tr>${head}<td class="v">${fmtI(it.value, unit)}</td><td>${dd ? fmtShort(dd) : '-'}</td><td>${chg}</td></tr>`;
+    }).join('');
+  }
+  async function loadNews(key) {
+    try { return await getJson(key === TODAY ? 'news.json' : `history/news_${key}.json`); } catch (e) { return null; }
+  }
+  function renderNews(nj) {
+    const ul = document.getElementById('newsList');
+    if (!nj || !nj.items || !nj.items.length) { ul.innerHTML = '<li class="fl">해당 일자의 뉴스 자료가 없습니다.</li>'; document.getElementById('newsUpd').textContent = ''; return; }
+    document.getElementById('newsUpd').textContent = nj.updated ? '갱신 ' + nj.updated : '';
+    ul.innerHTML = nj.items.map(x => {
+      const t = x.pub ? x.pub.slice(5, 7).replace(/^0/, '') + '.' + x.pub.slice(8, 10).replace(/^0/, '') + ' ' + x.pub.slice(11, 16) : '';
+      const more = x.more > 0 ? ` · 유사 기사 ${x.more}건 포함` : '';
+      return `<li><a href="${esc(x.link)}" target="_blank" rel="noopener noreferrer">${esc(x.title)}</a><span class="meta">${esc(x.source || '')}${t ? ' · ' + t : ''}${more}</span></li>`;
+    }).join('');
+  }
 
-      const g = d.gen;
-      charts.gen.data.datasets[0].data = g.net_load;
-      charts.gen.data.datasets[1].data = g.nuclear;
-      charts.gen.data.datasets[2].data = g.coal;
-      charts.gen.data.datasets[3].data = g.oil;
-      charts.gen.data.datasets[4].data = g.gas;
-      charts.gen.data.datasets[5].data = g.hydro;
-      charts.gen.data.datasets[6].data = g.pump_gen;
-      charts.gen.data.datasets[7].data = g.ess_dis;
-      charts.gen.data.datasets[8].data = g.wind;
-      charts.gen.data.datasets[9].data = g.solar;
-      charts.gen.data.datasets[10].data = g.pump_load;
-      charts.gen.data.datasets[11].data = g.ess_chg;
-      charts.gen.update('none');
+  let SEL = TODAY, SEQ = 0;
+  async function show(key) {
+    SEL = key; const my = ++SEQ;
+    document.getElementById('baseDate').textContent = fmtLong(key);
+    const wd = document.getElementById('viewWd'); wd.textContent = `(${dow(key)})`;
+    wd.className = 'wd' + (['일', '토'].includes(dow(key)) ? ' hol' : '');
+    document.getElementById('viewDate').value = ymdDash(key);
+    document.getElementById('btnToday').textContent = key === TODAY ? '⚡ 오늘' : `⚡ 오늘(${+TODAY.slice(4,6)}.${+TODAY.slice(6,8)})로 →`;
+    const pn = document.getElementById('pastNote');
+    if (key === TODAY) pn.style.display = 'none'; else { pn.style.display = 'block'; pn.textContent = `${fmtLong(key)}에 저장된 자료를 보고 있습니다.`; }
+    document.getElementById('indBody').innerHTML = '<tr><td colspan="5" class="fl">불러오는 중...</td></tr>';
+    const [ind, news] = await Promise.all([loadIndicators(key), loadNews(key)]);
+    if (my !== SEQ) return;                      // 그 사이 다른 날짜를 골랐으면 버림
+    renderInd(ind); renderNews(news);
+  }
+  show(TODAY);
 
-      charts.source.data.datasets[0].data = g.gas;
-      charts.source.data.datasets[1].data = g.coal;
-      charts.source.data.datasets[2].data = g.solar;
-      charts.source.options.plugins.annotation.annotations = { box1: peakAnnotation };
-      charts.source.update('none');
-
-      charts.spread.data.datasets[0].data = g.spread;
-      charts.spread.data.datasets[1].data = d.smp_hourly;
-      charts.spread.options.plugins.annotation.annotations = {
-        spreadMaxPt: { type: 'point', xScaleID: 'x', yScaleID: 'y1', xValue: d.smp_max_idx, yValue: d.smp_max, backgroundColor: '#d93c39', radius: 4.5, borderWidth: 2, borderColor: '#fff' },
-        spreadMaxLbl: { type: 'label', xScaleID: 'x', yScaleID: 'y1', xValue: d.smp_max_idx, yValue: d.smp_max, content: ['최고 ' + d.smp_max.toFixed(2) + '원'], font: { size: 10, weight: 'bold' }, color: '#d93c39', yAdjust: -14 },
-        spreadMinPt: { type: 'point', xScaleID: 'x', yScaleID: 'y1', xValue: d.smp_min_idx, yValue: d.smp_min, backgroundColor: '#005587', radius: 4.5, borderWidth: 2, borderColor: '#fff' },
-        spreadMinLbl: { type: 'label', xScaleID: 'x', yScaleID: 'y1', xValue: d.smp_min_idx, yValue: d.smp_min, content: ['최저 ' + d.smp_min.toFixed(2) + '원'], font: { size: 10, weight: 'bold' }, color: '#005587', yAdjust: -14 }
-      };
-      charts.spread.update('none');
-    }
-
-    // 처음에는 최근 60일만 담은 작은 파일(data_recent.json)을 읽고, 없으면 전체(data.json)를 읽는다.
-    async function loadFull() {
-      if (FULL_LOADED) return;
-      const full = await getJson('data.json');
-      MASTER_DATA.days = Object.assign({}, full.days, MASTER_DATA.days);
-      FULL_LOADED = true;
-    }
-    window.__DATA_P
-      .then(([data, live]) => {
-        SMP_LIVE = live;
-        MASTER_DATA = data;
-        initCharts();
-
-        const latestKey = data.latest_date;
-        const latestD = `${latestKey.slice(0,4)}-${latestKey.slice(4,6)}-${latestKey.slice(6,8)}`;
-        const latestMMDD = `${latestKey.slice(4,6)}.${latestKey.slice(6,8)}`;
-        document.getElementById('btnLatestText').textContent = `⚡ 최신 실적(${latestMMDD})으로`;
-
-        flatpickr("#historyDate", {
-          locale: "ko", dateFormat: "Y-m-d", defaultDate: latestD, minDate: "2022-01-01", maxDate: latestD, disableMobile: true,
-          onDayCreate: (dObj, dStr, fp, dayElem) => {
-            const dateStr = flatpickr.formatDate(dayElem.dateObj, "Y-m-d");
-            const rawKey = dateStr.replace(/-/g, '');
-            if (dayElem.dateObj.getDay() === 0 || dayElem.dateObj.getDay() === 6) dayElem.classList.add("weekend-day");
-            if (data.holidays[rawKey]) {
-              dayElem.classList.add("holiday-day");
-              dayElem.setAttribute("title", data.holidays[rawKey]);
-            }
-          },
-          onChange: (selectedDates, dateStr) => {
-            if (!dateStr) return;
-            const targetKey = dateStr.replace(/-/g, '');
-            const show = () => {
-              if (MASTER_DATA.days[targetKey]) renderDay(targetKey);
-              else alert("해당 일자의 데이터가 존재하지 않습니다.");
-            };
-            if (MASTER_DATA.days[targetKey] || FULL_LOADED) { show(); return; }
-            const badge = document.getElementById('badgeWeekday'); const prev = badge.textContent;
-            badge.textContent = '불러오는 중…';
-            loadFull().then(show).catch(() => alert("과거 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.")).finally(() => { if (badge.textContent === '불러오는 중…') badge.textContent = prev; });
-          }
-        });
-
-        document.getElementById('btnLatest').addEventListener('click', () => {
-          renderDay(latestKey);
-        });
-
-        renderDay(latestKey);
-      })
-      .catch(err => {
-        console.error("데이터 로딩 실패:", err);
-        alert("데이터(data.json)를 불러오는데 실패했습니다.");
-      });
+  // 달력(외부 라이브러리)은 늦게 떠도 표시를 막지 않도록 따로 초기화
+  window.addEventListener('DOMContentLoaded', () => {
+    if (typeof flatpickr === 'undefined') return;
+    flatpickr('#viewDate', {
+      locale: 'ko', dateFormat: 'Y-m-d', defaultDate: ymdDash(TODAY), minDate: ymdDash(MIN_KEY), maxDate: ymdDash(TODAY), disableMobile: true,
+      onDayCreate: (o, s, fp, el) => { const w = el.dateObj.getDay(); if (w === 0 || w === 6) el.classList.add('weekend-day'); },
+      onChange: (d, str) => { if (str) show(str.replace(/-/g, '')); }
+    });
+    document.getElementById('btnToday').addEventListener('click', () => {
+      const fp = document.getElementById('viewDate')._flatpickr;
+      if (fp) fp.setDate(ymdDash(TODAY), false);
+      show(TODAY);
+    });
   });
-  </script>
+</script>
 </body>
 </html>
