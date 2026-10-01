@@ -17,6 +17,7 @@ jobs:
         env:
           OILPRICE_API_KEY: ${{ secrets.OILPRICE_API_KEY }}
           DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+          KOREAEXIM_KEY: ${{ secrets.KOREAEXIM_KEY }}
         run: python collect_indicators.py
       - name: 변경 저장
         run: |
