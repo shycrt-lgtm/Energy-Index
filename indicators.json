@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-01 18:48",
+ "updated": "2026-10-01 18:49",
  "items": {
   "jkm": {
    "name": "JKM LNG",
@@ -8,6 +8,30 @@
    "value": 25.74,
    "prev_date": "2026-09-30",
    "prev_value": 25.43
+  },
+  "dubai": {
+   "name": "두바이유",
+   "unit": "$/bbl",
+   "date": "2026-09-30",
+   "value": 106.19,
+   "prev_date": "2026-09-29",
+   "prev_value": 107.5
+  },
+  "brent": {
+   "name": "브렌트유",
+   "unit": "$/bbl",
+   "date": "2026-09-30",
+   "value": 103.53,
+   "prev_date": "2026-09-29",
+   "prev_value": 102.59
+  },
+  "wti": {
+   "name": "WTI",
+   "unit": "$/bbl",
+   "date": "2026-09-30",
+   "value": 90.42,
+   "prev_date": "2026-09-29",
+   "prev_value": 89.38
   }
  }
 }
