@@ -1,0 +1,35 @@
+name: Opinet Test
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 오피넷 국제유가 접속 시험
+        run: |
+          python3 - <<'PY'
+          import re, urllib.request, urllib.error
+          urls = [
+              "https://www.opinet.co.kr/glopcoilSelect.do",
+              "https://www.opinet.co.kr/gloilList.do",
+              "https://www.opinet.co.kr/user/main/mainView.do",
+          ]
+          for u in urls:
+              req = urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0", "Accept-Language": "ko"})
+              try:
+                  r = urllib.request.urlopen(req, timeout=40)
+                  raw = r.read()
+                  txt = raw.decode("utf-8", "ignore")
+                  print(f"== {u} HTTP {r.status} 크기={len(raw)}")
+                  plain = re.sub(r"\s+", " ", re.sub(r"<script.*?</script>|<style.*?</style>|<[^>]+>", " ", txt, flags=re.S))
+                  i = plain.find("두바이")
+                  print("   '두바이' 포함:", i >= 0)
+                  if i >= 0:
+                      print("   주변:", plain[max(0, i-200):i+500])
+                  for m in re.findall(r"(?:action|href|url)\s*[=:]\s*[\"'](/[^\"']*(?:glo|oil|crude)[^\"']*)[\"']", txt, flags=re.I)[:15]:
+                      print("   링크 후보:", m)
+              except urllib.error.HTTPError as e:
+                  print(f"== {u} HTTP {e.code}")
+              except Exception as e:
+                  print(f"== {u} 실패 {type(e).__name__} {e}")
+          PY
