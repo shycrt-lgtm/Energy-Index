@@ -109,7 +109,7 @@
     <thead><tr><th>분류</th><th style="text-align:left">지표</th><th>가격</th><th>기준일</th><th>전일 대비</th></tr></thead>
     <tbody id="indBody"><tr><td colspan="5" class="fl">불러오는 중...</td></tr></tbody>
   </table>
-  <div class="note">JKM은 OilPriceAPI의 영업일별 값, 국제유가는 한국석유공사 일별 값입니다. 배출권은 한국거래소 시세, REC는 한국전력거래소 현물시장 육지 평균가이며 REC는 거래일에만 값이 있어 기준일이 며칠 전일 수 있습니다. 환율은 한국수출입은행 매매기준율(영업일 기준, 조회 불가 시 ECB 기준환율로 대체하며 지표명 옆에 출처 표기)입니다. SMP는 육지 기준이며 하루전시장에서 확정된 오늘 값(가중평균은 수요예측 가중, 최고·최저는 해당 시각 표시)입니다. 지표별로 기준일이 다를 수 있으며(배출권·국제유가는 거래 다음 영업일에 공표되어 공표 전에는 직전 값 표시) 휴장일에는 직전 영업일 값을 표시합니다. 자료 갱신: <span id="indUpdated">-</span></div>
+  <div class="note">JKM은 OilPriceAPI의 영업일별 값, 국제유가는 한국석유공사 일별 값입니다. 배출권은 한국거래소 시세, REC는 한국전력거래소 홈페이지의 최근 거래일 평균가이며 거래일(화·목)에만 값이 있어 기준일이 며칠 전일 수 있습니다. 환율은 한국수출입은행 매매기준율(영업일 기준, 조회 불가 시 ECB 기준환율로 대체하며 지표명 옆에 출처 표기)입니다. SMP는 육지 기준이며 전력거래소 하루전시장 결과로, 전일 18시 이후 공표되어 자정에 오늘 값으로 바뀝니다(가중평균은 수요예측 가중, 최고·최저는 해당 시각 표시)입니다. 지표별로 기준일이 다를 수 있으며(배출권·국제유가는 거래 다음 영업일에 공표되어 공표 전에는 직전 값 표시) 휴장일에는 직전 영업일 값을 표시합니다. 자료 갱신: <span id="indUpdated">-</span></div>
 
   <h2>에너지 뉴스<small id="newsUpd"></small></h2>
   <ol class="news" id="newsList"><li class="fl">불러오는 중...</li></ol>
@@ -136,7 +136,7 @@
 
   function stats(day) {
     const s = day.smp, w = day.mlfd;
-    const wavg = (w && w.length === s.length) ? s.reduce((a, v, i) => a + v * w[i], 0) / w.reduce((a, v) => a + v, 0) : s.reduce((a, v) => a + v, 0) / s.length;
+    const wavg = (day.wavg != null) ? day.wavg : (w && w.length === s.length) ? s.reduce((a, v, i) => a + v * w[i], 0) / w.reduce((a, v) => a + v, 0) : s.reduce((a, v) => a + v, 0) / s.length;
     const mx = Math.max(...s), mn = Math.min(...s);
     return { wavg, mx, mn, mxH: s.indexOf(mx) + 1, mnH: s.indexOf(mn) + 1 };
   }
