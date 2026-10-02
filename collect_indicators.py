@@ -408,22 +408,13 @@ def fetch_rec_kpx():
         return urllib.request.urlopen(req, timeout=40).read().decode("utf-8", "ignore")
     html = retry(call, tries=2)
     text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", re.sub(r"(?is)<(script|style).*?</\1>", " ", html)))
-    idxs = [m.start() for m in re.finditer("오늘의 REC", text)]
-    seg = ""
-    for i in idxs:
-        cand = text[i:i + 500]
-        if "평균가" in cand:
-            seg = cand
-            break
-    if not seg:
-        print(f">> [REC KPX] '오늘의 REC' 구간을 찾지 못함 (등장 {len(idxs)}회)")
-        raise ValueError("REC(KPX) 구간 없음")
-    print(f">> [REC KPX 구간] {seg[:260]!r}")
-    m = re.search(r"(\d{4})\.\s?(\d{2})\.\s?(\d{2})", seg)
-    p = re.search(r"평균가[^\d]{0,30}(\d{1,3}(?:,\d{3})+)", seg)
-    if not (m and p):
-        raise ValueError("REC(KPX) 형식 불일치")
-    val = float(p.group(1).replace(",", ""))
+    # REC 카드: "거래일 2026.10.01(목) 거래량 301,230 평균가 71,042 ..." (SMP 카드는 '거래량'이 없어 구분됨)
+    mm = list(re.finditer(r"거래일\s*(\d{4})\.\s?(\d{2})\.\s?(\d{2})[^\d]{0,6}\s*거래량\s*[\d,]+\s*평균가\s*(\d{1,3}(?:,\d{3})+)", text))
+    print(f">> [REC KPX] REC 카드 일치 {len(mm)}건")
+    if not mm:
+        raise ValueError("REC(KPX) 카드 없음")
+    m = p = mm[0]
+    val = float(p.group(4).replace(",", ""))
     d = datetime(int(m.group(1)), int(m.group(2)), int(m.group(3))).date()
     if d.weekday() not in (1, 3):   # 현물시장은 화·목 거래: 거래일이 아닌 날짜가 보이면 직전 화/목으로 본다
         while d.weekday() not in (1, 3):
