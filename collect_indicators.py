@@ -226,47 +226,88 @@ def _find_rows(node):
     return []
 
 
-def fetch_kau_krx():
-    """한국거래소 배출권시장 정보플랫폼(ets.krx.co.kr) 일자별 시세 — 거래 당일 바로 반영.
-    ① GenerateOTP 로 일회용 code 를 받고 ② 그 code 로 일자별 정보를 조회한다. 종목은 올해 연도물(KAU26 등)."""
+def _krx_session():
     base = "https://ets.krx.co.kr"
     page = base + "/contents/ETS/03/03010000/ETS03010000.jsp"
     cj = http.cookiejar.CookieJar()
     op = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
     H = {**UA, "Referer": page}
-    now = datetime.now(KST)
-    item = "KAU" + now.strftime("%y")
     op.open(urllib.request.Request(page, headers=H), timeout=40).read()          # 쿠키 받기
-    otp_url = (base + "/contents/COM/GenerateOTP.jspx?bld=" + urllib.parse.quote("ETS/03/03010000/ets03010000_05", safe="")
-               + "&name=grid&_=" + str(int(time.time() * 1000)))
+    return base, page, op, H
+
+
+def _krx_post(base, page, op, H, bld, name, extra):
+    otp_url = (base + "/contents/COM/GenerateOTP.jspx?bld=" + urllib.parse.quote(bld, safe="")
+               + "&name=" + name + "&_=" + str(int(time.time() * 1000)))
     code = op.open(urllib.request.Request(otp_url, headers=H), timeout=40).read().decode("utf-8", "ignore").strip()
     if len(code) < 20 or "<" in code:
         raise ValueError("KRX 인증값(code) 형식 이상: " + code[:80])
-    form = {"isu_cd": item, "fromdate": (now - timedelta(days=20)).strftime("%Y%m%d"), "todate": now.strftime("%Y%m%d"),
-            "pagePath": "/contents/ETS/03/03010000/ETS03010000.jsp", "code": code,
-            "gNo": "98f13708210194c475687be6106a3b84"}
+    now = datetime.now(KST)
+    form = {"isu_cd": "", "fromdate": (now - timedelta(days=20)).strftime("%Y%m%d"), "todate": now.strftime("%Y%m%d"),
+            "pagePath": "/contents/ETS/03/03010000/ETS03010000.jsp", "code": code}
+    form.update(extra)
     req = urllib.request.Request(base + "/contents/ETS/99/ETS99000001.jspx", data=urllib.parse.urlencode(form).encode(),
                                  headers={**H, "X-Requested-With": "XMLHttpRequest"})
-    body = op.open(req, timeout=40).read().decode("utf-8", "ignore")
-    j = json.loads(body)
-    rows = []
-    for x in _find_rows(j):
-        dd = re.sub(r"\D", "", str(x.get("trd_dd", "")))
-        px, vs, vol = _num(x.get("tdd_clsprc")), _num(x.get("cmpprevdd_prc")), _num(x.get("acc_trdvol")) or 0
-        names = {str(x.get(k, "")) for k in ("isu_eng_abbrv", "isu_cd", "isu_avvrv")}
-        if len(dd) == 8 and px and px > 0 and (item in names or not any(n.startswith("K") for n in names)):
-            rows.append((dd, px, vs or 0, vol))
-    print(f">> [배출권 KRX] {item} 일자별 {len(rows)}행, 앞부분: {body[:120]!r}")
-    if not rows:
-        raise ValueError("배출권(KRX) 행 없음")
-    rows.sort(reverse=True)
-    traded = [r for r in rows if r[3] > 0]
-    use = traded if len(traded) >= 2 else rows
-    cur, prev = use[0], (use[1] if len(use) > 1 else None)
+    return op.open(req, timeout=40).read().decode("utf-8", "ignore")
+
+
+def _prev_weekday(d):
+    d -= timedelta(days=1)
+    while d.weekday() >= 5:
+        d -= timedelta(days=1)
+    return d
+
+
+def fetch_kau_krx():
+    """한국거래소 배출권시장 정보플랫폼(ets.krx.co.kr) — 거래 당일 바로 반영. 종목은 올해 연도물(KAU26 등).
+    ① 일자별 정보(전 종목을 받아 이름으로 거름) ② 안 되면 현재가 표(전 종목 최근 종가) ③ 그래도 안 되면 호출한 쪽에서 공공데이터로 대체."""
+    base, page, op, H = _krx_session()
+    now = datetime.now(KST)
+    item = "KAU" + now.strftime("%y")
     ymd = lambda d: f"{d[:4]}-{d[4:6]}-{d[6:]}"
-    print(f">> [배출권 KRX] {ymd(cur[0])} 종가 {cur[1]:,.0f} (전 거래일 {prev[0] if prev else None})")
-    return {"kau": {"name": "배출권(KAU)", "item": item, "unit": "원/톤", "date": ymd(cur[0]), "value": cur[1],
-                    "prev_date": ymd(prev[0]) if prev else None, "prev_value": prev[1] if prev else cur[1] - cur[2]}}
+    # ① 일자별 정보
+    try:
+        body = _krx_post(base, page, op, H, "ETS/03/03010000/ets03010000_05", "grid", {"gNo": "98f13708210194c475687be6106a3b84"})
+        rows = []
+        for x in _find_rows(json.loads(body)):
+            dd = re.sub(r"\D", "", str(x.get("trd_dd", "")))
+            px, vs, vol = _num(x.get("tdd_clsprc")), _num(x.get("cmpprevdd_prc")), _num(x.get("acc_trdvol")) or 0
+            names = {str(x.get(k, "")) for k in ("isu_eng_abbrv", "isu_cd", "isu_avvrv")}
+            if len(dd) == 8 and px and px > 0 and item in names:
+                rows.append((dd, px, vs or 0, vol))
+        print(f">> [배출권 KRX 일자별] {item} {len(rows)}행, 앞부분: {body[:120]!r}")
+        if rows:
+            rows.sort(reverse=True)
+            traded = [r for r in rows if r[3] > 0]
+            use = traded if len(traded) >= 2 else rows
+            cur, prev = use[0], (use[1] if len(use) > 1 else None)
+            print(f">> [배출권 KRX] {ymd(cur[0])} 종가 {cur[1]:,.0f} (전 거래일 {prev[0] if prev else None})")
+            return {"kau": {"name": "배출권(KAU)", "item": item, "unit": "원/톤", "date": ymd(cur[0]), "value": cur[1],
+                            "prev_date": ymd(prev[0]) if prev else None, "prev_value": prev[1] if prev else cur[1] - cur[2]}}
+    except Exception as e:
+        print(f">> [배출권 KRX 일자별 실패] {type(e).__name__}: {str(e)[:100]}")
+    # ② 현재가 표: 오늘 거래가 없으면 값은 직전 거래일 종가
+    body = _krx_post(base, page, op, H, "ETS/03/03010000/ets03010000_04", "tablesubmit", {"bldcode": "ETS/03/03010000/ets03010000_04"})
+    j = json.loads(body)
+    lst = next((v for v in j.values() if isinstance(v, list)), []) if isinstance(j, dict) else []
+    row = next((x for x in lst if str(x.get("isu_cd", "")) == item), None)
+    print(f">> [배출권 KRX 현재가] {item} 행: {row}")
+    if not row or not _num(row.get("tdd_clsprc")):
+        raise ValueError("배출권(KRX) 현재가 행 없음")
+    px, vol = _num(row["tdd_clsprc"]), _num(row.get("acc_trdvol")) or 0
+    today = now.date()
+    trade_day = today if (vol > 0 and today.weekday() < 5) else _prev_weekday(today)
+    day = trade_day.isoformat()
+    old = (json.load(open(OUT, encoding="utf-8")).get("items", {}) if os.path.exists(OUT) else {}).get("kau") or {}
+    if old.get("date") == day:
+        pd, pv = old.get("prev_date"), old.get("prev_value")
+    elif old.get("date") and old.get("value") is not None and old["date"] < day:
+        pd, pv = old["date"], old["value"]
+    else:
+        pd, pv = old.get("prev_date"), old.get("prev_value")
+    print(f">> [배출권 KRX] {day} 종가 {px:,.0f} (전 거래일 {pd} {pv})")
+    return {"kau": {"name": "배출권(KAU)", "item": item, "unit": "원/톤", "date": day, "value": px,
+                    "prev_date": pd, "prev_value": pv}}
 
 
 def fetch_kau_any():
@@ -360,22 +401,38 @@ def fetch_fx():
 
 
 def fetch_rec_kpx():
-    """전력거래소 홈페이지 첫 화면 '오늘의 REC' (가장 최근 거래일의 평균가). 전일 값은 저장된 이전 값에서 이어받는다."""
+    """전력거래소 홈페이지 첫 화면 '오늘의 REC' (가장 최근 거래일의 평균가). 전일 값은 저장된 이전 값에서 이어받는다.
+    잘못 읽은 값이 화면에 나가지 않도록: 평균가는 '71,042' 같은 천 단위 쉼표 숫자만, 이전 값과 크게 다르면 거부한다."""
     def call():
         req = urllib.request.Request("https://kpx.or.kr/", headers=UA)
         return urllib.request.urlopen(req, timeout=40).read().decode("utf-8", "ignore")
     html = retry(call, tries=2)
     text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", re.sub(r"(?is)<(script|style).*?</\1>", " ", html)))
-    i = text.find("오늘의 REC")
-    seg = text[i:i + 600] if i >= 0 else ""
+    idxs = [m.start() for m in re.finditer("오늘의 REC", text)]
+    seg = ""
+    for i in idxs:
+        cand = text[i:i + 500]
+        if "평균가" in cand:
+            seg = cand
+            break
+    if not seg:
+        print(f">> [REC KPX] '오늘의 REC' 구간을 찾지 못함 (등장 {len(idxs)}회)")
+        raise ValueError("REC(KPX) 구간 없음")
+    print(f">> [REC KPX 구간] {seg[:260]!r}")
     m = re.search(r"(\d{4})\.\s?(\d{2})\.\s?(\d{2})", seg)
-    p = re.search(r"평균가\D{0,20}?([\d,]{4,})", seg)
+    p = re.search(r"평균가[^\d]{0,30}(\d{1,3}(?:,\d{3})+)", seg)
     if not (m and p):
-        print(f">> [REC KPX] 형식을 읽지 못함. 부근: {seg[:200]!r}")
         raise ValueError("REC(KPX) 형식 불일치")
-    day = f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
     val = float(p.group(1).replace(",", ""))
+    d = datetime(int(m.group(1)), int(m.group(2)), int(m.group(3))).date()
+    if d.weekday() not in (1, 3):   # 현물시장은 화·목 거래: 거래일이 아닌 날짜가 보이면 직전 화/목으로 본다
+        while d.weekday() not in (1, 3):
+            d -= timedelta(days=1)
+        print(f">> [REC KPX] 화면 날짜가 거래일이 아니어서 직전 거래일 {d}로 처리")
+    day = d.isoformat()
     old = (json.load(open(OUT, encoding="utf-8")).get("items", {}) if os.path.exists(OUT) else {}).get("rec") or {}
+    if val < 10000 or (old.get("value") and not (0.5 * old["value"] <= val <= 2 * old["value"])):
+        raise ValueError(f"REC(KPX) 값 이상: {val:,.0f} (이전 {old.get('value')})")
     if old.get("date") == day:
         pd, pv = old.get("prev_date"), old.get("prev_value")
     elif old.get("date") and old.get("value") is not None and old["date"] < day:
