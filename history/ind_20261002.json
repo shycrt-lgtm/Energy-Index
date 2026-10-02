@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-02 10:17",
+ "updated": "2026-10-02 10:22",
  "items": {
   "jkm": {
    "name": "JKM LNG",
@@ -21,7 +21,7 @@
    "name": "브렌트유",
    "unit": "$/bbl",
    "date": "2026-10-02",
-   "value": 102.73,
+   "value": 102.48,
    "prev_date": "2026-10-01",
    "prev_value": 102.44
   },
@@ -29,7 +29,7 @@
    "name": "WTI",
    "unit": "$/bbl",
    "date": "2026-10-02",
-   "value": 92.98,
+   "value": 92.96,
    "prev_date": "2026-10-01",
    "prev_value": 92.99
   },
@@ -38,16 +38,16 @@
    "item": "KAU26",
    "unit": "원/톤",
    "date": "2026-10-02",
-   "value": 29600.0,
+   "value": 29650.0,
    "prev_date": "2026-10-01",
    "prev_value": 29600.0
   },
   "rec": {
-   "name": "REC(육지)",
+   "name": "REC",
    "item": "평균가",
    "unit": "원/REC",
    "date": "2026-10-01",
-   "value": 71172.0,
+   "value": 71042.0,
    "prev_date": "2026-09-29",
    "prev_value": 71575.0
   },
