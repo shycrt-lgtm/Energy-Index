@@ -202,6 +202,81 @@ def fetch_kau():
     raise last or ValueError("배출권 자료 없음")
 
 
+def _num(v):
+    try:
+        return float(str(v).replace(",", "").strip())
+    except ValueError:
+        return None
+
+
+def _find_rows(node):
+    """응답 JSON 안에서 일자별 행(trd_dd, tdd_clsprc 가 있는 dict 목록)을 찾는다"""
+    if isinstance(node, list):
+        if node and all(isinstance(x, dict) for x in node) and any("trd_dd" in x and "tdd_clsprc" in x for x in node):
+            return node
+        for x in node:
+            r = _find_rows(x)
+            if r:
+                return r
+    elif isinstance(node, dict):
+        for v in node.values():
+            r = _find_rows(v)
+            if r:
+                return r
+    return []
+
+
+def fetch_kau_krx():
+    """한국거래소 배출권시장 정보플랫폼(ets.krx.co.kr) 일자별 시세 — 거래 당일 바로 반영.
+    ① GenerateOTP 로 일회용 code 를 받고 ② 그 code 로 일자별 정보를 조회한다. 종목은 올해 연도물(KAU26 등)."""
+    base = "https://ets.krx.co.kr"
+    page = base + "/contents/ETS/03/03010000/ETS03010000.jsp"
+    cj = http.cookiejar.CookieJar()
+    op = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+    H = {**UA, "Referer": page}
+    now = datetime.now(KST)
+    item = "KAU" + now.strftime("%y")
+    op.open(urllib.request.Request(page, headers=H), timeout=40).read()          # 쿠키 받기
+    otp_url = (base + "/contents/COM/GenerateOTP.jspx?bld=" + urllib.parse.quote("ETS/03/03010000/ets03010000_05", safe="")
+               + "&name=grid&_=" + str(int(time.time() * 1000)))
+    code = op.open(urllib.request.Request(otp_url, headers=H), timeout=40).read().decode("utf-8", "ignore").strip()
+    if len(code) < 20 or "<" in code:
+        raise ValueError("KRX 인증값(code) 형식 이상: " + code[:80])
+    form = {"isu_cd": item, "fromdate": (now - timedelta(days=20)).strftime("%Y%m%d"), "todate": now.strftime("%Y%m%d"),
+            "pagePath": "/contents/ETS/03/03010000/ETS03010000.jsp", "code": code,
+            "gNo": "98f13708210194c475687be6106a3b84"}
+    req = urllib.request.Request(base + "/contents/ETS/99/ETS99000001.jspx", data=urllib.parse.urlencode(form).encode(),
+                                 headers={**H, "X-Requested-With": "XMLHttpRequest"})
+    body = op.open(req, timeout=40).read().decode("utf-8", "ignore")
+    j = json.loads(body)
+    rows = []
+    for x in _find_rows(j):
+        dd = re.sub(r"\D", "", str(x.get("trd_dd", "")))
+        px, vs, vol = _num(x.get("tdd_clsprc")), _num(x.get("cmpprevdd_prc")), _num(x.get("acc_trdvol")) or 0
+        names = {str(x.get(k, "")) for k in ("isu_eng_abbrv", "isu_cd", "isu_avvrv")}
+        if len(dd) == 8 and px and px > 0 and (item in names or not any(n.startswith("K") for n in names)):
+            rows.append((dd, px, vs or 0, vol))
+    print(f">> [배출권 KRX] {item} 일자별 {len(rows)}행, 앞부분: {body[:120]!r}")
+    if not rows:
+        raise ValueError("배출권(KRX) 행 없음")
+    rows.sort(reverse=True)
+    traded = [r for r in rows if r[3] > 0]
+    use = traded if len(traded) >= 2 else rows
+    cur, prev = use[0], (use[1] if len(use) > 1 else None)
+    ymd = lambda d: f"{d[:4]}-{d[4:6]}-{d[6:]}"
+    print(f">> [배출권 KRX] {ymd(cur[0])} 종가 {cur[1]:,.0f} (전 거래일 {prev[0] if prev else None})")
+    return {"kau": {"name": "배출권(KAU)", "item": item, "unit": "원/톤", "date": ymd(cur[0]), "value": cur[1],
+                    "prev_date": ymd(prev[0]) if prev else None, "prev_value": prev[1] if prev else cur[1] - cur[2]}}
+
+
+def fetch_kau_any():
+    try:
+        return fetch_kau_krx()
+    except Exception as e:
+        print(f">> [배출권] 한국거래소 실패 → 공공데이터포털로 대체: {type(e).__name__}: {str(e)[:120]}")
+        return fetch_kau()
+
+
 def _fx_items(rows, label):
     """rows: [(날짜, 원/달러, 원/100엔)] 최신순 → 환율 항목 2개"""
     out = {}
@@ -376,7 +451,7 @@ def main():
         if not got:
             raise ValueError("국제유가 자료 없음")
         return got
-    for label, fn in (("JKM", fetch_jkm), ("국제유가", fetch_oil_all), ("배출권", fetch_kau), ("REC", fetch_rec_any), ("환율", fetch_fx)):
+    for label, fn in (("JKM", fetch_jkm), ("국제유가", fetch_oil_all), ("배출권", fetch_kau_any), ("REC", fetch_rec_any), ("환율", fetch_fx)):
         try:
             got = fn()
             items.update(got)
