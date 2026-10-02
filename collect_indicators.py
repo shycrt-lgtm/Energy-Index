@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """주요 시장지표 수집 → indicators.json
 - JKM LNG : OilPriceAPI (영업일별 값, USD/MMBtu)  ← Secret OILPRICE_API_KEY
-- 두바이/브렌트/WTI : 한국석유공사 오피넷 국제원유가격 (일별, $/Bbl)
+- 두바이/브렌트/WTI : OilPriceAPI(JKM과 동일, $/bbl) — 실패 시에만 한국석유공사 오피넷으로 보충
 수집에 실패한 항목은 이전 값을 그대로 둔다."""
 import os, re, io, csv, json, time, urllib.request, urllib.parse, urllib.error, http.cookiejar
 from datetime import datetime, timedelta, timezone
@@ -26,9 +26,10 @@ def retry(fn, tries=3):
     raise last
 
 
-def fetch_jkm():
+def oil_series(code):
+    """OilPriceAPI 최근 1주 값 → {날짜: (시각, 가격)}"""
     def call():
-        req = urllib.request.Request("https://api.oilpriceapi.com/v1/prices/past_week?by_code=JKM_LNG_USD",
+        req = urllib.request.Request("https://api.oilpriceapi.com/v1/prices/past_week?by_code=" + code,
                                      headers={**UA, "Authorization": "Token " + OIL_KEY})
         return json.loads(urllib.request.urlopen(req, timeout=40).read().decode("utf-8"))
     j = retry(call)
@@ -46,13 +47,40 @@ def fetch_jkm():
             continue
         if len(ts) >= 10 and (ts[:10] not in by_day or ts > by_day[ts[:10]][0]):
             by_day[ts[:10]] = (ts, p)
+    return by_day
+
+
+def oil_item(by_day, name, unit):
     days = sorted(by_day, reverse=True)
     if not days:
-        raise ValueError("JKM 자료 없음")
-    cur = by_day[days[0]][1]
-    prev = by_day[days[1]][1] if len(days) > 1 else None
-    return {"jkm": {"name": "JKM LNG", "unit": "USD/MMBtu", "date": days[0], "value": cur,
-                    "prev_date": days[1] if len(days) > 1 else None, "prev_value": prev}}
+        raise ValueError(name + " 자료 없음")
+    return {"name": name, "unit": unit, "date": days[0], "value": by_day[days[0]][1],
+            "prev_date": days[1] if len(days) > 1 else None, "prev_value": by_day[days[1]][1] if len(days) > 1 else None}
+
+
+def fetch_jkm():
+    return {"jkm": oil_item(oil_series("JKM_LNG_USD"), "JKM LNG", "USD/MMBtu")}
+
+
+# 두바이·브렌트·WTI: JKM 과 같은 OilPriceAPI 에서 가져옴(빠름). 코드는 후보를 차례로 시도
+OIL_CODES = {"dubai": ("두바이유", ["DUBAI_CRUDE_USD", "DUBAI_USD"]),
+             "brent": ("브렌트유", ["BRENT_CRUDE_USD"]),
+             "wti": ("WTI", ["WTI_USD"])}
+
+
+def fetch_crude():
+    out = {}
+    for key, (name, codes) in OIL_CODES.items():
+        for code in codes:
+            try:
+                out[key] = oil_item(oil_series(code), name, "$/bbl")
+                print(f">> [OilPriceAPI] {name} 코드 {code} 사용")
+                break
+            except Exception as e:
+                print(f">> [OilPriceAPI] {name} 코드 {code} 실패: {type(e).__name__}: {str(e)[:100]}")
+    if not out:
+        raise ValueError("OilPriceAPI 원유 자료 없음")
+    return out
 
 
 def opinet_csv(text):
@@ -256,6 +284,42 @@ def fetch_fx():
     return fetch_fx_ecb()
 
 
+def fetch_rec_kpx():
+    """전력거래소 홈페이지 첫 화면 '오늘의 REC' (가장 최근 거래일의 평균가). 전일 값은 저장된 이전 값에서 이어받는다."""
+    def call():
+        req = urllib.request.Request("https://kpx.or.kr/", headers=UA)
+        return urllib.request.urlopen(req, timeout=40).read().decode("utf-8", "ignore")
+    html = retry(call, tries=2)
+    text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", re.sub(r"(?is)<(script|style).*?</\1>", " ", html)))
+    i = text.find("오늘의 REC")
+    seg = text[i:i + 600] if i >= 0 else ""
+    m = re.search(r"(\d{4})\.\s?(\d{2})\.\s?(\d{2})", seg)
+    p = re.search(r"평균가\D{0,20}?([\d,]{4,})", seg)
+    if not (m and p):
+        print(f">> [REC KPX] 형식을 읽지 못함. 부근: {seg[:200]!r}")
+        raise ValueError("REC(KPX) 형식 불일치")
+    day = f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
+    val = float(p.group(1).replace(",", ""))
+    old = (json.load(open(OUT, encoding="utf-8")).get("items", {}) if os.path.exists(OUT) else {}).get("rec") or {}
+    if old.get("date") == day:
+        pd, pv = old.get("prev_date"), old.get("prev_value")
+    elif old.get("date") and old.get("value") is not None and old["date"] < day:
+        pd, pv = old["date"], old["value"]
+    else:
+        pd, pv = old.get("prev_date"), old.get("prev_value")
+    print(f">> [REC KPX] {day} 평균가 {val:,.0f} (전 거래일 {pd} {pv})")
+    return {"rec": {"name": "REC", "item": "평균가", "unit": "원/REC", "date": day, "value": val,
+                    "prev_date": pd, "prev_value": pv}}
+
+
+def fetch_rec_any():
+    try:
+        return fetch_rec_kpx()
+    except Exception as e:
+        print(f">> [REC] 전력거래소 홈페이지 실패 → 공공데이터포털로 대체: {type(e).__name__}")
+        return fetch_rec()
+
+
 def fetch_rec():
     """한국전력거래소 REC 현물시장 정보(공공데이터포털). 육지 평균가(landAvgPrc).
     거래가 있는 날(장운영일)에만 값이 있으므로, 날짜를 지정해 최근일부터 거슬러 올라가 2개 거래일을 찾는다."""
@@ -297,7 +361,22 @@ def main():
     store = json.load(open(OUT, encoding="utf-8")) if os.path.exists(OUT) else {}
     items = store.get("items", {})
     ok = 0
-    for label, fn in (("JKM", fetch_jkm), ("오피넷 국제유가", fetch_opinet), ("배출권", fetch_kau), ("REC", fetch_rec), ("환율", fetch_fx)):
+    def fetch_oil_all():
+        got = {}
+        try:
+            got.update(fetch_crude())
+        except Exception as e:
+            print(f">> [국제유가] OilPriceAPI 실패 → 오피넷으로 대체: {type(e).__name__}")
+        if len(got) < 3:  # 하나라도 못 받았으면 오피넷(느림)으로 보충
+            try:
+                for k, v in fetch_opinet().items():
+                    got.setdefault(k, v)
+            except Exception as e:
+                print(f">> [오피넷] 보충 실패: {type(e).__name__}")
+        if not got:
+            raise ValueError("국제유가 자료 없음")
+        return got
+    for label, fn in (("JKM", fetch_jkm), ("국제유가", fetch_oil_all), ("배출권", fetch_kau), ("REC", fetch_rec_any), ("환율", fetch_fx)):
         try:
             got = fn()
             items.update(got)
