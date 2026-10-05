@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-05 06:47",
+ "updated": "2026-10-05 09:52",
  "items": {
   "jkm": {
    "name": "JKM LNG",
@@ -20,18 +20,18 @@
   "brent": {
    "name": "브렌트유",
    "unit": "$/bbl",
-   "date": "2026-10-04",
-   "value": 102.61,
-   "prev_date": "2026-10-02",
-   "prev_value": 102.61
+   "date": "2026-10-05",
+   "value": 102.21,
+   "prev_date": "2026-10-04",
+   "prev_value": 102.38
   },
   "wti": {
    "name": "WTI",
    "unit": "$/bbl",
-   "date": "2026-10-04",
-   "value": 91.26,
-   "prev_date": "2026-10-03",
-   "prev_value": 91.26
+   "date": "2026-10-05",
+   "value": 90.66,
+   "prev_date": "2026-10-04",
+   "prev_value": 90.86
   },
   "kau": {
    "name": "배출권(KAU)",
