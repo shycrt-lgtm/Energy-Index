@@ -9,6 +9,18 @@ KST = timezone(timedelta(hours=9))
 KEYWORDS = ["집단에너지", "전력시장", "용량시장", "SMP 전력시장", "전력도매가격", "PPA 전력", "전력수급기본계획", "전기본 에너지",
             "RPS 신재생", "태양광 발전", "풍력 발전", "LNG 발전", "LNG 가격", "도시가스 요금", "탄소배출권", "전력거래소",
             "전기위원회", "발전사업 허가", "ESS 에너지저장", "열병합발전", "RE100", "전기차 충전", "VPP 가상발전소"]
+# ▼▼ 가져올 언론사 목록 (여기에 있는 언론사 기사만 사용). 추가·삭제는 이름만 고치면 됩니다. ▼▼
+# 구글 뉴스에 표시되는 언론사 이름의 일부만 맞아도 인정합니다(예: "한국경제"는 "한국경제TV"도 포함).
+# ALLOWED_SOURCES를 빈 목록 [] 으로 두면 언론사 제한 없이 모두 가져옵니다.
+ALLOWED_SOURCES = []
+# 아래 3개 언론사는 구글 검색에 더해 해당 사이트에서도 같은 키워드로 따로 검색하고, 점수도 조금 더 줍니다.
+FOCUS_SITES = {"이투뉴스": "e2news.com", "에너지경제": "ekn.kr", "조선비즈": "biz.chosun.com"}
+FOCUS_BONUS = 3
+# ▲▲ ----------------------------------------------------------------------- ▲▲
+
+def source_ok(src):
+    return (not ALLOWED_SOURCES) or any(w in (src or "") for w in ALLOWED_SOURCES)
+
 PER_KEYWORD = 15      # 키워드당 가져올 최대 건수
 MAX_AGE_H = 36        # 이 시간보다 오래된 기사는 제외
 TOP_N = 15
@@ -42,8 +54,8 @@ def retry(fn, n=3, wait=3):
             time.sleep(wait)
     return None
 
-def fetch_rss(q):
-    url = "https://news.google.com/rss/search?q=" + urllib.parse.quote(q + " when:1d") + "&hl=ko&gl=KR&ceid=KR:ko"
+def fetch_rss(q, when="when:1d"):
+    url = "https://news.google.com/rss/search?q=" + urllib.parse.quote(q + " " + when) + "&hl=ko&gl=KR&ceid=KR:ko"
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     with urllib.request.urlopen(req, timeout=30) as r:
         return r.read()
@@ -87,7 +99,8 @@ def score(g):
     t = g["item"]["title"]
     core = sum(1 for w in CORE if w.lower() in t.lower())
     pri = sum(1 for w in PRIORITY if w.lower() in t.lower())
-    return min(core, 4) * 3 + min(pri, 3) * 5 + min(g["more"], 3) - 20 * sum(1 for w in NOISE_HARD if w in t) - 2 * sum(1 for w in NOISE_SOFT if w in t), core
+    bonus = FOCUS_BONUS if any(w in (g["item"]["source"] or "") for w in FOCUS_SITES) else 0
+    return min(core, 4) * 3 + min(pri, 3) * 5 + bonus + min(g["more"], 3) - 20 * sum(1 for w in NOISE_HARD if w in t) - 2 * sum(1 for w in NOISE_SOFT if w in t), core
 
 def dedup(items):
     # 1) 링크 중복 제거
@@ -125,10 +138,37 @@ def main():
         except Exception as e:
             print(f">> [뉴스] '{q}' 해석 실패 {e}"); continue
         rows = [r for r in rows if now - r["pub"] <= timedelta(hours=MAX_AGE_H)
-                and hangul_ratio(r["title"]) >= 0.5 and not any(w in r["title"] for w in NOISE_HARD)][:PER_KEYWORD]
+                and hangul_ratio(r["title"]) >= 0.5 and not any(w in r["title"] for w in NOISE_HARD)]
+        skipped = {r["source"] for r in rows if not source_ok(r["source"])}
+        if skipped:
+            print(f"   (지정 외 언론사 제외: {', '.join(sorted(skipped))})")
+        rows = [r for r in rows if source_ok(r["source"])][:PER_KEYWORD]
         print(f">> [뉴스] '{q}' {len(rows)}건"); ok += 1
         allit += rows
         time.sleep(1)
+    # 지정 언론사 사이트에서 같은 키워드로 추가 검색 (키워드를 5개씩 묶어 OR 검색)
+    def q(k):
+        return '"' + k + '"' if " " in k else k
+    groups_kw = [KEYWORDS[i:i+5] for i in range(0, len(KEYWORDS), 5)]
+    for name, dom in FOCUS_SITES.items():
+        n_site = 0
+        for gk in groups_kw:
+            query = "(" + " OR ".join(q(k) for k in gk) + ") site:" + dom
+            xml = retry(lambda: fetch_rss(query))
+            if not xml:
+                continue
+            try:
+                rows = parse(xml)
+            except Exception:
+                continue
+            rows = [r for r in rows if now - r["pub"] <= timedelta(hours=MAX_AGE_H)
+                    and hangul_ratio(r["title"]) >= 0.5 and not any(w in r["title"] for w in NOISE_HARD)]
+            for r in rows:
+                if not r["source"]:
+                    r["source"] = name
+            n_site += len(rows); allit += rows
+            time.sleep(1)
+        print(f">> [뉴스] {name}({dom}) 지정 검색 {n_site}건")
     if not allit:
         print(">> [뉴스] 수집된 기사가 없어 기존 파일을 유지합니다."); raise SystemExit(1 if ok == 0 else 0)
     groups = dedup(allit)
