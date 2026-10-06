@@ -8,7 +8,7 @@ from datetime import datetime, timedelta, timezone
 KST = timezone(timedelta(hours=9))
 KEYWORDS = ["집단에너지", "전력시장", "용량시장", "SMP 전력시장", "전력도매가격", "PPA 전력", "전력수급기본계획", "전기본 에너지",
             "RPS 신재생", "태양광 발전", "풍력 발전", "LNG 발전", "LNG 가격", "도시가스 요금", "탄소배출권", "전력거래소",
-            "전기위원회", "발전사업 허가", "ESS 에너지저장", "열병합발전", "RE100", "전기차 충전", "VPP 가상발전소"]
+            "전기위원회", "발전사업 허가", "ESS 에너지저장", "열병합발전", "RE100", "전기차 충전", "VPP 가상발전소", "열병합 용량입찰", "LNG 용량시장"]
 # ▼▼ 가져올 언론사 목록 (여기에 있는 언론사 기사만 사용). 추가·삭제는 이름만 고치면 됩니다. ▼▼
 # 구글 뉴스에 표시되는 언론사 이름의 일부만 맞아도 인정합니다(예: "한국경제"는 "한국경제TV"도 포함).
 # ALLOWED_SOURCES를 빈 목록 [] 으로 두면 언론사 제한 없이 모두 가져옵니다.
@@ -21,8 +21,22 @@ FOCUS_BONUS = 3
 def source_ok(src):
     return (not ALLOWED_SOURCES) or any(w in (src or "") for w in ALLOWED_SOURCES)
 
-PER_KEYWORD = 15      # 키워드당 가져올 최대 건수
-MAX_AGE_H = 36        # 이 시간보다 오래된 기사는 제외
+PER_KEYWORD = 25      # 키워드당 가져올 최대 건수
+MAX_AGE_H = 36        # 평소 이 시간보다 오래된 기사는 제외 (주말·휴일이 끼면 아래 함수가 자동으로 늘림)
+# 공휴일(주말 제외). 새 해가 되면 날짜를 추가하세요.
+HOLIDAYS = {"2026-10-05", "2026-10-09", "2026-12-25", "2027-01-01", "2027-02-06", "2027-02-07", "2027-02-08", "2027-02-09",
+            "2027-03-01", "2027-03-02", "2027-05-05", "2027-05-13", "2027-06-07", "2027-08-16", "2027-09-14", "2027-09-15",
+            "2027-09-16", "2027-10-04", "2027-10-11", "2027-12-27"}
+
+def lookback_hours(now):
+    """직전 영업일 낮 12시 이후 기사부터 모두 포함. 평일 연속이면 기존 36시간."""
+    d = now.date()
+    while True:
+        d -= timedelta(days=1)
+        if d.weekday() < 5 and d.isoformat() not in HOLIDAYS:
+            break
+    cut = datetime(d.year, d.month, d.day, 12, 0, tzinfo=KST)
+    return max(MAX_AGE_H, int((now - cut).total_seconds() // 3600) + 1)
 TOP_N = 15
 SIM = 0.50            # 제목 글자 유사도 기준(이 이상이면 같은 기사로 봄)
 JAC = 0.25            # 두 글자 조각 겹침 비율 기준(이 이상이면 같은 기사로 봄)
@@ -39,7 +53,22 @@ NOISE_HARD = ["연봉", "채용", "인사", "부고", "결혼", "장학", "봉�
               "베트남", "인도네시아", "필리핀", "말레이시아", "태국", "싱가포르", "몽골", "카자흐", "우즈벡", "중동", "사우디", "UAE", "호주", "캐나다", "멕시코", "브라질", "인도 ", "아프리카", "해외"]
 NOISE_SOFT = ["설명회", "포럼", "세미나", "워크숍", "개최", "성료", "간담회", "발대식", "캠페인"]
 # 사용자가 중점으로 보는 주제(제목에 있으면 크게 가산)
-PRIORITY = ["집단에너지", "전력시장", "용량시장", "SMP", "PPA", "전력수급기본계획", "전기본", "RPS", "태양광", "풍력", "열병합", "전력거래소", "도매가격", "LNG발전", "발전사업", "계통한계"]
+PRIORITY = ["집단에너지", "전력시장", "용량시장", "SMP", "PPA", "전력수급기본계획", "전기본", "용량입찰", "LNG 용량", "RPS", "태양광", "풍력", "열병합", "전력거래소", "도매가격", "LNG발전", "발전사업", "계통한계"]
+
+# 정책·제도 기사(화면 맨 위에 노출) / 기술 기사(맨 아래로 후순위)
+POLICY = ["정책", "제도", "개편", "개선안", "기본계획", "전기본", "전력수급기본계획", "용량시장", "용량입찰", "전력시장", "도매시장", "전기위원회",
+          "산업부", "기후부", "기후에너지환경부", "국회", "정부", "법안", "개정", "시행령", "고시", "규제", "허가", "요금", "정산", "상한", "보조금",
+          "지침", "공고", "탈탄소", "RPS", "PPA", "배출권", "계통", "집단에너지법", "전기사업법", "열병합"]
+TECH = ["기술", "기술개발", "개발", "실증", "연구", "소재", "효율", "배터리", "전고체", "모듈", "인버터", "수소", "연료전지", "SMR", "특허",
+        "상용화", "시스템", "AI", "알고리즘", "플랫폼", "센서", "탠덤", "페로브스카이트", "터빈", "준공", "착공"]
+
+def tier(t):
+    """0=정책(맨 위), 1=일반, 2=기술(후순위)"""
+    if any(w in t for w in POLICY):
+        return 0
+    if any(w in t for w in TECH):
+        return 2
+    return 1
 
 def hangul_ratio(t):
     letters = re.findall(r"[A-Za-z가-힣]", t)
@@ -54,7 +83,7 @@ def retry(fn, n=3, wait=3):
             time.sleep(wait)
     return None
 
-def fetch_rss(q, when="when:1d"):
+def fetch_rss(q, when="when:2d"):
     url = "https://news.google.com/rss/search?q=" + urllib.parse.quote(q + " " + when) + "&hl=ko&gl=KR&ceid=KR:ko"
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     with urllib.request.urlopen(req, timeout=30) as r:
@@ -98,9 +127,10 @@ def same(a, b, ga, gb):
 def score(g):
     t = g["item"]["title"]
     core = sum(1 for w in CORE if w.lower() in t.lower())
+    tr = tier(t)
     pri = sum(1 for w in PRIORITY if w.lower() in t.lower())
     bonus = FOCUS_BONUS if any(w in (g["item"]["source"] or "") for w in FOCUS_SITES) else 0
-    return min(core, 4) * 3 + min(pri, 3) * 5 + bonus + min(g["more"], 3) - 20 * sum(1 for w in NOISE_HARD if w in t) - 2 * sum(1 for w in NOISE_SOFT if w in t), core
+    return min(core, 4) * 3 + min(pri, 3) * 5 + bonus + (6 if tr == 0 else -6 if tr == 2 else 0) + min(g["more"], 3) - 20 * sum(1 for w in NOISE_HARD if w in t) - 2 * sum(1 for w in NOISE_SOFT if w in t), core
 
 def dedup(items):
     # 1) 링크 중복 제거
@@ -128,9 +158,13 @@ def dedup(items):
 
 def main():
     now = datetime.now(KST)
+    global MAX_AGE_H, WHEN
+    MAX_AGE_H = lookback_hours(now)
+    WHEN = "when:%dd" % (MAX_AGE_H // 24 + 2)
+    print(f">> [뉴스] 수집 범위: 최근 {MAX_AGE_H}시간 ({WHEN})")
     allit, ok = [], 0
     for q in KEYWORDS:
-        xml = retry(lambda: fetch_rss(q))
+        xml = retry(lambda: fetch_rss(q, WHEN))
         if not xml:
             print(f">> [뉴스] '{q}' 실패"); continue
         try:
@@ -154,7 +188,7 @@ def main():
         n_site = 0
         for gk in groups_kw:
             query = "(" + " OR ".join(q(k) for k in gk) + ") site:" + dom
-            xml = retry(lambda: fetch_rss(query))
+            xml = retry(lambda: fetch_rss(query, WHEN))
             if not xml:
                 continue
             try:
@@ -184,7 +218,8 @@ def main():
         best = max(pool, key=lambda g: (score(g)[0] - 4 * cnt.get(lead(g), 0), g["item"]["pub"].timestamp()))
         pool.remove(best); top.append(best)
         cnt[lead(best)] = cnt.get(lead(best), 0) + 1
-    top.sort(key=lambda g: -g["item"]["pub"].timestamp())      # 화면에는 최신순
+    # 화면 순서: 정책 기사 → 일반 기사 → 기술 기사, 같은 구분 안에서는 최신순
+    top.sort(key=lambda g: (tier(g["item"]["title"]), -g["item"]["pub"].timestamp()))
     items = [{"title": g["item"]["title"], "source": g["item"]["source"], "link": g["item"]["link"],
               "pub": g["item"]["pub"].strftime("%Y-%m-%d %H:%M"), "more": g["more"]} for g in top]
     json.dump({"updated": now.strftime("%Y-%m-%d %H:%M"), "items": items},
