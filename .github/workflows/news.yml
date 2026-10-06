@@ -1,8 +1,8 @@
 name: News Collect
 on:
   schedule:
-    - cron: '30 21 * * *'   # 매일 06:30 KST
-    - cron: '0 3 * * *'     # 매일 12:00 KST
+    - cron: '30 22 * * *'   # 매일 07:30 KST
+    - cron: '30 6 * * *'     # 매일 15:30 KST
   workflow_dispatch:
 permissions:
   contents: write
