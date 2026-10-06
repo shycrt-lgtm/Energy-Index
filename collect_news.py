@@ -6,9 +6,9 @@ from email.utils import parsedate_to_datetime
 from datetime import datetime, timedelta, timezone
 
 KST = timezone(timedelta(hours=9))
-KEYWORDS = ["SMP 전력시장", "전력도매가격", "LNG 가격", "도시가스 요금", "집단에너지", "탄소배출권",
-            "한국가스공사", "한국전력", "전기위원회", "RE100", "전력거래소", "발전사업",
-            "전력수급기본계획", "ESS 에너지저장 입찰", "RPS 신재생", "태양광 PPA", "전기차 충전", "VPP 가상발전소", "용량시장"]
+KEYWORDS = ["집단에너지", "전력시장", "용량시장", "SMP 전력시장", "전력도매가격", "PPA 전력", "전력수급기본계획", "전기본 에너지",
+            "RPS 신재생", "태양광 발전", "풍력 발전", "LNG 발전", "LNG 가격", "도시가스 요금", "탄소배출권", "전력거래소",
+            "전기위원회", "발전사업 허가", "ESS 에너지저장", "열병합발전", "RE100", "전기차 충전", "VPP 가상발전소"]
 PER_KEYWORD = 15      # 키워드당 가져올 최대 건수
 MAX_AGE_H = 36        # 이 시간보다 오래된 기사는 제외
 TOP_N = 15
@@ -18,8 +18,20 @@ JAC = 0.25            # 두 글자 조각 겹침 비율 기준(이 이상이면 
 CORE = ["SMP", "전력시장", "전력도매", "도매가격", "계통한계", "LNG", "천연가스", "도시가스", "가스요금", "전기요금", "요금",
         "가격", "배출권", "탄소", "REC", "열병합", "집단에너지", "한전", "한국전력", "전력거래소", "가스공사", "수급",
         "정산", "상한제", "재생에너지", "RE100", "발전", "전력", "유가", "환율", "에너지", "송전", "전기위원회", "산업부", "기후부", "전력수급기본계획", "ESS", "RPS", "PPA", "태양광", "충전", "VPP", "가상발전소", "에너지저장", "입찰", "용량시장"]
-NOISE_HARD = ["연봉", "채용", "인사", "부고", "결혼", "장학", "봉사", "기부", "특징주", "목표주가", "주가", "수상", "표창", "시상", "동정", "인사말", "학생", "대학교", "국립대"]
-NOISE_SOFT = ["설명회", "업무협약", "MOU", "협약", "포럼", "세미나", "워크숍", "개최", "성료", "간담회", "발대식", "캠페인"]
+NOISE_HARD = ["연봉", "채용", "인사", "부고", "결혼", "장학", "봉사", "기부", "특징주", "목표주가", "주가", "수상", "표창", "시상", "동정", "인사말", "학생", "대학교", "국립대",
+              # 스포츠(가스공사 농구단 등)
+              "농구", "프로농구", "페가수스", "KBL", "구단", "선수", "배구", "야구", "축구", "시즌",
+              # 지역상생·협약성 홍보 기사
+              "맞손", "상생", "손잡", "업무협약", "MOU", "협약", "지역사회", "나눔", "후원",
+              # 해외 사업·해외 뉴스
+              "베트남", "인도네시아", "필리핀", "말레이시아", "태국", "싱가포르", "몽골", "카자흐", "우즈벡", "중동", "사우디", "UAE", "호주", "캐나다", "멕시코", "브라질", "인도 ", "아프리카", "해외"]
+NOISE_SOFT = ["설명회", "포럼", "세미나", "워크숍", "개최", "성료", "간담회", "발대식", "캠페인"]
+# 사용자가 중점으로 보는 주제(제목에 있으면 크게 가산)
+PRIORITY = ["집단에너지", "전력시장", "용량시장", "SMP", "PPA", "전력수급기본계획", "전기본", "RPS", "태양광", "풍력", "열병합", "전력거래소", "도매가격", "LNG발전", "발전사업", "계통한계"]
+
+def hangul_ratio(t):
+    letters = re.findall(r"[A-Za-z가-힣]", t)
+    return (sum(1 for c in letters if "가" <= c <= "힣") / len(letters)) if letters else 0
 
 def retry(fn, n=3, wait=3):
     for i in range(n):
@@ -74,7 +86,8 @@ def same(a, b, ga, gb):
 def score(g):
     t = g["item"]["title"]
     core = sum(1 for w in CORE if w.lower() in t.lower())
-    return min(core, 4) * 3 + min(g["more"], 3) - 6 * sum(1 for w in NOISE_HARD if w in t) - 2 * sum(1 for w in NOISE_SOFT if w in t), core
+    pri = sum(1 for w in PRIORITY if w.lower() in t.lower())
+    return min(core, 4) * 3 + min(pri, 3) * 5 + min(g["more"], 3) - 20 * sum(1 for w in NOISE_HARD if w in t) - 2 * sum(1 for w in NOISE_SOFT if w in t), core
 
 def dedup(items):
     # 1) 링크 중복 제거
@@ -111,7 +124,8 @@ def main():
             rows = parse(xml)
         except Exception as e:
             print(f">> [뉴스] '{q}' 해석 실패 {e}"); continue
-        rows = [r for r in rows if now - r["pub"] <= timedelta(hours=MAX_AGE_H)][:PER_KEYWORD]
+        rows = [r for r in rows if now - r["pub"] <= timedelta(hours=MAX_AGE_H)
+                and hangul_ratio(r["title"]) >= 0.5 and not any(w in r["title"] for w in NOISE_HARD)][:PER_KEYWORD]
         print(f">> [뉴스] '{q}' {len(rows)}건"); ok += 1
         allit += rows
         time.sleep(1)
