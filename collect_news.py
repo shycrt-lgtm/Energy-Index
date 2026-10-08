@@ -96,7 +96,7 @@ def retry(fn, n=3, wait=3):
 def fetch_rss(q, when="when:2d"):
     url = "https://news.google.com/rss/search?q=" + urllib.parse.quote(q + " " + when) + "&hl=ko&gl=KR&ceid=KR:ko"
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-    with urllib.request.urlopen(req, timeout=30) as r:
+    with urllib.request.urlopen(req, timeout=15) as r:
         return r.read()
 
 def parse(xml_bytes):
@@ -174,46 +174,57 @@ def main():
     WHEN = "when:%dd" % (MAX_AGE_H // 24 + 2)
     print(f">> [뉴스] 수집 범위: 최근 {MAX_AGE_H}시간 ({WHEN})")
     allit, ok = [], 0
-    for q in KEYWORDS:
-        xml = retry(lambda: fetch_rss(q, WHEN))
-        if not xml:
-            print(f">> [뉴스] '{q}' 실패"); continue
-        try:
-            rows = parse(xml)
-        except Exception as e:
-            print(f">> [뉴스] '{q}' 해석 실패 {e}"); continue
-        rows = [r for r in rows if now - r["pub"] <= timedelta(hours=MAX_AGE_H)
-                and hangul_ratio(r["title"]) >= 0.5 and not any(w in r["title"] for w in NOISE_HARD)]
-        skipped = {r["source"] for r in rows if not source_ok(r["source"])}
-        if skipped:
-            print(f"   (지정 외 언론사 제외: {', '.join(sorted(skipped))})")
-        rows = [r for r in rows if source_ok(r["source"])][:PER_KEYWORD]
-        print(f">> [뉴스] '{q}' {len(rows)}건"); ok += 1
-        allit += rows
-        time.sleep(1)
-    # 지정 언론사 사이트에서 같은 키워드로 추가 검색 (키워드를 5개씩 묶어 OR 검색)
+    import concurrent.futures as cf
+    t0 = time.time()
+    DEADLINE = 170   # 초. 이 시간이 지나면 남은 검색은 건너뛰고 지금까지 모은 기사로 마무리
+
     def q(k):
         return '"' + k + '"' if " " in k else k
     groups_kw = [KEYWORDS[i:i+8] for i in range(0, len(KEYWORDS), 8)]
+    tasks = [("kw", k, k, None) for k in KEYWORDS]
     for name, dom in FOCUS_SITES.items():
-        n_site = 0
         for gk in groups_kw:
-            query = "(" + " OR ".join(q(k) for k in gk) + ") site:" + dom
-            xml = retry(lambda: fetch_rss(query, WHEN))
-            if not xml:
-                continue
-            try:
-                rows = parse(xml)
-            except Exception:
-                continue
-            rows = [r for r in rows if now - r["pub"] <= timedelta(hours=MAX_AGE_H)
-                    and hangul_ratio(r["title"]) >= 0.5 and not any(w in r["title"] for w in NOISE_HARD)]
+            tasks.append(("site", name, "(" + " OR ".join(q(k) for k in gk) + ") site:" + dom, name))
+
+    def work(t):
+        if time.time() - t0 > DEADLINE:
+            return t, None, "skip"
+        xml = retry(lambda: fetch_rss(t[2], WHEN), n=2, wait=2)
+        return t, xml, None
+
+    with cf.ThreadPoolExecutor(max_workers=5) as ex:
+        results = list(ex.map(work, tasks))      # 입력 순서대로 결과를 돌려줌
+
+    site_n, skipped_n = {}, 0
+    for t, xml, why in results:
+        kind, label, _, name = t
+        if why == "skip":
+            skipped_n += 1; continue
+        if not xml:
+            print(f">> [뉴스] '{label}' 실패"); continue
+        try:
+            rows = parse(xml)
+        except Exception as e:
+            print(f">> [뉴스] '{label}' 해석 실패 {e}"); continue
+        rows = [r for r in rows if now - r["pub"] <= timedelta(hours=MAX_AGE_H)
+                and hangul_ratio(r["title"]) >= 0.5 and not any(w in r["title"] for w in NOISE_HARD)]
+        if kind == "kw":
+            skipped = {r["source"] for r in rows if not source_ok(r["source"])}
+            if skipped:
+                print(f"   (지정 외 언론사 제외: {', '.join(sorted(skipped))})")
+            rows = [r for r in rows if source_ok(r["source"])][:PER_KEYWORD]
+            print(f">> [뉴스] '{label}' {len(rows)}건"); ok += 1
+        else:
             for r in rows:
                 if not r["source"]:
                     r["source"] = name
-            n_site += len(rows); allit += rows
-            time.sleep(1)
-        print(f">> [뉴스] {name}({dom}) 지정 검색 {n_site}건")
+            site_n[name] = site_n.get(name, 0) + len(rows)
+        allit += rows
+    for name, dom in FOCUS_SITES.items():
+        print(f">> [뉴스] {name}({dom}) 지정 검색 {site_n.get(name, 0)}건")
+    if skipped_n:
+        print(f">> [뉴스] 시간 초과로 {skipped_n}건 검색을 건너뜀")
+    print(f">> [뉴스] 수집에 {int(time.time() - t0)}초 걸림")
     if not allit:
         print(">> [뉴스] 수집된 기사가 없어 기존 파일을 유지합니다."); raise SystemExit(1 if ok == 0 else 0)
     groups = dedup(allit)
