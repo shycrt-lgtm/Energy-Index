@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-08 11:36",
+ "updated": "2026-10-08 12:26",
  "items": [
   {
    "title": "정부, 10년간 1000조원 투입해 재생에너지 등 녹색 전환(GX) 지원",
@@ -24,7 +24,7 @@
   },
   {
    "title": "[국감] 기후에너지환경부 “12차 전기본 또 미뤄지나”…국감서 ‘원전 공론화’ 놓고 공방",
-   "source": "이미디어",
+   "source": "환경미디어",
    "link": "https://news.google.com/rss/articles/CBMic0FVX3lxTFBFZHhsQ1RIdzVLSnFkQUNCVUFza1Y5SkRxYXJoSEJRa0hINnlxNU5fTmsxaTl0VzdTbHN3V2s0ZVlvWWl1R01tZV9ycVU0bVJwQUJRUlY4aWxfbGp4bXZYTTJINmZQd0F3T3lmR090Zk1JUk3SAW5BVV95cUxNdHM1eTlwaXBBZWpqeWdkSUpOVWxMaHRUWEpwOWoyNWxPUXJLSThBV041UXE4NC0wc1N3WjRYMDFhZ1JoWERwTndQWWw1N29jNkxxQlFHVFJjZkNqZVJpT1U3V0hSZmZpMXNvYWpoQQ?oc=5",
    "pub": "2026-10-07 16:46",
    "more": 0
@@ -51,13 +51,6 @@
    "more": 0
   },
   {
-   "title": "LS일렉트릭, 대만 전력시장 ‘수주형 사업’으로 전환… 포모사와 JV 설립",
-   "source": "Korea IT Times",
-   "link": "https://news.google.com/rss/articles/CBMib0FVX3lxTE5TaHJFQjBYTC1zTWtZTm1RV2x4ek9LRzRqdkpKc3I0cXpLNHhGOG1hcktzeWdRV2c1WHg0eUw3VEtYdTBQSm5XUTMxTDZwbDV6NC0yRm9hU3BPU09rRDZuei1VMkhlZVhnaEU1NkU4UQ?oc=5",
-   "pub": "2026-10-07 10:28",
-   "more": 0
-  },
-  {
    "title": "(국감)기후부, 재생에너지 100GW·2040 탈석탄 추진",
    "source": "에너지타임뉴스",
    "link": "https://news.google.com/rss/articles/CBMidkFVX3lxTE9sTV9PODFURDZQMmVUbUlORmc5aVJLbzM0al9aY1owTGo3ZjkwUWdiazNTLTV3NW0wSTMyZTZXOHktT3B1SzNMU1RpZk03MHFpdXJCeGVQM3ZQclNjM2EwbmhpRkZxR05iU3RnZnYwSFBVeWJ1U0HSAXZBVV95cUxPbE1fTzgxVEQ2UDJlVG1JTkZnOWlSS28zNGpfWmNaMExqN2Y5MFFnYmszUy01dzVtMEkzMmU2Vzh5LU9wdUszTFNUaWZNNzBxaXVyQnhlUDN2UHJTYzNhMG5oaUZGcUdOYlN0Z2Z2MEhQVXlidVNB?oc=5",
@@ -65,18 +58,25 @@
    "more": 2
   },
   {
-   "title": "[2026 국감] “2040 탈석탄 법안 없다”··· AI 전력수요·전기본 ‘정조준’",
-   "source": "환경일보",
-   "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTFBoQXh1V0hOY2RrWl9RN3dTcDVlMGs3MktBMmZlR21LcmVyMmRLNjAtek1wRVlzX2l6VFFCTlNUM2Z4Y3NiRGM2QkF0Z0ZGTXB1R1g4b2t0SFZCU1dYS2xmUGZ1aDhBM2FH?oc=5",
-   "pub": "2026-10-07 08:10",
-   "more": 0
+   "title": "아파트 3층 높이 거대 전기주전자?... 반도체 수요로 판 커지는 LNG열병합",
+   "source": "한국일보",
+   "link": "https://news.google.com/rss/articles/CBMic0FVX3lxTE5YVWZrLVFEYWZoOHJNdWg4dmhfYXZsdWpVM1o0TDZpeWpUT3drZm1tNVh6emhKTFlhd2lrMktLTmRpQmlmZld1WDFRMWlpZDJDR0JqblY0MlpvRFp4UV92OVpzMUJmeEd6T3BfOXZyOFhwVHfSAXNBVV95cUxOWFVmay1RRGFmaDhyTXVoOHZoX2F2bHVqVTNaNEw2aXlqVE93a2ZtbTVYenpoSkxZYXdpazJLS05kaUJpZmZXdVgxUTFpaWQyQ0dCam5WNDJab0RaeFFfdjlaczFCZnhHek9wXzl2cjhYcFR3?oc=5",
+   "pub": "2026-10-07 04:30",
+   "more": 1
+  },
+  {
+   "title": "LG전자, K-GX전략서 히트펌프 기반 주거공간 탄소중립 로드맵 발표",
+   "source": "이투뉴스",
+   "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE0xd2l5emJlMFNvaG5fQllHRkF1YzhVcTBYWUVXRG5NdENnaDZGZW5xSGl2LU1rUFBNVEQ5TFlkV0dldTRRMG5TdktsLVEzWmM1eW5qTUhJSHhSVFNfdWtkZE5waGxjSFXSAWtBVV95cUxPOE9FQ0Y1WHlIYktzZ0pOazhyaTkzYXN5SkFnbk9hd3pXUEJFVGVFdEN6SkpRSndpMWRHbHlaS0g2TnV0Z0tRdEt6RDlRcUFCb2d4d3c0VTNXS2Rzai1jVjBFcGhKaXJHWC1Saw?oc=5",
+   "pub": "2026-10-07 16:38",
+   "more": 3
   },
   {
    "title": "한전KDN, 민간 태양광 발전 사이버 안보 강화",
    "source": "투데이에너지",
    "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE94eWhrNzBjdTY2cm5QSlNUdVpOUnZ5ZnctU3VXUTRxRTdzU1lkTjVzX2ZQZEtqaC1JUDdGSWNuYzhjMkRkNWxUQnRINkxfekxucDYwWkJLd1MyVjd5eHBNQjJCT1ZpZExuNW9IRFBn?oc=5",
    "pub": "2026-10-07 12:00",
-   "more": 3
+   "more": 2
   },
   {
    "title": "전력거래소-볼트에이아이, 가상발전소(VPP) 시장설계 공동 추진",
@@ -104,7 +104,7 @@
    "source": "미디어시시비비",
    "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE9aREU4TG9QMllmRXZodU1SQXF6Q2g1VzNmTkU3d2xEOWprckJYWm9rczU4SGhoSGxyRkRHQy1zUndUMGxmckxwdU1SQzc4TW9JMzJwSFEwaHNWZ2VDUjVTRk15QndoZ0FnYmg0RGtDMDRJQQ?oc=5",
    "pub": "2026-10-07 11:40",
-   "more": 16
+   "more": 19
   }
  ]
 }
