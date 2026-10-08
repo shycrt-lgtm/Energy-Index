@@ -8,14 +8,24 @@ from datetime import datetime, timedelta, timezone
 KST = timezone(timedelta(hours=9))
 KEYWORDS = ["집단에너지", "전력시장", "용량시장", "SMP 전력시장", "전력도매가격", "PPA 전력", "전력수급기본계획", "전기본 에너지",
             "RPS 신재생", "태양광 발전", "풍력 발전", "LNG 발전", "LNG 가격", "도시가스 요금", "탄소배출권", "전력거래소",
-            "전기위원회", "발전사업 허가", "ESS 에너지저장", "열병합발전", "RE100", "전기차 충전", "VPP 가상발전소", "열병합 용량입찰", "LNG 용량시장"]
+            "전기위원회", "발전사업 허가", "ESS 에너지저장", "열병합발전", "RE100", "전기차 충전", "VPP 가상발전소", "열병합 용량입찰", "LNG 용량시장",
+            "SMR", "원전", "탄소중립", "가스터빈", "화력발전", "석탄발전", "JKM LNG"]
 # ▼▼ 가져올 언론사 목록 (여기에 있는 언론사 기사만 사용). 추가·삭제는 이름만 고치면 됩니다. ▼▼
 # 구글 뉴스에 표시되는 언론사 이름의 일부만 맞아도 인정합니다(예: "한국경제"는 "한국경제TV"도 포함).
 # ALLOWED_SOURCES를 빈 목록 [] 으로 두면 언론사 제한 없이 모두 가져옵니다.
 ALLOWED_SOURCES = []
 # 아래 3개 언론사는 구글 검색에 더해 해당 사이트에서도 같은 키워드로 따로 검색하고, 점수도 조금 더 줍니다.
-FOCUS_SITES = {"이투뉴스": "e2news.com", "에너지경제": "ekn.kr", "조선비즈": "biz.chosun.com"}
-FOCUS_BONUS = 3
+# 우선 노출 언론사 (위에 있을수록 먼저 노출). 이름은 구글 뉴스에 표시되는 언론사명, 값은 사이트 주소입니다.
+FOCUS_SITES = {"조선비즈": "biz.chosun.com", "이투뉴스": "e2news.com", "조선일보": "chosun.com", "에너지경제": "ekn.kr",
+               "중앙일보": "joongang.co.kr", "매일경제": "mk.co.kr", "투데이에너지": "todayenergy.kr"}
+FOCUS_ORDER = list(FOCUS_SITES)
+
+def src_rank(src):
+    """우선 언론사 순번(0이 가장 높음), 해당 없으면 99"""
+    for i, n in enumerate(FOCUS_ORDER):
+        if n in (src or ""):
+            return i
+    return 99
 # ▲▲ ----------------------------------------------------------------------- ▲▲
 
 def source_ok(src):
@@ -43,7 +53,7 @@ JAC = 0.25            # 두 글자 조각 겹침 비율 기준(이 이상이면 
 # 시장과 관련 깊은 낱말(제목에 있으면 가산) / 시장과 무관한 행사·인사·홍보 낱말(제목에 있으면 감점)
 CORE = ["SMP", "전력시장", "전력도매", "도매가격", "계통한계", "LNG", "천연가스", "도시가스", "가스요금", "전기요금", "요금",
         "가격", "배출권", "탄소", "REC", "열병합", "집단에너지", "한전", "한국전력", "전력거래소", "가스공사", "수급",
-        "정산", "상한제", "재생에너지", "RE100", "발전", "전력", "유가", "환율", "에너지", "송전", "전기위원회", "산업부", "기후부", "전력수급기본계획", "ESS", "RPS", "PPA", "태양광", "충전", "VPP", "가상발전소", "에너지저장", "입찰", "용량시장"]
+        "정산", "상한제", "재생에너지", "RE100", "발전", "전력", "유가", "환율", "에너지", "송전", "전기위원회", "산업부", "기후부", "전력수급기본계획", "ESS", "RPS", "PPA", "태양광", "충전", "VPP", "가상발전소", "에너지저장", "입찰", "용량시장", "SMR", "원전", "탄소중립", "가스터빈", "화력", "석탄", "JKM"]
 NOISE_HARD = ["연봉", "채용", "인사", "부고", "결혼", "장학", "봉사", "기부", "특징주", "목표주가", "주가", "수상", "표창", "시상", "동정", "인사말", "학생", "대학교", "국립대",
               # 스포츠(가스공사 농구단 등)
               "농구", "프로농구", "페가수스", "KBL", "구단", "선수", "배구", "야구", "축구", "시즌",
@@ -59,8 +69,8 @@ PRIORITY = ["집단에너지", "전력시장", "용량시장", "SMP", "PPA", "�
 POLICY = ["정책", "제도", "개편", "개선안", "기본계획", "전기본", "전력수급기본계획", "용량시장", "용량입찰", "전력시장", "도매시장", "전기위원회",
           "산업부", "기후부", "기후에너지환경부", "국회", "정부", "법안", "개정", "시행령", "고시", "규제", "허가", "요금", "정산", "상한", "보조금",
           "지침", "공고", "탈탄소", "RPS", "PPA", "배출권", "계통", "집단에너지법", "전기사업법", "열병합"]
-TECH = ["기술", "기술개발", "개발", "실증", "연구", "소재", "효율", "배터리", "전고체", "모듈", "인버터", "수소", "연료전지", "SMR", "특허",
-        "상용화", "시스템", "AI", "알고리즘", "플랫폼", "센서", "탠덤", "페로브스카이트", "터빈", "준공", "착공"]
+TECH = ["기술", "기술개발", "개발", "실증", "연구", "소재", "효율", "배터리", "전고체", "모듈", "인버터", "수소", "연료전지", "특허",
+        "상용화", "시스템", "AI", "알고리즘", "플랫폼", "센서", "탠덤", "페로브스카이트", "준공", "착공"]
 
 def tier(t):
     """0=정책(맨 위), 1=일반, 2=기술(후순위)"""
@@ -129,7 +139,8 @@ def score(g):
     core = sum(1 for w in CORE if w.lower() in t.lower())
     tr = tier(t)
     pri = sum(1 for w in PRIORITY if w.lower() in t.lower())
-    bonus = FOCUS_BONUS if any(w in (g["item"]["source"] or "") for w in FOCUS_SITES) else 0
+    r = src_rank(g["item"]["source"])
+    bonus = (len(FOCUS_ORDER) - r) if r < 99 else 0
     return min(core, 4) * 3 + min(pri, 3) * 5 + bonus + (6 if tr == 0 else -6 if tr == 2 else 0) + min(g["more"], 3) - 20 * sum(1 for w in NOISE_HARD if w in t) - 2 * sum(1 for w in NOISE_SOFT if w in t), core
 
 def dedup(items):
@@ -183,7 +194,7 @@ def main():
     # 지정 언론사 사이트에서 같은 키워드로 추가 검색 (키워드를 5개씩 묶어 OR 검색)
     def q(k):
         return '"' + k + '"' if " " in k else k
-    groups_kw = [KEYWORDS[i:i+5] for i in range(0, len(KEYWORDS), 5)]
+    groups_kw = [KEYWORDS[i:i+8] for i in range(0, len(KEYWORDS), 8)]
     for name, dom in FOCUS_SITES.items():
         n_site = 0
         for gk in groups_kw:
@@ -218,8 +229,8 @@ def main():
         best = max(pool, key=lambda g: (score(g)[0] - 4 * cnt.get(lead(g), 0), g["item"]["pub"].timestamp()))
         pool.remove(best); top.append(best)
         cnt[lead(best)] = cnt.get(lead(best), 0) + 1
-    # 화면 순서: 정책 기사 → 일반 기사 → 기술 기사, 같은 구분 안에서는 최신순
-    top.sort(key=lambda g: (tier(g["item"]["title"]), -g["item"]["pub"].timestamp()))
+    # 화면 순서: 정책 → 일반 → 기술, 같은 구분 안에서는 우선 언론사 순서 → 최신순
+    top.sort(key=lambda g: (tier(g["item"]["title"]), src_rank(g["item"]["source"]), -g["item"]["pub"].timestamp()))
     items = [{"title": g["item"]["title"], "source": g["item"]["source"], "link": g["item"]["link"],
               "pub": g["item"]["pub"].strftime("%Y-%m-%d %H:%M"), "more": g["more"]} for g in top]
     json.dump({"updated": now.strftime("%Y-%m-%d %H:%M"), "items": items},
