@@ -23,8 +23,7 @@
   .menu a:hover{background:#f1f5f9}
   .menu a.on{background:#cbd5e1}
   .menu a span{font-size:16px;line-height:1}
-  .menu a .bt i{font-style:normal;white-space:nowrap}
-  @media (max-width:640px){ .menu a{line-height:1.2;text-align:center} .menu a .bt i{display:block} }
+  .mb{display:none}
   h2 { font-size:18px; font-weight:700; color:var(--navy); margin:30px 0 10px; padding-bottom:8px; border-bottom:2px solid var(--line); }
   h2 { display:flex; align-items:center; }
   h2::before { content:''; flex:none; width:6px; height:18px; margin-right:9px; background:var(--navy); }
@@ -54,6 +53,8 @@
   .pick .sep { margin-left:4px; padding-left:8px; border-left:1px solid #e2e8f0; }
   .pick button { background:#001f3f; color:#fff; border:0; border-radius:4px; padding:7px 12px; font:inherit; font-size:12px; font-weight:700; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,.2); }
   .pick button:hover { background:#1e293b; }
+  .pick label, .pick button, .pick .wd { white-space:nowrap; }
+  @media (max-width:640px){ .pick{gap:5px;padding:6px 8px} .pick label{font-size:13px} .pick input{width:92px;font-size:13px} .pick .sep{margin-left:0;padding-left:6px} .pick button{padding:7px 8px} }
   .flatpickr-calendar { border:1px solid #cbd5e1; box-shadow:0 10px 25px -5px rgba(0,0,0,.15); }
   .flatpickr-day.selected, .flatpickr-day.selected:hover { background:#001f3f; border-color:#001f3f; }
   .flatpickr-day.weekend-day { color:#dc2626; font-weight:700; }
@@ -75,7 +76,7 @@
   .up { color:#d93f3c; font-weight:700; } .dn { color:#005587; font-weight:700; } .fl { color:var(--mute); }
   .foot { margin-top:36px; font-size:12px; color:#94a3b8; }
   @media (max-width:640px){ table.ind th, table.ind td { padding:8px 6px; font-size:12px; } table.ind td.v { font-size:14px; } table.ind td.nm small { display:block; margin:0; } .wrap{padding-top:20px}
-    .site-header h1{font-size:22px} .menu{width:100%} .menu a{flex:1;width:auto;height:40px;padding:0 12px;font-size:13px} }
+    .mb{display:inline} .menu a{text-align:center;line-height:1.25;gap:4px;height:48px!important;padding:0 6px!important} .menu a span{display:none} .site-header h1{font-size:22px} .menu{width:100%} .menu a{flex:1;width:auto;height:40px;padding:0 12px;font-size:13px} }
 </style>
 </head>
 <body>
@@ -86,8 +87,9 @@
       <p class="sub">기준일: <b id="baseDate">-</b> | 에너지사업총괄</p>
     </div>
     <nav class="menu">
-      <a href="https://shycrt-lgtm.github.io/KPX-Daily-Report/"><b class="bt"><i>전력시장</i> <i>전일실적</i></b> <span>›</span></a>
+      <a href="https://shycrt-lgtm.github.io/KPX-Daily-Report/">전력시장<br class="mb"> 전일실적 <span>›</span></a>
       <a href="https://shycrt-lgtm.github.io/TMS/">TMS <span>›</span></a>
+      <a href="https://shycrt-lgtm.github.io/Energy-Price/#home">에너지<br class="mb"> 단가 <span>›</span></a>
     </nav>
   </div>
 </header>
