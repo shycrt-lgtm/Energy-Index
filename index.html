@@ -23,7 +23,8 @@
   .menu a:hover{background:#f1f5f9}
   .menu a.on{background:#cbd5e1}
   .menu a span{font-size:16px;line-height:1}
-  .mb{display:none}
+  .menu a .bt i{font-style:normal;white-space:nowrap}
+  @media (max-width:640px){ .menu a{line-height:1.2;text-align:center} .menu a .bt i{display:block} }
   h2 { font-size:18px; font-weight:700; color:var(--navy); margin:30px 0 10px; padding-bottom:8px; border-bottom:2px solid var(--line); }
   h2 { display:flex; align-items:center; }
   h2::before { content:''; flex:none; width:6px; height:18px; margin-right:9px; background:var(--navy); }
@@ -74,7 +75,7 @@
   .up { color:#d93f3c; font-weight:700; } .dn { color:#005587; font-weight:700; } .fl { color:var(--mute); }
   .foot { margin-top:36px; font-size:12px; color:#94a3b8; }
   @media (max-width:640px){ table.ind th, table.ind td { padding:8px 6px; font-size:12px; } table.ind td.v { font-size:14px; } table.ind td.nm small { display:block; margin:0; } .wrap{padding-top:20px}
-    .mb{display:inline} .menu a{text-align:center;line-height:1.25;gap:4px;height:48px!important;padding:0 6px!important} .menu a span{display:none} .site-header h1{font-size:22px} .menu{width:100%} .menu a{flex:1;width:auto;height:40px;padding:0 12px;font-size:13px} }
+    .site-header h1{font-size:22px} .menu{width:100%} .menu a{flex:1;width:auto;height:40px;padding:0 12px;font-size:13px} }
 </style>
 </head>
 <body>
@@ -85,9 +86,8 @@
       <p class="sub">기준일: <b id="baseDate">-</b> | 에너지사업총괄</p>
     </div>
     <nav class="menu">
-      <a href="https://shycrt-lgtm.github.io/KPX-Daily-Report/">전력시장<br class="mb"> 전일실적 <span>›</span></a>
+      <a href="https://shycrt-lgtm.github.io/KPX-Daily-Report/"><b class="bt"><i>전력시장</i> <i>전일실적</i></b> <span>›</span></a>
       <a href="https://shycrt-lgtm.github.io/TMS/">TMS <span>›</span></a>
-      <a href="https://shycrt-lgtm.github.io/Energy-Price/#home">에너지<br class="mb"> 단가 <span>›</span></a>
     </nav>
   </div>
 </header>
@@ -101,7 +101,7 @@
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
       </div>
       <span id="viewWd" class="wd">(-)</span>
-      <div class="sep"><button id="btnToday" type="button">⚡ 오늘로 →</button></div>
+      <div class="sep"><button id="btnToday" type="button">⚡ 최근일로 →</button></div>
     </div>
   </div>
   <div id="pastNote" class="pastnote"></div>
@@ -233,7 +233,7 @@
     const wd = document.getElementById('viewWd'); wd.textContent = `(${dow(key)})`;
     wd.className = 'wd' + (['일', '토'].includes(dow(key)) ? ' hol' : '');
     document.getElementById('viewDate').value = ymdDash(key);
-    document.getElementById('btnToday').textContent = key === TODAY ? '⚡ 오늘' : `⚡ 오늘(${+TODAY.slice(4,6)}.${+TODAY.slice(6,8)})로 →`;
+    document.getElementById('btnToday').textContent = '⚡ 최근일로 →';
     const pn = document.getElementById('pastNote');
     if (key === TODAY) pn.style.display = 'none'; else { pn.style.display = 'block'; pn.textContent = `${fmtLong(key)}에 저장된 자료를 보고 있습니다.`; }
     document.getElementById('indBody').innerHTML = '<tr><td colspan="5" class="fl">불러오는 중...</td></tr>';
