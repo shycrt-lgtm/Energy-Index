@@ -244,7 +244,17 @@ def main():
         print(">> [뉴스] 수집된 기사가 없어 기존 파일을 유지합니다."); raise SystemExit(1 if ok == 0 else 0)
     groups = dedup(allit)
     # 시장 관련도(낱말 점수) + 여러 매체가 다룬 정도로 점수를 매겨 상위만 선택, 같으면 최신순
-    groups = [g for g in groups if score(g)[1] >= 1 and score(g)[0] > 0]
+    main = [g for g in groups if score(g)[1] >= 1 and score(g)[0] > 0]
+    # 주말·휴일처럼 기사가 적어 TOP_N 에 못 미치면, 에너지 관련 낱말은 있으나 점수가 낮아 탈락한 기사(후순위)로 채운다.
+    # 채운 기사는 filler 표시를 달아 화면 맨 아래에 놓는다.
+    if len(main) < TOP_N:
+        rest = sorted([g for g in groups if g not in main and score(g)[1] >= 1],
+                      key=lambda g: (score(g)[0], g["item"]["pub"].timestamp()), reverse=True)
+        for g in rest[: TOP_N - len(main)]:
+            g["filler"] = True
+        main += rest[: TOP_N - len(main)]
+        print(f">> [뉴스] 기사가 적어 후순위 기사로 {sum(1 for g in main if g.get('filler'))}건 보충")
+    groups = main
     # 같은 기관(제목 맨 앞 낱말)이 주어인 기사가 한쪽으로 몰리지 않도록, 이미 뽑힌 수만큼 점수를 깎아 가며 한 건씩 선택
     def lead(g):
         m = re.search(r"[A-Za-z가-힣]{2,}", re.sub(r"\[[^\]]*\]", " ", g["item"]["title"]))
@@ -256,7 +266,7 @@ def main():
         pool.remove(best); top.append(best)
         cnt[lead(best)] = cnt.get(lead(best), 0) + 1
     # 화면 순서: 정책 → 일반 → 기술, 같은 구분 안에서는 우선 언론사 순서 → 최신순
-    top.sort(key=lambda g: (tier(g["item"]["title"]), src_rank(g["item"]["source"]), -g["item"]["pub"].timestamp()))
+    top.sort(key=lambda g: (g.get("filler", False), tier(g["item"]["title"]), src_rank(g["item"]["source"]), -g["item"]["pub"].timestamp()))
     items = [{"title": g["item"]["title"], "source": g["item"]["source"], "link": g["item"]["link"],
               "pub": g["item"]["pub"].strftime("%Y-%m-%d %H:%M"), "more": g["more"]} for g in top]
     json.dump({"updated": now.strftime("%Y-%m-%d %H:%M"), "items": items},
