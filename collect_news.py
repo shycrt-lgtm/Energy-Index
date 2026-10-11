@@ -18,7 +18,7 @@ ALLOWED_SOURCES = []
 # 아래 3개 언론사는 구글 검색에 더해 해당 사이트에서도 같은 키워드로 따로 검색하고, 점수도 조금 더 줍니다.
 # 우선 노출 언론사 (위에 있을수록 먼저 노출). 이름은 구글 뉴스에 표시되는 언론사명, 값은 사이트 주소입니다.
 FOCUS_SITES = {"조선비즈": "biz.chosun.com", "이투뉴스": "e2news.com", "조선일보": "chosun.com", "에너지경제": "ekn.kr",
-               "중앙일보": "joongang.co.kr", "매일경제": "mk.co.kr", "투데이에너지": "todayenergy.kr"}
+               "중앙일보": "joongang.co.kr", "매일경제": "mk.co.kr", "투데이에너지": "todayenergy.kr", "전기신문": "electimes.com"}
 FOCUS_ORDER = list(FOCUS_SITES)
 
 def src_rank(src):
@@ -94,6 +94,98 @@ def tier(t):
     if any(w in t for w in TECH):
         return 2
     return 1
+
+# ---------------------------------------------------------------------------
+# 기사 실제 발행일 검증: 구글 뉴스 날짜는 오래된 기사를 다시 수집하면 오늘 날짜로 바뀔 수 있어, 최종 후보는 원문 페이지의 발행일을 확인한다.
+# 확인에 실패(접속 불가·날짜 없음)하면 구글 날짜를 믿고 그대로 둔다(기사가 통째로 사라지지 않게).
+STALE_DAYS = 7        # 실제 발행일이 이보다 오래된 기사는 제외
+VERIFY_BUDGET = 120   # 초. 검증에 쓰는 총 시간 상한(넘으면 나머지는 검증 생략)
+_vstate = {"t0": None, "checked": 0}
+UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36"}
+
+def decode_gnews(url):
+    """구글 뉴스 암호화 링크 -> 원문 주소. 실패 시 None."""
+    m = re.search(r"/articles/([^/?]+)", url)
+    if not m:
+        return None
+    gid = m.group(1)
+    page = None
+    for base in ("https://news.google.com/articles/", "https://news.google.com/rss/articles/"):
+        try:
+            req = urllib.request.Request(base + gid, headers=UA)
+            page = urllib.request.urlopen(req, timeout=10).read().decode("utf-8", "ignore")
+            sg = re.search(r'data-n-a-sg="([^"]+)"', page)
+            ts = re.search(r'data-n-a-ts="([^"]+)"', page)
+            if sg and ts:
+                break
+        except Exception:
+            page = None
+    else:
+        return None
+    if not page or not sg or not ts:
+        return None
+    inner = ('["garturlreq",[["X","X",["X","X"],null,null,1,1,"US:en",null,1,null,null,null,null,null,0,1],'
+             '"X","X",1,[1,1,1],1,1,null,0,0,null,0],"%s",%s,"%s"]' % (gid, ts.group(1), sg.group(1)))
+    body = urllib.parse.urlencode({"f.req": json.dumps([[["Fbv4je", inner]]])}).encode()
+    req = urllib.request.Request("https://news.google.com/_/DotsSplashUi/data/batchexecute", data=body,
+                                 headers={**UA, "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"})
+    raw = urllib.request.urlopen(req, timeout=10).read().decode("utf-8", "ignore")
+    arr = json.loads(raw.split("\n\n")[1])
+    return json.loads(arr[0][2])[1]
+
+DATE_PATS = [
+    r'<meta[^>]+(?:property|name|itemprop)=["\'](?:article:published_time|og:article:published_time|article:published|pubdate|publishdate|date|dc\.date(?:\.issued)?|og:regDate|regDate|datePublished)["\'][^>]*content=["\']([^"\']+)',
+    r'<meta[^>]+content=["\']([^"\']+)["\'][^>]*(?:property|name|itemprop)=["\'](?:article:published_time|og:article:published_time|article:published|pubdate|publishdate|date|dc\.date(?:\.issued)?|og:regDate|regDate|datePublished)["\']',
+    r'"datePublished"\s*:\s*"([^"]+)"',
+    r'"dateCreated"\s*:\s*"([^"]+)"',
+]
+
+def parse_pub_date(text):
+    """'2006-03-02T10:00:00+09:00', '20060302100000', '2006.03.02 10:00' 등 -> aware datetime(KST) 또는 None"""
+    t = (text or "").strip()
+    m = re.match(r"(\d{4})[-./]?(\d{2})[-./]?(\d{2})(?:[T\s]?(\d{2}):?(\d{2}))?", t)
+    if not m:
+        return None
+    y, mo, d, hh, mi = m.groups()
+    try:
+        return datetime(int(y), int(mo), int(d), int(hh or 0), int(mi or 0), tzinfo=KST)
+    except ValueError:
+        return None
+
+def article_date(html_text):
+    for pat in DATE_PATS:
+        for m in re.finditer(pat, html_text, re.I):
+            dt = parse_pub_date(m.group(1))
+            if dt and 2000 <= dt.year <= datetime.now(KST).year + 1:
+                return dt
+    return None
+
+def is_stale(item, now):
+    """실제 발행일이 STALE_DAYS 보다 오래되었으면 True. 확인 불가면 False."""
+    if _vstate["t0"] is None:
+        _vstate["t0"] = time.time()
+    if time.time() - _vstate["t0"] > VERIFY_BUDGET:
+        return False
+    try:
+        real = decode_gnews(item["link"])
+        if not real or "news.google.com" in real:
+            return False
+        req = urllib.request.Request(real, headers=UA)
+        raw = urllib.request.urlopen(req, timeout=10).read(400000)
+        txt = raw.decode("utf-8", "ignore")
+        dt = article_date(txt)
+        if dt is None:
+            txt = raw.decode("euc-kr", "ignore")
+            dt = article_date(txt)
+        _vstate["checked"] += 1
+        if dt is None:
+            return False
+        if now - dt > timedelta(days=STALE_DAYS):
+            print(f"   [날짜검증] 제외: 실제 발행 {dt:%Y-%m-%d} (구글 표시 {item['pub']:%Y-%m-%d}) {item['title'][:40]}")
+            return True
+    except Exception as e:
+        print(f"   [날짜검증] 확인 실패({type(e).__name__}) - 구글 날짜 유지: {item['title'][:30]}")
+    return False
 
 def hangul_ratio(t):
     letters = re.findall(r"[A-Za-z가-힣]", t)
@@ -263,7 +355,10 @@ def main():
     pool = list(groups)
     while pool and len(top) < TOP_N:
         best = max(pool, key=lambda g: (score(g)[0] - 4 * cnt.get(lead(g), 0), g["item"]["pub"].timestamp()))
-        pool.remove(best); top.append(best)
+        pool.remove(best)
+        if is_stale(best["item"], now):
+            continue
+        top.append(best)
         cnt[lead(best)] = cnt.get(lead(best), 0) + 1
     # 화면 순서: 정책 → 일반 → 기술, 같은 구분 안에서는 우선 언론사 순서 → 최신순
     top.sort(key=lambda g: (g.get("filler", False), tier(g["item"]["title"]), src_rank(g["item"]["source"]), -g["item"]["pub"].timestamp()))
@@ -277,6 +372,7 @@ def main():
     json.dump({"updated": now.strftime("%Y-%m-%d %H:%M"), "items": items},
               open(f"history/news_{day}.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     print(f">> [뉴스] history/news_{day}.json 보관")
+    print(f">> [뉴스] 발행일 검증 {_vstate['checked']}건 확인")
     print(f">> [뉴스] 수집 {len(allit)}건 -> 중복 제거 후 {len(groups)}건 -> 상위 {len(items)}건 저장")
     for i, x in enumerate(items, 1):
         print(f"   {i}. [{x['source']}] {x['title']} (같은 내용 +{x['more']})")
