@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""에너지시장 뉴스 수집: 구글 뉴스 RSS(키워드별) -> 중복 제거 -> 상위 10건 -> news.json"""
+"""에너지시장 뉴스 수집: 구글 뉴스 RSS(키워드별) -> 중복 제거 -> 상위 15건 -> news.json"""
 import json, re, time, difflib, urllib.request, urllib.parse
 import xml.etree.ElementTree as ET
 from email.utils import parsedate_to_datetime
@@ -10,12 +10,23 @@ KEYWORDS = ["집단에너지", "전력시장", "용량시장", "SMP 전력시장
             "RPS 신재생", "태양광 발전", "풍력 발전", "LNG 발전", "LNG 가격", "도시가스 요금", "탄소배출권", "전력거래소",
             "전기위원회", "발전사업 허가", "ESS 에너지저장", "열병합발전", "RE100", "전기차 충전", "VPP 가상발전소", "열병합 용량입찰", "LNG 용량시장",
             "SMR", "원전", "탄소중립", "가스터빈", "화력발전", "석탄발전", "JKM LNG", "히트펌프", "재생열", "전극보일러",
-            "발전소 사고", "발전소 화재", "발전소 폭발", "발전소 불시정지", "도시가스 공급비용"]
+            "발전소 사고", "발전소 화재", "발전소 폭발", "발전소 불시정지", "도시가스 공급비용", "구역전기"]
+
+# ▼▼ 그룹 사업장 사명. 제목에 사명이 있으면 ①따로 검색 ②점수 크게 가산·다른 기사에 밀리지 않음 ③화면 맨 위 노출 ④협약·MOU·인사 등 노이즈 필터 면제 ▼▼
+# 추가·삭제는 이름만 고치면 됩니다. 띄어쓰기는 무시하고 비교합니다(예: "삼천리 광명" -> "삼천리광명"도 인정).
+# "삼천리 광명"은 "삼천리 광명열병합"처럼 뒤에 다른 말이 붙어도 걸립니다. "삼천리ES 광명사업단"은 삼천리와 광명이 붙어 있지 않아 걸리지 않습니다.
+COMPANIES = ["안산도시개발", "삼천리 광명", "삼천리 광명열병합", "삼천리 구역전기", "에스파워", "휴세스"]
+# ▲▲ ----------------------------------------------------------------------- ▲▲
+
+def has_company(t):
+    s = (t or "").replace(" ", "")
+    return any(c.replace(" ", "") in s for c in COMPANIES)
+
 # ▼▼ 가져올 언론사 목록 (여기에 있는 언론사 기사만 사용). 추가·삭제는 이름만 고치면 됩니다. ▼▼
 # 구글 뉴스에 표시되는 언론사 이름의 일부만 맞아도 인정합니다(예: "한국경제"는 "한국경제TV"도 포함).
 # ALLOWED_SOURCES를 빈 목록 [] 으로 두면 언론사 제한 없이 모두 가져옵니다.
 ALLOWED_SOURCES = []
-# 아래 3개 언론사는 구글 검색에 더해 해당 사이트에서도 같은 키워드로 따로 검색하고, 점수도 조금 더 줍니다.
+# 아래 언론사는 구글 검색에 더해 해당 사이트에서도 같은 키워드로 따로 검색하고, 점수도 조금 더 줍니다.
 # 우선 노출 언론사 (위에 있을수록 먼저 노출). 이름은 구글 뉴스에 표시되는 언론사명, 값은 사이트 주소입니다.
 FOCUS_SITES = {"조선비즈": "biz.chosun.com", "이투뉴스": "e2news.com", "조선일보": "chosun.com", "에너지경제": "ekn.kr",
                "중앙일보": "joongang.co.kr", "매일경제": "mk.co.kr", "투데이에너지": "todayenergy.kr", "전기신문": "electimes.com"}
@@ -54,19 +65,27 @@ JAC = 0.25            # 두 글자 조각 겹침 비율 기준(이 이상이면 
 # 시장과 관련 깊은 낱말(제목에 있으면 가산) / 시장과 무관한 행사·인사·홍보 낱말(제목에 있으면 감점)
 CORE = ["SMP", "전력시장", "전력도매", "도매가격", "계통한계", "LNG", "천연가스", "도시가스", "가스요금", "전기요금", "요금",
         "가격", "배출권", "탄소", "REC", "열병합", "집단에너지", "한전", "한국전력", "전력거래소", "가스공사", "수급",
-        "정산", "상한제", "재생에너지", "RE100", "발전", "전력", "유가", "환율", "에너지", "송전", "전기위원회", "산업부", "기후부", "전력수급기본계획", "ESS", "RPS", "PPA", "태양광", "충전", "VPP", "가상발전소", "에너지저장", "입찰", "용량시장", "SMR", "원전", "탄소중립", "가스터빈", "화력", "석탄", "JKM", "히트펌프", "재생열", "전극보일러"]
+        "정산", "상한제", "재생에너지", "RE100", "발전", "전력", "유가", "환율", "에너지", "송전", "전기위원회", "산업부", "기후부", "전력수급기본계획", "ESS", "RPS", "PPA", "태양광", "충전", "VPP", "가상발전소", "에너지저장", "입찰", "용량시장", "SMR", "원전", "탄소중립", "가스터빈", "화력", "석탄", "JKM", "히트펌프", "재생열", "전극보일러", "구역전기"]
+# 사진만 있는 기사(사진 설명문·포토뉴스·화보 등) - 사명이 있어도 제외
+PHOTO_NOISE = ["재판매", "DB 금지", "무단 전재", "[포토", "포토뉴스", "[사진", "[화보", "[영상", "[동영상", "[카드뉴스", "사진 제공", "사진=", "기념 촬영", "기념사진"]
 NOISE_HARD = ["연봉", "채용", "인사", "부고", "결혼", "장학", "봉사", "기부", "특징주", "목표주가", "주가", "수상", "표창", "시상", "동정", "인사말", "학생", "대학교", "국립대",
               # 스포츠(가스공사 농구단 등)
               "농구", "프로농구", "페가수스", "KBL", "구단", "선수", "배구", "야구", "축구", "시즌",
               # 지역상생·협약성 홍보 기사
               "맞손", "상생", "손잡", "업무협약", "MOU", "협약", "지역사회", "나눔", "후원",
               # 해외 사업·해외 뉴스
-              "베트남", "인도네시아", "필리핀", "말레이시아", "태국", "싱가포르", "몽골", "카자흐", "우즈벡", "중동", "사우디", "UAE", "호주", "캐나다", "멕시코", "브라질", "인도 ", "아프리카", "해외", "우크라이나", "러시아", "이스라엘", "이란", "가자",
-              # 사진만 있는 기사(사진 설명문·포토뉴스·화보 등)
-              "재판매", "DB 금지", "무단 전재", "[포토", "포토뉴스", "[사진", "[화보", "[영상", "[동영상", "[카드뉴스", "사진 제공", "사진=", "기념 촬영", "기념사진"]
+              "베트남", "인도네시아", "필리핀", "말레이시아", "태국", "싱가포르", "몽골", "카자흐", "우즈벡", "중동", "사우디", "UAE", "호주", "캐나다", "멕시코", "브라질", "인도 ", "아프리카", "해외", "우크라이나", "러시아", "이스라엘", "이란", "가자"] + PHOTO_NOISE
 NOISE_SOFT = ["설명회", "포럼", "세미나", "워크숍", "개최", "성료", "간담회", "발대식", "캠페인"]
+
+def noise_hits(t):
+    """제목에 걸린 강한 노이즈 낱말. 사명이 있는 기사는 사진 기사만 노이즈로 인정(협약·MOU·인사 등은 면제)."""
+    hits = [w for w in NOISE_HARD if w in t]
+    if has_company(t):
+        hits = [w for w in hits if w in PHOTO_NOISE]
+    return hits
+
 # 사용자가 중점으로 보는 주제(제목에 있으면 크게 가산)
-PRIORITY = ["도시가스 공급비용", "공급비용", "발전소 사고", "발전소 화재", "발전소 폭발", "불시정지", "발전정지", "발전기 고장", "집단에너지", "전력시장", "용량시장", "SMP", "PPA", "전력수급기본계획", "전기본", "용량입찰", "LNG 용량", "RPS", "태양광", "풍력", "열병합", "전력거래소", "도매가격", "LNG발전", "발전사업", "계통한계"]
+PRIORITY = ["도시가스 공급비용", "공급비용", "발전소 사고", "발전소 화재", "발전소 폭발", "불시정지", "발전정지", "발전기 고장", "집단에너지", "전력시장", "용량시장", "SMP", "PPA", "전력수급기본계획", "전기본", "용량입찰", "LNG 용량", "RPS", "태양광", "풍력", "열병합", "전력거래소", "도매가격", "LNG발전", "발전사업", "계통한계", "구역전기"]
 
 # 정책·제도 기사(화면 맨 위에 노출) / 기술 기사(맨 아래로 후순위)
 POLICY = ["정책", "제도", "개편", "개선안", "기본계획", "전기본", "전력수급기본계획", "용량시장", "용량입찰", "전력시장", "도매시장", "전기위원회",
@@ -86,7 +105,9 @@ def overseas_carbon(t):
     return bool(CARBON_RE.search(t)) and bool(OVERSEAS_RE.search(t))
 
 def tier(t):
-    """0=정책·사고(맨 위), 1=일반, 2=기술(후순위), 3=해외 배출권(맨 아래)"""
+    """-1=그룹 사업장 사명(최상단), 0=정책·사고, 1=일반, 2=기술(후순위), 3=해외 배출권(맨 아래)"""
+    if has_company(t):
+        return -1
     if overseas_carbon(t):
         return 3
     if ACCIDENT_RE.search(t) or any(w in t for w in POLICY):
@@ -243,12 +264,14 @@ def same(a, b, ga, gb):
 
 def score(g):
     t = g["item"]["title"]
-    core = sum(1 for w in CORE if w.lower() in t.lower())
+    comp = has_company(t)
+    core = sum(1 for w in CORE if w.lower() in t.lower()) + (3 if comp else 0)   # 사명이 있으면 관련도 필터를 통과
     tr = tier(t)
     pri = sum(1 for w in PRIORITY if w.lower() in t.lower())
     r = src_rank(g["item"]["source"])
     bonus = (len(FOCUS_ORDER) - r) if r < 99 else 0
-    return min(core, 4) * 3 + min(pri, 3) * 5 + bonus + (6 if tr == 0 else -6 if tr in (2, 3) else 0) + min(g["more"], 3) - 20 * sum(1 for w in NOISE_HARD if w in t) - 2 * sum(1 for w in NOISE_SOFT if w in t), core
+    return (min(core, 4) * 3 + min(pri, 3) * 5 + bonus + (6 if tr <= 0 else -6 if tr in (2, 3) else 0) + (40 if comp else 0)
+            + min(g["more"], 3) - 20 * len(noise_hits(t)) - 2 * sum(1 for w in NOISE_SOFT if w in t)), core
 
 def dedup(items):
     # 1) 링크 중복 제거
@@ -288,7 +311,9 @@ def main():
     def q(k):
         return '"' + k + '"' if " " in k else k
     groups_kw = [KEYWORDS[i:i+8] for i in range(0, len(KEYWORDS), 8)]
-    tasks = [("kw", k, k, None) for k in KEYWORDS]
+    # 사명은 맨 앞에 두어 시간 초과 시에도 건너뛰지 않게 하고, 정확히 일치하는 구문("...")으로 검색
+    tasks = [("kw", c, '"' + c + '"', None) for c in COMPANIES]
+    tasks += [("kw", k, k, None) for k in KEYWORDS]
     for name, dom in FOCUS_SITES.items():
         for gk in groups_kw:
             tasks.append(("site", name, "(" + " OR ".join(q(k) for k in gk) + ") site:" + dom, name))
@@ -314,7 +339,7 @@ def main():
         except Exception as e:
             print(f">> [뉴스] '{label}' 해석 실패 {e}"); continue
         rows = [r for r in rows if now - r["pub"] <= timedelta(hours=MAX_AGE_H)
-                and hangul_ratio(r["title"]) >= 0.5 and not any(w in r["title"] for w in NOISE_HARD)]
+                and hangul_ratio(r["title"]) >= 0.5 and not noise_hits(r["title"])]
         if kind == "kw":
             skipped = {r["source"] for r in rows if not source_ok(r["source"])}
             if skipped:
@@ -354,13 +379,13 @@ def main():
     top, cnt = [], {}
     pool = list(groups)
     while pool and len(top) < TOP_N:
-        best = max(pool, key=lambda g: (score(g)[0] - 4 * cnt.get(lead(g), 0), g["item"]["pub"].timestamp()))
+        best = max(pool, key=lambda g: (score(g)[0] - (0 if has_company(g["item"]["title"]) else 4 * cnt.get(lead(g), 0)), g["item"]["pub"].timestamp()))
         pool.remove(best)
         if is_stale(best["item"], now):
             continue
         top.append(best)
         cnt[lead(best)] = cnt.get(lead(best), 0) + 1
-    # 화면 순서: 정책 → 일반 → 기술, 같은 구분 안에서는 우선 언론사 순서 → 최신순
+    # 화면 순서: 그룹 사업장 → 정책·사고 → 일반 → 기술, 같은 구분 안에서는 우선 언론사 순서 → 최신순
     top.sort(key=lambda g: (g.get("filler", False), tier(g["item"]["title"]), src_rank(g["item"]["source"]), -g["item"]["pub"].timestamp()))
     items = [{"title": g["item"]["title"], "source": g["item"]["source"], "link": g["item"]["link"],
               "pub": g["item"]["pub"].strftime("%Y-%m-%d %H:%M"), "more": g["more"]} for g in top]
