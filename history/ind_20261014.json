@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-14 10:13",
+ "updated": "2026-10-14 12:01",
  "items": {
   "jkm": {
    "name": "JKM LNG",
@@ -37,9 +37,9 @@
    "name": "배출권(KAU)",
    "item": "KAU26",
    "unit": "원/톤",
-   "date": "2026-10-13",
+   "date": "2026-10-14",
    "value": 30350.0,
-   "prev_date": "2026-10-12",
+   "prev_date": "2026-10-13",
    "prev_value": 30350.0
   },
   "rec": {
