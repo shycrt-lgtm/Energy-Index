@@ -10,7 +10,8 @@ KEYWORDS = ["집단에너지", "전력시장", "용량시장", "SMP 전력시장
             "RPS 신재생", "태양광 발전", "풍력 발전", "LNG 발전", "LNG 가격", "도시가스 요금", "탄소배출권", "전력거래소",
             "전기위원회", "발전사업 허가", "ESS 에너지저장", "열병합발전", "RE100", "전기차 충전", "VPP 가상발전소", "열병합 용량입찰", "LNG 용량시장",
             "SMR", "원전", "탄소중립", "가스터빈", "화력발전", "석탄발전", "JKM LNG", "히트펌프", "재생열", "전극보일러",
-            "발전소 사고", "발전소 화재", "발전소 폭발", "발전소 불시정지", "도시가스 공급비용", "구역전기"]
+            "발전소 사고", "발전소 화재", "발전소 폭발", "발전소 불시정지", "도시가스 공급비용", "구역전기",
+            "LNG 시장", "LNG 터미널", "LNG 도입", "LNG 수입", "천연가스", "가스공사 LNG"]
 
 # ▼▼ 그룹 사업장 사명. 제목에 사명이 있으면 ①따로 검색 ②점수 크게 가산·다른 기사에 밀리지 않음 ③화면 맨 위 노출 ④협약·MOU·인사 등 노이즈 필터 면제 ▼▼
 # 추가·삭제는 이름만 고치면 됩니다. 띄어쓰기는 무시하고 비교합니다(예: "삼천리 광명" -> "삼천리광명"도 인정).
@@ -60,6 +61,9 @@ def lookback_hours(now):
     cut = datetime(d.year, d.month, d.day, 12, 0, tzinfo=KST)
     return max(MAX_AGE_H, int((now - cut).total_seconds() // 3600) + 1)
 TOP_N = 15
+# LNG 기사 최소 확보: 제목에 LNG 관련 낱말이 있는 기사를 매일 이 건수 이상 포함(후보가 있을 때). 점수가 낮아도 우선 확보한다.
+LNG_MIN = 2
+LNG_RE = re.compile(r"LNG|액화천연가스|천연가스|가스공사|\bJKM\b|\bTTF\b|헨리\s*허브|LNG선|인수기지")
 SIM = 0.50            # 제목 글자 유사도 기준(이 이상이면 같은 기사로 봄)
 JAC = 0.25            # 두 글자 조각 겹침 비율 기준(이 이상이면 같은 기사로 봄)
 # 시장과 관련 깊은 낱말(제목에 있으면 가산) / 시장과 무관한 행사·인사·홍보 낱말(제목에 있으면 감점)
@@ -271,7 +275,7 @@ def score(g):
     r = src_rank(g["item"]["source"])
     bonus = (len(FOCUS_ORDER) - r) if r < 99 else 0
     return (min(core, 4) * 3 + min(pri, 3) * 5 + bonus + (6 if tr <= 0 else -6 if tr in (2, 3) else 0) + (40 if comp else 0)
-            + min(g["more"], 3) - 20 * len(noise_hits(t)) - 2 * sum(1 for w in NOISE_SOFT if w in t)), core
+            + (4 if LNG_RE.search(t) else 0) + min(g["more"], 3) - 20 * len(noise_hits(t)) - 2 * sum(1 for w in NOISE_SOFT if w in t)), core
 
 def dedup(items):
     # 1) 링크 중복 제거
@@ -387,6 +391,7 @@ def main():
         groups = [g for g in groups if g["item"]["link"] not in seen_links
                   and not any(same(g["n"], pn, g["g"], pg) for pn, pg in seen_titles)]
         print(f">> [뉴스] 전일까지 노출된 기사 {before - len(groups)}건 제외")
+    allg = list(groups)      # LNG 최소 확보용 전체 후보(전일 노출분 제외 후)
     # 시장 관련도(낱말 점수) + 여러 매체가 다룬 정도로 점수를 매겨 상위만 선택, 같으면 최신순
     main = [g for g in groups if score(g)[1] >= 1 and score(g)[0] > 0]
     # 주말·휴일처럼 기사가 적어 TOP_N 에 못 미치면, 에너지 관련 낱말은 있으나 점수가 낮아 탈락한 기사(후순위)로 채운다.
@@ -404,7 +409,18 @@ def main():
         m = re.search(r"[A-Za-z가-힣]{2,}", re.sub(r"\[[^\]]*\]", " ", g["item"]["title"]))
         return m.group(0)[:3] if m else ""
     top, cnt = [], {}
-    pool = list(groups)
+    # LNG 기사를 먼저 LNG_MIN 건까지 확보(점수 높은 순, 발행일 검증 통과분)
+    lng_pool = sorted([g for g in allg if LNG_RE.search(g["item"]["title"]) and score(g)[1] >= 1],
+                      key=lambda g: (score(g)[0], g["item"]["pub"].timestamp()), reverse=True)
+    for g in lng_pool:
+        if len(top) >= LNG_MIN:
+            break
+        if is_stale(g["item"], now):
+            continue
+        top.append(g)
+        cnt[lead(g)] = cnt.get(lead(g), 0) + 1
+    print(f">> [뉴스] LNG 기사 {len(top)}건 우선 확보(후보 {len(lng_pool)}건)")
+    pool = [g for g in groups if g not in top]
     while pool and len(top) < TOP_N:
         best = max(pool, key=lambda g: (score(g)[0] - (0 if has_company(g["item"]["title"]) else 4 * cnt.get(lead(g), 0)), g["item"]["pub"].timestamp()))
         pool.remove(best)
