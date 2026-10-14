@@ -297,6 +297,27 @@ def dedup(items):
             groups.append({"n": nx, "g": grams(nx), "item": x, "more": 0, "srcs": {x["source"]}})
     return groups
 
+SEEN_DAYS = 3         # 최근 며칠간 이미 노출한 기사는 다시 올리지 않음(history 폴더 기준)
+
+def load_seen(now):
+    """오늘 이전 날짜의 history/news_YYYYMMDD.json 에 실린 기사 링크·제목을 모은다. 오늘 파일은 제외(같은 날 재실행 허용)."""
+    import os, glob
+    links, titles = set(), []
+    today = now.strftime("%Y%m%d")
+    for f in sorted(glob.glob("history/news_*.json"))[-(SEEN_DAYS + 1):]:
+        day = os.path.basename(f)[5:13]
+        if day >= today:
+            continue
+        try:
+            for x in json.load(open(f, encoding="utf-8")).get("items", []):
+                links.add(x.get("link"))
+                n = norm(x.get("title", ""))
+                if n:
+                    titles.append((n, grams(n)))
+        except Exception as e:
+            print(f"   (history 읽기 실패 {f}: {type(e).__name__})")
+    return links, titles
+
 def main():
     now = datetime.now(KST)
     global MAX_AGE_H, WHEN
@@ -360,6 +381,12 @@ def main():
     if not allit:
         print(">> [뉴스] 수집된 기사가 없어 기존 파일을 유지합니다."); raise SystemExit(1 if ok == 0 else 0)
     groups = dedup(allit)
+    seen_links, seen_titles = load_seen(now)
+    if seen_links or seen_titles:
+        before = len(groups)
+        groups = [g for g in groups if g["item"]["link"] not in seen_links
+                  and not any(same(g["n"], pn, g["g"], pg) for pn, pg in seen_titles)]
+        print(f">> [뉴스] 전일까지 노출된 기사 {before - len(groups)}건 제외")
     # 시장 관련도(낱말 점수) + 여러 매체가 다룬 정도로 점수를 매겨 상위만 선택, 같으면 최신순
     main = [g for g in groups if score(g)[1] >= 1 and score(g)[0] > 0]
     # 주말·휴일처럼 기사가 적어 TOP_N 에 못 미치면, 에너지 관련 낱말은 있으나 점수가 낮아 탈락한 기사(후순위)로 채운다.
