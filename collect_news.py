@@ -44,6 +44,15 @@ def src_rank(src):
 def source_ok(src):
     return (not ALLOWED_SOURCES) or any(w in (src or "") for w in ALLOWED_SOURCES)
 
+# ▼▼ 제외할 언론사(구글 뉴스에 표시되는 언론사명의 일부, 대소문자 무시). 제목에 나라 이름이 없어도 이 언론사 기사는 모두 뺍니다. 사명 기사도 예외 없음. ▼▼
+BLOCKED_SOURCES = ["베트남", "vietnam", "viet nam", "vnexpress", "vov", "vietnamplus", "vietnamnet", "tuoi tre", "thanh nien",
+                   "dan tri", "nhan dan", "saigon", "hanoi", "vir.com.vn", ".vn"]
+# ▲▲ ----------------------------------------------------------------------- ▲▲
+
+def blocked_source(src):
+    s = (src or "").lower()
+    return any(w in s for w in BLOCKED_SOURCES)
+
 PER_KEYWORD = 25      # 키워드당 가져올 최대 건수
 MAX_AGE_H = 30        # 평소 이 시간보다 오래된 기사는 제외 (주말·휴일이 끼면 아래 함수가 자동으로 늘림)
 # 공휴일(주말 제외). 새 해가 되면 날짜를 추가하세요.
@@ -364,7 +373,7 @@ def main():
         except Exception as e:
             print(f">> [뉴스] '{label}' 해석 실패 {e}"); continue
         rows = [r for r in rows if now - r["pub"] <= timedelta(hours=MAX_AGE_H)
-                and hangul_ratio(r["title"]) >= 0.5 and not noise_hits(r["title"])]
+                and hangul_ratio(r["title"]) >= 0.5 and not noise_hits(r["title"]) and not blocked_source(r["source"])]
         if kind == "kw":
             skipped = {r["source"] for r in rows if not source_ok(r["source"])}
             if skipped:
