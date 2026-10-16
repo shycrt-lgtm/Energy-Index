@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-16 06:59",
+ "updated": "2026-10-16 10:10",
  "items": {
   "jkm": {
    "name": "JKM LNG",
@@ -12,26 +12,26 @@
   "dubai": {
    "name": "두바이유",
    "unit": "$/bbl",
-   "date": "2026-10-14",
-   "value": 109.09,
-   "prev_date": "2026-10-13",
-   "prev_value": 108.75
+   "date": "2026-10-15",
+   "value": 107.01,
+   "prev_date": "2026-10-14",
+   "prev_value": 109.09
   },
   "brent": {
    "name": "브렌트유",
    "unit": "$/bbl",
-   "date": "2026-10-14",
-   "value": 106.06,
-   "prev_date": "2026-10-13",
-   "prev_value": 105.69
+   "date": "2026-10-15",
+   "value": 105.92,
+   "prev_date": "2026-10-14",
+   "prev_value": 106.06
   },
   "wti": {
    "name": "WTI",
    "unit": "$/bbl",
-   "date": "2026-10-14",
-   "value": 95.09,
-   "prev_date": "2026-10-13",
-   "prev_value": 94.14
+   "date": "2026-10-15",
+   "value": 97.97,
+   "prev_date": "2026-10-14",
+   "prev_value": 95.09
   },
   "kau": {
    "name": "배출권(KAU)",
@@ -55,19 +55,19 @@
    "name": "원/달러 환율",
    "item": "매매기준율",
    "unit": "원",
-   "date": "2026-10-15",
-   "value": 1338.6,
-   "prev_date": "2026-10-14",
-   "prev_value": 1340.5
+   "date": "2026-10-16",
+   "value": 1348.5,
+   "prev_date": "2026-10-15",
+   "prev_value": 1338.6
   },
   "fx_jpy": {
    "name": "원/100엔 환율",
    "item": "매매기준율",
    "unit": "원",
-   "date": "2026-10-15",
-   "value": 846.65,
-   "prev_date": "2026-10-14",
-   "prev_value": 846.57
+   "date": "2026-10-16",
+   "value": 853.02,
+   "prev_date": "2026-10-15",
+   "prev_value": 846.65
   }
  }
 }
