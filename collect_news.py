@@ -44,9 +44,14 @@ def src_rank(src):
 def source_ok(src):
     return (not ALLOWED_SOURCES) or any(w in (src or "") for w in ALLOWED_SOURCES)
 
-# ▼▼ 제외할 언론사(구글 뉴스에 표시되는 언론사명의 일부, 대소문자 무시). 제목에 나라 이름이 없어도 이 언론사 기사는 모두 뺍니다. 사명 기사도 예외 없음. ▼▼
+# ▼▼ 제외할 언론사(구글 뉴스에 표시되는 언론사명의 일부, 대소문자 무시). 제목에 나라 이름이 없어도 이 언론사 기사는 모두 뺍니다. 사명 기사도 예외 없음. 새로 걸러낼 곳은 여기에 이름만 추가하세요. ▼▼
 BLOCKED_SOURCES = ["베트남", "vietnam", "viet nam", "vnexpress", "vov", "vietnamplus", "vietnamnet", "tuoi tre", "thanh nien",
-                   "dan tri", "nhan dan", "saigon", "hanoi", "vir.com.vn", ".vn"]
+                   "dan tri", "nhan dan", "saigon", "hanoi", "vir.com.vn", ".vn",
+                   # 시장조사 보고서 판매·홍보 사이트(언론사 아님)
+                   "indexbox", "index box", "researchandmarkets", "research and markets", "marketsandmarkets", "markets and markets",
+                   "grand view research", "mordor intelligence", "fortune business insights", "allied market research", "imarc",
+                   "precedence research", "straits research", "verified market", "reportlinker", "business research insights",
+                   "market research", "marketresearch", "research report", "openpr", "einpresswire", "ein presswire", "globenewswire", "prnewswire", "pr newswire", "businesswire", "business wire"]
 # ▲▲ ----------------------------------------------------------------------- ▲▲
 
 def blocked_source(src):
@@ -88,6 +93,9 @@ NOISE_HARD = ["연봉", "채용", "인사", "부고", "결혼", "장학", "봉�
               "맞손", "상생", "손잡", "업무협약", "MOU", "협약", "지역사회", "나눔", "후원",
               # 해외 사업·해외 뉴스
               "베트남", "인도네시아", "필리핀", "말레이시아", "태국", "싱가포르", "몽골", "카자흐", "우즈벡", "중동", "사우디", "UAE", "호주", "캐나다", "멕시코", "브라질", "인도 ", "아프리카", "해외", "우크라이나", "러시아", "이스라엘", "이란", "가자"] + PHOTO_NOISE
+# 시장조사 보고서 판매성 제목(언론사명이 달라도 걸러냄)
+REPORT_NOISE = ["CAGR", "연평균 성장률", "시장 보고서", "시장조사 보고서", "시장 조사 보고서", "리서치 보고서", "market report", "market size", "market analysis", "market forecast"]
+NOISE_HARD = NOISE_HARD + REPORT_NOISE
 NOISE_SOFT = ["설명회", "포럼", "세미나", "워크숍", "개최", "성료", "간담회", "발대식", "캠페인"]
 
 def noise_hits(t):
