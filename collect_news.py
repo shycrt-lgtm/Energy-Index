@@ -19,9 +19,14 @@ KEYWORDS = ["집단에너지", "전력시장", "용량시장", "SMP 전력시장
 COMPANIES = ["안산도시개발", "삼천리 광명", "삼천리 광명열병합", "삼천리 구역전기", "에스파워", "휴세스"]
 # ▲▲ ----------------------------------------------------------------------- ▲▲
 
+# 사명 앞에 다른 글자가 붙은 경우는 제외(예: "이오에스 파워볼"의 "에스파워"). 사명 뒤에 붙는 말은 허용(예: "삼천리 광명열병합", "휴세스는").
+_COMP_RE = [re.compile(r"(?<![가-힣A-Za-z0-9])" + r"\s*".join(map(re.escape, c.replace(" ", "")))) for c in COMPANIES]
+
 def has_company(t):
-    s = (t or "").replace(" ", "")
-    return any(c.replace(" ", "") in s for c in COMPANIES)
+    t = t or ""
+    if any(w in t for w in GAMBLE_NOISE):
+        return False
+    return any(r.search(t) for r in _COMP_RE)
 
 # ▼▼ 가져올 언론사 목록 (여기에 있는 언론사 기사만 사용). 추가·삭제는 이름만 고치면 됩니다. ▼▼
 # 구글 뉴스에 표시되는 언론사 이름의 일부만 맞아도 인정합니다(예: "한국경제"는 "한국경제TV"도 포함).
@@ -93,6 +98,9 @@ NOISE_HARD = ["연봉", "채용", "인사", "부고", "결혼", "장학", "봉�
               "맞손", "상생", "손잡", "업무협약", "MOU", "협약", "지역사회", "나눔", "후원",
               # 해외 사업·해외 뉴스
               "베트남", "인도네시아", "필리핀", "말레이시아", "태국", "싱가포르", "몽골", "카자흐", "우즈벡", "중동", "사우디", "UAE", "호주", "캐나다", "멕시코", "브라질", "인도 ", "아프리카", "해외", "우크라이나", "러시아", "이스라엘", "이란", "가자"] + PHOTO_NOISE
+# 사행성·도박 광고(사명 면제 없이 항상 제외)
+GAMBLE_NOISE = ["파워볼", "토토", "카지노", "바카라", "베팅", "배팅", "먹튀", "홀덤", "도박", "사다리게임", "메이저사이트", "안전놀이터", "놀이터 추천", "룰렛"]
+NOISE_HARD = NOISE_HARD + GAMBLE_NOISE
 # 시장조사 보고서 판매성 제목(언론사명이 달라도 걸러냄)
 REPORT_NOISE = ["CAGR", "연평균 성장률", "시장 보고서", "시장조사 보고서", "시장 조사 보고서", "리서치 보고서", "market report", "market size", "market analysis", "market forecast"]
 NOISE_HARD = NOISE_HARD + REPORT_NOISE
@@ -107,7 +115,7 @@ def noise_hits(t):
     if SEMINAR_AD_RE.search(t):
         hits.append("세미나광고")
     if has_company(t):
-        hits = [w for w in hits if w in PHOTO_NOISE]
+        hits = [w for w in hits if w in PHOTO_NOISE or w in GAMBLE_NOISE]
     return hits
 
 # 사용자가 중점으로 보는 주제(제목에 있으면 크게 가산)
