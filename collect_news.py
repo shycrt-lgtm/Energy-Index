@@ -83,6 +83,12 @@ TOP_N = 15
 # ▼▼ 고정 기사: 수집 범위(최근 30시간)나 점수와 관계없이 지정한 순위에 넣는 기사. 전일 노출 제외 규칙도 적용하지 않음. ▼▼
 # until(KST) 이후 실행부터는 자동으로 빠집니다. rank 는 화면 순위(1부터). 지난 항목은 지워도 됩니다.
 PINNED = [
+    {"title": "[단독] 삼성전자, 지역별 전기요금제에 RE100 계약 ‘멈칫’", "source": "에너지경제신문",
+     "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE03Qnl1WmUtTW1vNmpsZWlFOVN2cTYwbE1YZV9VZDllQklGVk1HNnRSdUszUlBHYnVBbF8yQlItR3psYkNUZXFFSkE3Z2R0TTdYNE9pMFdFdTB6MVk?oc=5",
+     "pub": "2026-10-21 13:20", "until": "2026-10-22 12:00", "rank": 1},
+    {"title": "“공급만 하는 도시가스사에 재생열 의무?”…산업부·기후부 정면 충돌", "source": "에너지경제신문",
+     "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE1CM0xBeGI0VzVCb3VZVWpRcFZEaWxpa0FJelJuTm1vYXFtZ0l6Tkg2OHR3S3Q1TF9wVEtnaEtwcFVTdG5Tcy04WmVuTzlzdE8xWUx0M2V5cHcybmc?oc=5",
+     "pub": "2026-10-21 09:17", "until": "2026-10-22 12:00", "rank": 3},
     {"title": "[단독] PPA 확대·전기요금 감면…산자위 의원도 초광역특구법 발의", "source": "서울경제",
      "link": "https://m.sedaily.com/article/20103709", "pub": "2026-10-20 12:10", "until": "2026-10-22 12:00", "rank": 2},
 ]
