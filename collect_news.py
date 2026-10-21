@@ -80,6 +80,13 @@ def lookback_hours(now):
     cut = datetime(d.year, d.month, d.day, 12, 0, tzinfo=KST)
     return max(MAX_AGE_H, int((now - cut).total_seconds() // 3600) + 1)
 TOP_N = 15
+# ▼▼ 고정 기사: 수집 범위(최근 30시간)나 점수와 관계없이 지정한 순위에 넣는 기사. 전일 노출 제외 규칙도 적용하지 않음. ▼▼
+# until(KST) 이후 실행부터는 자동으로 빠집니다. rank 는 화면 순위(1부터). 지난 항목은 지워도 됩니다.
+PINNED = [
+    {"title": "[단독] PPA 확대·전기요금 감면…산자위 의원도 초광역특구법 발의", "source": "서울경제",
+     "link": "https://m.sedaily.com/article/20103709", "pub": "2026-10-20 12:10", "until": "2026-10-22 12:00", "rank": 2},
+]
+# ▲▲ ----------------------------------------------------------------------- ▲▲
 # LNG 기사 최소 확보: 제목에 LNG 관련 낱말이 있는 기사를 매일 이 건수 이상 포함(후보가 있을 때). 점수가 낮아도 우선 확보한다.
 LNG_MIN = 2
 LNG_RE = re.compile(r"LNG|액화천연가스|천연가스|가스공사|\bJKM\b|\bTTF\b|헨리\s*허브|LNG선|인수기지")
@@ -462,6 +469,16 @@ def main():
     top.sort(key=lambda g: (g.get("filler", False), tier(g["item"]["title"]), src_rank(g["item"]["source"]), -g["item"]["pub"].timestamp()))
     items = [{"title": g["item"]["title"], "source": g["item"]["source"], "link": g["item"]["link"],
               "pub": g["item"]["pub"].strftime("%Y-%m-%d %H:%M"), "more": g["more"]} for g in top]
+    pins = [p for p in PINNED if now.strftime("%Y-%m-%d %H:%M") < p["until"]]
+    for p in pins:   # 같은 기사가 자연 선별로 이미 들어 있으면 먼저 빼고, 지정 순위에 한 번만 넣는다
+        pn = norm(p["title"]); pg = grams(pn)
+        items = [x for x in items if x["link"] != p["link"] and not same(norm(x["title"]), pn, grams(norm(x["title"])), pg)]
+    for p in sorted(pins, key=lambda p: p["rank"]):
+        items.insert(min(max(p["rank"] - 1, 0), len(items)),
+                     {"title": p["title"], "source": p["source"], "link": p["link"], "pub": p["pub"], "more": 0})
+    items = items[:TOP_N]
+    if pins:
+        print(f">> [뉴스] 고정 기사 {len(pins)}건 반영")
     json.dump({"updated": now.strftime("%Y-%m-%d %H:%M"), "items": items},
               open("news.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     import os
