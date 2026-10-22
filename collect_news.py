@@ -56,7 +56,7 @@ BLOCKED_SOURCES = ["베트남", "vietnam", "viet nam", "vnexpress", "vov", "viet
                    "indexbox", "index box", "researchandmarkets", "research and markets", "marketsandmarkets", "markets and markets",
                    "grand view research", "mordor intelligence", "fortune business insights", "allied market research", "imarc",
                    "precedence research", "straits research", "verified market", "reportlinker", "business research insights",
-                   "헬로디디", "hellodd", "entv", "market research", "marketresearch", "research report", "openpr", "einpresswire", "ein presswire", "globenewswire", "prnewswire", "pr newswire", "businesswire", "business wire"]
+                   "헬로디디", "hellodd", "entv", "버핏연구소", "market research", "marketresearch", "research report", "openpr", "einpresswire", "ein presswire", "globenewswire", "prnewswire", "pr newswire", "businesswire", "business wire"]
 # ▲▲ ----------------------------------------------------------------------- ▲▲
 
 def blocked_source(src):
@@ -125,11 +125,16 @@ NOISE_SOFT = ["설명회", "포럼", "세미나", "워크숍", "개최", "성료
 # 세미나·교육 홍보성 제목: "[10.30] ..." 처럼 날짜 말머리가 붙거나, 참가 모집·사전등록·수강 안내 같은 낱말이 있는 광고성 기사
 SEMINAR_AD_RE = re.compile(r"^\s*\[\s*\d{1,2}\s*[./월]\s*\d{1,2}\s*(일)?\s*\]|참가\s*(자\s*)?(모집|신청)|사전\s*등록|수강\s*(생\s*)?(모집|신청)|교육\s*(과정\s*)?(안내|모집)|접수\s*(중|마감|시작)|얼리버드")
 
+# 투자·종목 홍보성 제목(증권 종목 소개, 수혜주·테마주 등)
+STOCK_AD_RE = re.compile(r"\[\s*클릭\s*e?\s*종목\s*\]|e종목|종목\s*(추천|분석|리포트|픽)|수혜주|관련주|테마주|상한가|하한가|투자\s*의견|매수\s*(의견|추천)|주식\s*(추천|투자)|증권사\s*(리포트|추천)")
+
 def noise_hits(t):
     """제목에 걸린 강한 노이즈 낱말. 사명이 있는 기사는 사진 기사만 노이즈로 인정(협약·MOU·인사 등은 면제)."""
     hits = [w for w in NOISE_HARD if w in t]
     if SEMINAR_AD_RE.search(t):
         hits.append("세미나광고")
+    if STOCK_AD_RE.search(t):
+        hits.append("투자홍보")
     if has_company(t):
         hits = [w for w in hits if w in PHOTO_NOISE or w in GAMBLE_NOISE]
     return hits
