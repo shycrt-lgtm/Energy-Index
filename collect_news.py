@@ -56,11 +56,14 @@ BLOCKED_SOURCES = ["베트남", "vietnam", "viet nam", "vnexpress", "vov", "viet
                    "indexbox", "index box", "researchandmarkets", "research and markets", "marketsandmarkets", "markets and markets",
                    "grand view research", "mordor intelligence", "fortune business insights", "allied market research", "imarc",
                    "precedence research", "straits research", "verified market", "reportlinker", "business research insights",
-                   "헬로디디", "hellodd", "market research", "marketresearch", "research report", "openpr", "einpresswire", "ein presswire", "globenewswire", "prnewswire", "pr newswire", "businesswire", "business wire"]
+                   "헬로디디", "hellodd", "entv", "market research", "marketresearch", "research report", "openpr", "einpresswire", "ein presswire", "globenewswire", "prnewswire", "pr newswire", "businesswire", "business wire"]
 # ▲▲ ----------------------------------------------------------------------- ▲▲
 
 def blocked_source(src):
-    s = (src or "").lower()
+    s = (src or "").strip().lower()
+    # 언론사명이 없이 사이트 주소(https://..., www....)로 표시되는 출처는 소규모·비언론 사이트가 대부분이라 일괄 제외
+    if s.startswith(("http://", "https://", "www.")):
+        return True
     return any(w in s for w in BLOCKED_SOURCES)
 
 PER_KEYWORD = 25      # 키워드당 가져올 최대 건수
