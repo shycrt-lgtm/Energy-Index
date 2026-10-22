@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-22 18:11",
+ "updated": "2026-10-23 07:01",
  "items": {
   "jkm": {
    "name": "JKM LNG",
@@ -43,31 +43,31 @@
    "prev_value": 30150.0
   },
   "rec": {
-   "name": "REC(육지)",
+   "name": "REC",
    "item": "평균가",
    "unit": "원/REC",
-   "date": "2026-10-20",
-   "value": 71545.0,
-   "prev_date": "2026-10-15",
-   "prev_value": 71399.0
+   "date": "2026-10-22",
+   "value": 71299.0,
+   "prev_date": "2026-10-20",
+   "prev_value": 71545.0
   },
   "fx": {
    "name": "원/달러 환율",
-   "item": "ECB 기준",
+   "item": "매매기준율",
    "unit": "원",
-   "date": "2026-10-21",
-   "value": 1325.57,
-   "prev_date": "2026-10-20",
-   "prev_value": 1327.84
+   "date": "2026-10-22",
+   "value": 1325.5,
+   "prev_date": "2026-10-21",
+   "prev_value": 1328.0
   },
   "fx_jpy": {
    "name": "원/100엔 환율",
-   "item": "ECB 기준",
+   "item": "매매기준율",
    "unit": "원",
-   "date": "2026-10-21",
-   "value": 839.6060298961237,
-   "prev_date": "2026-10-20",
-   "prev_value": 839.7141592360716
+   "date": "2026-10-22",
+   "value": 838.26,
+   "prev_date": "2026-10-21",
+   "prev_value": 839.07
   }
  }
 }
