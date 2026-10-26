@@ -1,40 +1,75 @@
 {
- "updated": "2026-10-26 09:32",
+ "updated": "2026-10-26 22:24",
  "items": [
   {
-   "title": "[사설] 기후부, 계통정보 공개기준 법제화해야",
-   "source": "이투뉴스",
-   "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE5PdXBhQ0lxX3htRWVaSUw4LW5kajMtSjlLbGxXQm5uUGlITGY5enB5cHJNaUdwX3BJVjBXMDNFdXl1QU9GeFhoM01zRU9DSFhwcDJjVDNuMVhOXzlCdU1mLUpNa2EtcGtsYlVR0gFrQVVfeXFMTk91cGFDSXFfeG1FZVpJTDgtbmRqMy1KOUtsbFdCbm5QaUhMZjl6cHlwck1pR3BfcElWMFcwM0V1eXVBT0Z4WGgzTXNFT0NIWHBwMmNUM24xWE5fOUJ1TWYtSk1rYS1wa2xiVVE?oc=5",
-   "pub": "2026-10-26 07:21",
-   "more": 0
-  },
-  {
-   "title": "NH농협은행, 재생에너지 산업발전 유공 정부 포상",
-   "source": "뉴시스",
-   "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE9lV1gwNUVZejk3VlRmRzdqcmdXclhYNDhyMEs0amUwU2U0SjhOMl81Zy13QmNTUUlvN0dQaVBBVlZFSkdWSHBHV2w1RHNrWGhUSkZKb2s0YzVyZGZTQlVLU9IBeEFVX3lxTE5hMWE4UWh3TlJBSlZTVm5hZFZHUktSckZFVEduZHRuRENBYUk2UC1meG1XcnljaktYVFVTQ2JUa2ppSy1zdC01bGl2eTRBSjBHUjNjaFFWLWVHMGtGNW1YR1pUV0xUTXN4WlVPUVY2TzBXNEpUVUQ3bg?oc=5",
-   "pub": "2026-10-26 09:21",
-   "more": 0
-  },
-  {
-   "title": "박정 의원, 尹석열 정부 RPS 비율 대폭 하향... 태양광 등 재생에너지 산업 생태계 붕괴!",
-   "source": "경기종합뉴스",
-   "link": "https://news.google.com/rss/articles/CBMidEFVX3lxTE01TEpuWDJWMHliRzVpZXNuSGhJTHkxRW9KRDhzdlpYQ045UjVyWjdtUnBVTDFiLTJyTlBOT2FRQzJVOWNvM2N0dW04UlZTZHhiQURsS2Y1Mm5Na25nT19uZG90NWxfUmlPQ1VIRVdlSUlXQVVj?oc=5",
-   "pub": "2026-10-26 08:14",
-   "more": 0
-  },
-  {
-   "title": "원전 PPA, ‘신중’이 아닌 ‘불허’로 가야",
-   "source": "뉴스데일리",
-   "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE1oc2V6R2d2MTJ0dG5fdUlzb1JJVlRYOUdnaVZpVVFmNmZpNjQ4X215cU5aVTh3WXNDSHBNWFNrd1RLeU1sREtyeDFob1EzY0I1T3l3M3NGNFlRSkJVZ3ZQaWJTbDJVMWtMRlo0?oc=5",
-   "pub": "2026-10-26 07:48",
+   "title": "원전 PPA 요금 전가·태양광 추락사·산안위 위반 ‘도마’",
+   "source": "전기신문",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE82XzU0NjVyMmladXJ1VmJhbHhmcXBKRWtrUVV5dkVIS2k5NlluZkJXVW9EamJlb05kU2F1bjM4clFISHVhbDF4b0VMRFhuTms4ZHdpRVh1LWtmTGtDdlNaZndoa2VhRFZKNkNTTtIBcEFVX3lxTE9HdHZHV0JqR3VSOW5PM0gzd00wS3JFT29ZeUg5NkxlN2pxVXRqSUdObjN6U1d2bHpnQmlYYmNabXdrcjJxajdyYU5QVlhqV3hvc2VMRjBOdUdJS3hnOEZlUjg5eFgzbTFLNThWdDZrZl8?oc=5",
+   "pub": "2026-10-26 11:23",
    "more": 1
   },
   {
-   "title": "[아침 뉴스픽] 26일 충남 주요뉴스…층간소음 유족 소송·열병합발전소 설명회·제네시스 챔피언십",
-   "source": "천안신문",
-   "link": "https://news.google.com/rss/articles/CBMiQ0FVX3lxTE5XVFNjZVFyTktBYl9pd3BOYWh1dm42d1hOQ2NkTUk1dXM2bDRFN3FIVFpXdDFwVmtPYjQ1WkRXT0xTODQ?oc=5",
-   "pub": "2026-10-26 07:36",
+   "title": "[학술/R&D] 대한전기전력기술부문회·전력계통계획기술위원회, 제주서 ‘전력계통 해석에의 AI 적용’ 집중 조명 美 EPRI·한전 전력연구원·경북대·전력거래소 등 한자리...LLM 연계부터 ‘에이전틱 루프’까지 “AI는 강력한 도구이자 동료, 안전과 신뢰성의 최종 책임은 인간",
+   "source": "산경e뉴스",
+   "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE4zajU2WXRjS2FMN1VDM0xoX0s1bFF0X2VmeU5jZVQ1a2ZEY1hkR2t2QnpPWkg0czJySDB2ZWd2ZzBadVBNX1dTV2lXUVJ2V1AxQVllUGtRdTI2b2pEOVo5UUozNlNKUVk?oc=5",
+   "pub": "2026-10-26 21:53",
    "more": 0
+  },
+  {
+   "title": "전기차 공장서 ESS 찍는다…K배터리, '전력시장' 공략 가속화",
+   "source": "포인트데일리",
+   "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE9tNHZUTDNJZTlSRDMyaGdHdmlsV1REU1l4UzFobnNMemIxSlJZbTU2QXE3UmFQUTAzOUo3ZjQwRXY5VDhhaFJCakY4eGpHdVNVZEV6el8wUEIyUkNoQVY5XzJJMkhBTlVBVFl0dXpVd0jSAXRBVV95cUxQTERpRW96X0JHNWdGQWk5Q3p5ZTR6eC1RQ2xuNUJQS01oMmVNT2JFS2JmdC14aEQ5VVlLcjNxbEgwSlh4NWFRM1FtTVJWLWYyQ3c5ck05SEMzdjJoWm9hb1NaYmgxcEZpNi1OSEdjcVF0N0NxUw?oc=5",
+   "pub": "2026-10-26 14:36",
+   "more": 0
+  },
+  {
+   "title": "전북개발공사, 지방공기업 최초 'On-site 직접PPA사업' 등 재생에너지 보급 확대 기여",
+   "source": "전북투데이",
+   "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE9BZGlyOHZlNTA0Mi1oR0VCaE1xblB2N25rbWxhY0c4RWdiTExqNDM1M0xmWXJ2TXZuR2p2ZHJ1YXprcDZUVjZuOHZGUi1VX29FcnZDUHZWdHc2WGJZYjRidldzZXcyUQ?oc=5",
+   "pub": "2026-10-26 13:47",
+   "more": 0
+  },
+  {
+   "title": "기후부, 원전 PPA 허용 땐 전력구입비 상승…형평성 논란",
+   "source": "핀포인트뉴스",
+   "link": "https://news.google.com/rss/articles/CBMic0FVX3lxTE1SWkRVT3puUi1vSEUyT1BCWkw5VjBoSGd5S3QyeDdOeDhxcmg5NU1wcGJLWTJtNXFjREFNX1djZG91bTBuYmJoU01sbEpyRW1fMHdMdkhEUFFSbHlEVFQyVDE4VWdnNEQ1eHIxU2J3WFJ2SGPSAXdBVV95cUxPdzd2VjJkTFVlSmFTRFEwbnN4dFN5cXg0MGtBaWt2bEFJWDFzNWNLY1BwRlhSQkZxeER5djQzajdmUXM1dlFNWEVyUV9sX1hDLWZBRFhNRXhYOXJXVTlsYVlMb2NKZE5pN2Jrd0dJWnlCM0dCYlA1dw?oc=5",
+   "pub": "2026-10-26 11:45",
+   "more": 1
+  },
+  {
+   "title": "김성환 “석탄발전 최소출력 하향·ESS 요금 감면 적극 검토”",
+   "source": "이데일리",
+   "link": "https://news.google.com/rss/articles/CBMigAFBVV95cUxQSFZMcmpYZTlRV0tHa2JsRUFZRVlzb2RmSHgwT2FHS0gzd2FldWp2LTdyTFVwUHU0VWVUQjU1RmhTaEhuT0FVdUl4WHJGbzdUbWNacmctZ0VGWlhtVk1aRFJFTTNjUHRQYTduRk9mSXBOOWkyX1RPbThIUF9qcjl1Wg?oc=5",
+   "pub": "2026-10-26 11:02",
+   "more": 9
+  },
+  {
+   "title": "국산 태양광 점유율 '반토막'...\"尹정부 때 RPS 낮춘 탓\"",
+   "source": "뉴스;트리",
+   "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE1RcUxqbWVlc2F1SmJEbExzbEp4Ym9wcXRvdWZDWlBIODFWWm9qOUJnTTRFcXB1Znh4ZU5TbGVWV1FWcU9BSlZaR3k2dGdXUVd0TWlOdjJZaTFFM2J3?oc=5",
+   "pub": "2026-10-26 10:39",
+   "more": 0
+  },
+  {
+   "title": "“이전 정부의 RPS 비율 대폭 하향으로 재생에너지 산업 생태계 붕괴”",
+   "source": "에너지플랫폼뉴스",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBCM1hEc3BKRlV4R201MzA0amdhSmdBQ3RYczhJVTlXa20xZlJnQlBUNnpnMzU0cDFnNFBsVUJodmZpbzdPOWhHVHZyaF83ZzBPck1VMF8xTHp1aTB0Qkt1TzhMWVFmVWJ0czBFeNIBcEFVX3lxTFBVZTBCZUJxZ3VXMU42dmZIazBrdU1MZ3laZ0RidzgtcktEOVN3Z1hIel9FdjVkd2tISGtDTWtvZUFIVVFKMHhUSWpNbU1lRkh5WGU3ZklrMF9yNktGSmg3NW5zZGZNcXdiakdrOWpGZFg?oc=5",
+   "pub": "2026-10-26 10:28",
+   "more": 1
+  },
+  {
+   "title": "삼성SDI, 美 ESS 대형 수주 잇따라…북미 전력시장 공략 가속",
+   "source": "아시아타임즈",
+   "link": "https://news.google.com/rss/articles/CBMiXkFVX3lxTE0waVN0YlBhb09zNG95R1ZpM01YTUJCMTFYLUswTDdBRXNoajdDQXpmWk1DZGhnMjFGWW5fcnp4SXJuZWRVeXdsSk5YVmd3c20tS3ZubWxTQ3JPV2ktLXc?oc=5",
+   "pub": "2026-10-26 09:43",
+   "more": 0
+  },
+  {
+   "title": "[국감] 원전 PPA 허용 논란…저가 전력 특정 기업 공급에 국민 요금부담 전가 우려",
+   "source": "에너지데일리",
+   "link": "https://news.google.com/rss/articles/CBMickFVX3lxTFBEbUpxYkJETy1jUS1PRXNVQU4xaGRZUUV0b1ExNWxzZUFycXpGYjVaaS0zX1FqMWNySXNkeE4takRfZlB3VXdPSUtMMFhBQ3Z5blFQU3VfNUtlVU1HaHg3cHlhaE1JNUpRREg2OGFuMERpZw?oc=5",
+   "pub": "2026-10-26 08:41",
+   "more": 2
   },
   {
    "title": "발전 연료비·SMP 오르는데 판매 단가는 하락…전기요금 인상 필요성 커져",
@@ -44,20 +79,6 @@
    "more": 1
   },
   {
-   "title": "새만금산단에 태양광 발전설비…개발행위허가 승인",
-   "source": "KBS 뉴스",
-   "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE4xa09GeW5BNDZ2WXVQSHpJZEQ5Z1ZDaVJpbHoxSVRsSUd6TFVJMUhCcWJSV3RXT3RGdzdqT1dSMzltc3RNVEtwelVZXzZ6ZVpvYk1mMlNMeEtqZFU?oc=5",
-   "pub": "2026-10-25 21:27",
-   "more": 0
-  },
-  {
-   "title": "메가특구 특혜 어디까지..노동 유연화 이어 원전 PPA도 논란",
-   "source": "파이낸셜뉴스",
-   "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE5TWHd6UlFYbUNlNF9zSVVFaVN5UnA5TVRNSVMwOEw1eEZpV1l0c3F5V1JEb1Byc1VCMGNyRzI3TG0tMkFIMkdiS0tzLXkydndhNDJZdFpheWQ5dw?oc=5",
-   "pub": "2026-10-25 21:06",
-   "more": 0
-  },
-  {
    "title": "[COP31. 튀르키에 안탈리아로 가는 길] COP31 개최국, 태양광·풍력은 두 배 늘었지만 석탄발전은 유럽 1위…튀르키예 기후정책의 두 얼굴",
    "source": "르몽드디플로마티크",
    "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTE1xek9fZ1YzVDYyLWZLX3BwSE5SM1Mtb0FTZ2hTaWY3b0w4eVk5MHdXbTBoU3R4cWtELXVUQW9salVSUllldVRFV0U3NkN3bjRFRF9yZUJOT1hRaGVvcDJySnZRaURhOXBSMUHSAW5BVV95cUxNV3JkTjI1Mlp1T0RHc21ZMWtwTlphUnp0ejZibHRSY1BMUWRoMEFJYUF4QXJZTi1NSnBtb3Uxc3EtSVdtSVBPUGlfZzNMRUtVVnBzVEpPMUk5aUpSV29tcTJTcWcycEJtNWF5UExQQQ?oc=5",
@@ -65,46 +86,25 @@
    "more": 1
   },
   {
-   "title": "“탄소배출권 활성화로 농가 소득 창출해야”",
-   "source": "한국농어민신문",
-   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE01TkNhOFRiMTBQdENHR2xrTW81a3l6VGJYeXh2bTlJOFN1T29qZGZRdEdfblZwNzcxNW1vT3V0Nm5PWHZrZHJNbUZWX2NRVGFGaVhKOUw4WUY2MWYxSWNXRnJwSFFsQkNUVEhqag?oc=5",
-   "pub": "2026-10-23 16:35",
-   "more": 1
-  },
-  {
-   "title": "창업기업 서류 12개→6개…기후부, 에너지·환경 행정 간소화 추진 - 머니투데이",
-   "source": "머니투데이",
-   "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE43dkRjMXdwWHJhcWpLM1RnUXZOWndPem5IZGpRMFJLUjQ3Ul9rTXlmMmFEUEoxOGZtR2IwNWZ2U19YYW1qQUlYcTZFZTQtemVzSDkxa0RTeDNWaENUYS1pY3NZVWRmVnlPLVpZU1ZNQzDSAXBBVV95cUxON3ZEYzF3cFhyYXFqSzNUZ1F2Tlp3T3puSGRqUTBSS1I0N1Jfa015ZjJhRFBKMThmbUdiMDVmdlNfWGFtakFJWHE2RWU0LXplc0g5MWtEU3gzVmhDVGEtaWNzWVVkZlZ5Ty1aWVNWTUMw?oc=5",
-   "pub": "2026-10-23 15:17",
+   "title": "[국감] 박지혜 의원 \"석탄 최소출력 낮추고 태양광·ESS 망 비용 차별 개선해야”",
+   "source": "이투뉴스",
+   "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE5mQ2w3Nmc2ZDRtamZYZUxKaTZWZGZ3bjZaSGxCOHR1blFQZDl4c1VLeHpZUkNwRlBTbHRkM3pCZld3d00zaFlLVURCWkRxU2dGVHBCc0ZTTkV0empBLU45UzdRc2IxdFVT?oc=5",
+   "pub": "2026-10-26 12:48",
    "more": 1
   },
   {
    "title": "韓 압박하면서 러 에너지 기업과 거래… 트럼프, 알래스카 LNG 사업 ‘양다리’",
    "source": "조선일보",
    "link": "https://news.google.com/rss/articles/CBMingFBVV95cUxNd3lTendsem5jZzBVWFNsNngyeEF5d1BoaVRFUFBhbXltZnZiREJyVWhGV3p4MGxCeVNBbjFiQUNUWUl6dzM0QXB2SGtlYnFEMFpOMWxXUlRrbHZOb2paU2lsTGpLck5fT0RfdDlNdnZvZTVjMUF6RFJBR3YxN1dJdk9ZLWExTkY2Z1BvNDY5bV9neFo4M3V2clBiVXY3QQ?oc=5",
-   "pub": "2026-10-26 00:44",
+   "pub": "2026-10-26 00:49",
    "more": 0
   },
   {
-   "title": "“호르무즈 막히면 에너지 공급망 흔들”…수은硏, LNG선·물류 인프라 확충 주문",
-   "source": "해사신문",
-   "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE9yWUZHWXJKcG9fckhuUkZBalhxZFlFSjVUSnhxZE8tN08zMjJnMEZPZG1jQ200M1NJVkFnbERITnh4dHFNa1VTbUQyM0VyREF1NDczbFZPZW1DdnRWOWg3ekNNWElZWW16TlVB?oc=5",
-   "pub": "2026-10-26 08:40",
-   "more": 0
-  },
-  {
-   "title": "삼천리, 도시가스 1위 넘어 친환경 에너지 기업으로…탄소중립 속도",
-   "source": "핀포인트뉴스",
-   "link": "https://news.google.com/rss/articles/CBMic0FVX3lxTE02Vk9xVFVNSnpLcGd1STZPS0gwNjJtQVlqS3J5X3pOT1BPU3FuRnZKbElpZ2lOYWc0UnIweE85T0V3MmVjMDNrZkZHN2U3V3l3S0lHUi1tSTFucjBrXzVKTnZPWnd6VThIOXRHc1ZvOTgyT0HSAXdBVV95cUxPcW9sdjctQ2w3Z3ZSQnF0aVA2SFBkR01rUmR0V3N2M0xQYmdmOTZkLTZUUFBtRzF6eFJ3VFdyUHRwUkhPaXpZMzNPdkowemFVa1pVY3ZsN0J2MThuRnR4S05JQ0hBM1UzczN4YzJxVXV5bHotbmNfQQ?oc=5",
-   "pub": "2026-10-26 07:20",
+   "title": "가스공사 3분기 판매량 줄었지만…가스 가격 상승세에 실적 개선 기대",
+   "source": "에너지경제신문",
+   "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTE9OVE5CeEdNTW4xcDRKMy1LQ0xyX1ZIYTNnaTBqY3pKWDNXaS1LMTlOQXlfTUVqb1dGNVJkV3MxaVZ2U19ZZ2ZmR3o1MjF4bnVvTTNoc0ZNbGpPTlQ2VWtnbTh3Yw?oc=5",
+   "pub": "2026-10-26 16:42",
    "more": 1
-  },
-  {
-   "title": "송전망 주변 마을에 지원금 최대 3분의 2 배분…태양광 발전으로 주민소득 높인다",
-   "source": "쿠키뉴스",
-   "link": "https://news.google.com/rss/articles/CBMiY0FVX3lxTFBJSVZfVkVFZDZ1TEE2ZTBHSzd5ZW1oLTlRY21EY2NvVEJfWHNZTVlkUENzYWx5QXlxQjhmbGx5RkxTVVZaVFJhenhIRzRfQ1NqNjJiNkVST2w4eHBvaElnZFIwTQ?oc=5",
-   "pub": "2026-10-25 19:43",
-   "more": 0
   }
  ]
 }
