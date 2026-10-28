@@ -26,13 +26,20 @@ def retry(fn, tries=3):
     raise last
 
 
+def oil_get(path):
+    """OilPriceAPI 호출. HTTP 오류면 응답 본문 앞부분을 붙여 원인을 남긴다(키는 기록하지 않음)."""
+    req = urllib.request.Request("https://api.oilpriceapi.com/v1/" + path,
+                                 headers={**UA, "Authorization": "Token " + OIL_KEY})
+    try:
+        return json.loads(urllib.request.urlopen(req, timeout=40).read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        body = e.read().decode("utf-8", "ignore")[:200].replace(OIL_KEY, "***") if OIL_KEY else ""
+        raise ValueError(f"HTTP {e.code} {body}") from None
+
+
 def oil_series(code):
     """OilPriceAPI 최근 1주 값 → {날짜: (시각, 가격)}"""
-    def call():
-        req = urllib.request.Request("https://api.oilpriceapi.com/v1/prices/past_week?by_code=" + code,
-                                     headers={**UA, "Authorization": "Token " + OIL_KEY})
-        return json.loads(urllib.request.urlopen(req, timeout=40).read().decode("utf-8"))
-    j = retry(call)
+    j = retry(lambda: oil_get("prices/past_week?by_code=" + code))
     d = j.get("data")
     if isinstance(d, dict) and isinstance(d.get("prices"), list):
         d = d["prices"]
@@ -59,7 +66,17 @@ def oil_item(by_day, name, unit):
 
 
 def fetch_jkm():
-    return {"jkm": oil_item(oil_series("JKM_LNG_USD"), "JKM LNG", "USD/MMBtu")}
+    by_day = oil_series("JKM_LNG_USD")
+    if not by_day:
+        # 최근 1주 값이 비어 있으면 최신값 조회로 원인(마지막 갱신일·요금제 제한 등)을 확인해 오류에 남긴다
+        try:
+            j = oil_get("prices/latest?by_code=JKM_LNG_USD")
+            d = j.get("data") or {}
+            info = f"최신값 {d.get('price')} ({d.get('created_at') or d.get('as_of')})" if isinstance(d, dict) else str(j)[:150]
+        except Exception as e:
+            info = f"최신값 조회 실패 {str(e)[:150]}"
+        raise ValueError("JKM 최근 1주 자료 없음 - " + info)
+    return {"jkm": oil_item(by_day, "JKM LNG", "USD/MMBtu")}
 
 
 # 두바이·브렌트·WTI: JKM 과 같은 OilPriceAPI 에서 가져옴(빠름). 코드는 후보를 차례로 시도
@@ -484,6 +501,7 @@ def main():
     store = json.load(open(OUT, encoding="utf-8")) if os.path.exists(OUT) else {}
     items = store.get("items", {})
     ok = 0
+    errors = {}
     def fetch_oil_all():
         got = {}
         try:
@@ -508,9 +526,11 @@ def main():
                 print(f">> [수집 성공] {k}: {v['date']} {v['value']} (전일 {v['prev_date']} {v['prev_value']})")
         except Exception as e:
             print(f">> [수집 실패] {label}: {type(e).__name__}: {str(e)[:150]} → 이전 값 유지")
+            errors[label] = f"{type(e).__name__}: {str(e)[:200]}"
     if ok == 0:
         raise SystemExit(1)
-    json.dump({"updated": datetime.now(KST).strftime("%Y-%m-%d %H:%M"), "items": items},
+    # errors: 이번 실행에서 실패한 항목과 사유(화면에는 쓰지 않음, 점검용)
+    json.dump({"updated": datetime.now(KST).strftime("%Y-%m-%d %H:%M"), "items": items, "errors": errors},
               open(OUT, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     print(">> indicators.json 저장 완료")
     # 날짜별 보관본(history/): 화면에서 과거 일자를 고르면 이 파일을 읽는다. 같은 날 여러 번 실행되면 마지막 값으로 덮어쓴다.
