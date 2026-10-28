@@ -1,5 +1,5 @@
 {
- "updated": "2026-10-28 20:34",
+ "updated": "2026-10-28 23:40",
  "items": {
   "jkm": {
    "name": "JKM LNG",
@@ -69,5 +69,8 @@
    "prev_date": "2026-10-27",
    "prev_value": 839.83
   }
+ },
+ "errors": {
+  "JKM": "ValueError: HTTP 402 {\"error\":\"Historical data requires paid access\",\"error_code\":\"UPGRADE_REQUIRED\",\"message\":\"Your 7-day trial has ended. Historical price data (past_day, past_week, past_month, past_year) now r"
  }
 }
