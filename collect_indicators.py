@@ -91,6 +91,8 @@ def fetch_jkm(prev=None):
         pd_, pv = prev.get("prev_date"), prev.get("prev_value")
     else:
         pd_, pv = None, None
+    if pd_ and (datetime.strptime(day, "%Y-%m-%d") - datetime.strptime(pd_, "%Y-%m-%d")).days > 7:
+        pd_, pv = None, None                              # 7일 넘게 떨어진 값은 전일 비교에 쓰지 않음
     print(f">> [JKM] 과거조회 불가({why}) → 최신값 사용")
     return {"jkm": {"name": "JKM LNG", "unit": "USD/MMBtu", "date": day, "value": price, "prev_date": pd_, "prev_value": pv}}
 
