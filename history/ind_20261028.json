@@ -1,13 +1,13 @@
 {
- "updated": "2026-10-28 23:40",
+ "updated": "2026-10-28 23:44",
  "items": {
   "jkm": {
    "name": "JKM LNG",
    "unit": "USD/MMBtu",
-   "date": "2026-10-08",
-   "value": 25.87,
-   "prev_date": "2026-10-07",
-   "prev_value": 25.88
+   "date": "2026-10-28",
+   "value": 31.74,
+   "prev_date": "2026-10-08",
+   "prev_value": 25.87
   },
   "dubai": {
    "name": "두바이유",
