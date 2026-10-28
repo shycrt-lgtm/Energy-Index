@@ -65,18 +65,34 @@ def oil_item(by_day, name, unit):
             "prev_date": days[1] if len(days) > 1 else None, "prev_value": by_day[days[1]][1] if len(days) > 1 else None}
 
 
-def fetch_jkm():
-    by_day = oil_series("JKM_LNG_USD")
-    if not by_day:
-        # 최근 1주 값이 비어 있으면 최신값 조회로 원인(마지막 갱신일·요금제 제한 등)을 확인해 오류에 남긴다
-        try:
-            j = oil_get("prices/latest?by_code=JKM_LNG_USD")
-            d = j.get("data") or {}
-            info = f"최신값 {d.get('price')} ({d.get('created_at') or d.get('as_of')})" if isinstance(d, dict) else str(j)[:150]
-        except Exception as e:
-            info = f"최신값 조회 실패 {str(e)[:150]}"
-        raise ValueError("JKM 최근 1주 자료 없음 - " + info)
-    return {"jkm": oil_item(by_day, "JKM LNG", "USD/MMBtu")}
+def fetch_jkm(prev=None):
+    """JKM: 과거 1주 조회(유료)가 막히면 최신값 조회(prices/latest)로 받고, 전일 값은 직전에 저장한 값을 쓴다."""
+    try:
+        by_day = oil_series("JKM_LNG_USD")
+        if by_day:
+            return {"jkm": oil_item(by_day, "JKM LNG", "USD/MMBtu")}
+        why = "최근 1주 자료 없음"
+    except Exception as e:
+        why = str(e)[:120]
+    j = oil_get("prices/latest?by_code=JKM_LNG_USD")
+    d = j.get("data") or {}
+    ts = str(d.get("created_at") or d.get("as_of") or "")
+    try:
+        price = float(d["price"])
+    except (KeyError, TypeError, ValueError):
+        raise ValueError(f"JKM 최신값 없음 ({why}) - 응답 {str(j)[:150]}")
+    day = ts[:10]
+    if len(day) != 10:
+        raise ValueError(f"JKM 최신값 날짜 없음 - 응답 {str(j)[:150]}")
+    prev = prev or {}
+    if prev.get("date") and prev["date"] < day:          # 새 날짜면 직전 저장값이 전일 값
+        pd_, pv = prev["date"], prev.get("value")
+    elif prev.get("date") == day:                         # 같은 날 재실행이면 기존 전일 값 유지
+        pd_, pv = prev.get("prev_date"), prev.get("prev_value")
+    else:
+        pd_, pv = None, None
+    print(f">> [JKM] 과거조회 불가({why}) → 최신값 사용")
+    return {"jkm": {"name": "JKM LNG", "unit": "USD/MMBtu", "date": day, "value": price, "prev_date": pd_, "prev_value": pv}}
 
 
 # 두바이·브렌트·WTI: JKM 과 같은 OilPriceAPI 에서 가져옴(빠름). 코드는 후보를 차례로 시도
@@ -517,7 +533,7 @@ def main():
         if not got:
             raise ValueError("국제유가 자료 없음")
         return got
-    for label, fn in (("JKM", fetch_jkm), ("국제유가", fetch_oil_all), ("배출권", fetch_kau_any), ("REC", fetch_rec_any), ("환율", fetch_fx)):
+    for label, fn in (("JKM", lambda: fetch_jkm(items.get("jkm"))), ("국제유가", fetch_oil_all), ("배출권", fetch_kau_any), ("REC", fetch_rec_any), ("환율", fetch_fx)):
         try:
             got = fn()
             items.update(got)
