@@ -128,9 +128,17 @@ SEMINAR_AD_RE = re.compile(r"^\s*\[\s*\d{1,2}\s*[./월]\s*\d{1,2}\s*(일)?\s*\]|
 # 투자·종목 홍보성 제목(증권 종목 소개, 수혜주·테마주 등)
 STOCK_AD_RE = re.compile(r"\[\s*클릭\s*e?\s*종목\s*\]|e종목|종목\s*(추천|분석|리포트|픽)|수혜주|관련주|테마주|상한가|하한가|투자\s*의견|매수\s*(의견|추천)|주식\s*(추천|투자)|증권사\s*(리포트|추천)|밸류파인더|리서치알음|한국IR협의회|목표가")
 
+# 중점 주제(용량시장·용량입찰): 입찰 공고·접수·참가 신청·사업자 상생·해외사업자 언급 등이 흔해 일반 노이즈 규칙에 걸리기 쉬움 → 사진·투자홍보만 노이즈로 인정
+PROTECT_RE = re.compile(r"용량\s*시장|용량\s*입찰|LNG\s*용량")
+
 def noise_hits(t):
     """제목에 걸린 강한 노이즈 낱말. 사명이 있는 기사는 사진 기사만 노이즈로 인정(협약·MOU·인사 등은 면제)."""
     hits = [w for w in NOISE_HARD if w in t]
+    if PROTECT_RE.search(t):
+        hits = [w for w in hits if w in PHOTO_NOISE]
+        if STOCK_AD_RE.search(t):
+            hits.append("투자홍보")
+        return hits
     if SEMINAR_AD_RE.search(t):
         hits.append("세미나광고")
     if STOCK_AD_RE.search(t):
