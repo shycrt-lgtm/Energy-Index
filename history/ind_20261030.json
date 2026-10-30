@@ -1,73 +1,73 @@
 {
- "updated": "2026-10-30 00:26",
+ "updated": "2026-10-30 10:16",
  "items": {
   "jkm": {
    "name": "JKM LNG",
    "unit": "USD/MMBtu",
-   "date": "2026-10-29",
-   "value": 32.35,
-   "prev_date": "2026-10-28",
-   "prev_value": 31.74
+   "date": "2026-10-30",
+   "value": 32.03,
+   "prev_date": "2026-10-29",
+   "prev_value": 32.35
   },
   "dubai": {
    "name": "두바이유",
    "unit": "$/bbl",
-   "date": "2026-10-28",
+   "date": "2026-10-29",
    "value": 114.2,
-   "prev_date": "2026-10-27",
-   "prev_value": 115.1
+   "prev_date": "2026-10-28",
+   "prev_value": 114.2
   },
   "brent": {
    "name": "브렌트유",
    "unit": "$/bbl",
-   "date": "2026-10-28",
-   "value": 115.32,
-   "prev_date": "2026-10-27",
-   "prev_value": 113.88
+   "date": "2026-10-29",
+   "value": 114.88,
+   "prev_date": "2026-10-28",
+   "prev_value": 115.32
   },
   "wti": {
    "name": "WTI",
    "unit": "$/bbl",
-   "date": "2026-10-28",
-   "value": 102.78,
-   "prev_date": "2026-10-27",
-   "prev_value": 99.9
+   "date": "2026-10-29",
+   "value": 102.0,
+   "prev_date": "2026-10-28",
+   "prev_value": 102.78
   },
   "kau": {
    "name": "배출권(KAU)",
    "item": "KAU26",
    "unit": "원/톤",
-   "date": "2026-10-29",
+   "date": "2026-10-30",
    "value": 30250.0,
-   "prev_date": "2026-10-28",
+   "prev_date": "2026-10-29",
    "prev_value": 30250.0
   },
   "rec": {
    "name": "REC",
    "item": "평균가",
    "unit": "원/REC",
-   "date": "2026-10-27",
-   "value": 71442.0,
-   "prev_date": "2026-10-22",
-   "prev_value": 71397.0
+   "date": "2026-10-29",
+   "value": 71199.0,
+   "prev_date": "2026-10-27",
+   "prev_value": 71442.0
   },
   "fx": {
    "name": "원/달러 환율",
    "item": "매매기준율",
    "unit": "원",
-   "date": "2026-10-29",
-   "value": 1336.3,
-   "prev_date": "2026-10-28",
-   "prev_value": 1324.3
+   "date": "2026-10-30",
+   "value": 1335.3,
+   "prev_date": "2026-10-29",
+   "prev_value": 1336.3
   },
   "fx_jpy": {
    "name": "원/100엔 환율",
    "item": "매매기준율",
    "unit": "원",
-   "date": "2026-10-29",
-   "value": 846.89,
-   "prev_date": "2026-10-28",
-   "prev_value": 838.3
+   "date": "2026-10-30",
+   "value": 846.41,
+   "prev_date": "2026-10-29",
+   "prev_value": 846.89
   }
  }
 }
