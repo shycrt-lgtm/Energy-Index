@@ -1,37 +1,37 @@
 {
- "updated": "2026-10-31 00:13",
+ "updated": "2026-10-31 09:59",
  "items": {
   "jkm": {
    "name": "JKM LNG",
    "unit": "USD/MMBtu",
-   "date": "2026-10-30",
-   "value": 32.03,
-   "prev_date": "2026-10-29",
-   "prev_value": 32.35
+   "date": "2026-10-31",
+   "value": 32.84,
+   "prev_date": "2026-10-30",
+   "prev_value": 32.03
   },
   "dubai": {
    "name": "두바이유",
    "unit": "$/bbl",
-   "date": "2026-10-29",
-   "value": 114.2,
-   "prev_date": "2026-10-28",
+   "date": "2026-10-30",
+   "value": 118.7,
+   "prev_date": "2026-10-29",
    "prev_value": 114.2
   },
   "brent": {
    "name": "브렌트유",
    "unit": "$/bbl",
-   "date": "2026-10-29",
-   "value": 114.88,
-   "prev_date": "2026-10-28",
-   "prev_value": 115.32
+   "date": "2026-10-30",
+   "value": 117.64,
+   "prev_date": "2026-10-29",
+   "prev_value": 114.88
   },
   "wti": {
    "name": "WTI",
    "unit": "$/bbl",
-   "date": "2026-10-29",
-   "value": 102.0,
-   "prev_date": "2026-10-28",
-   "prev_value": 102.78
+   "date": "2026-10-30",
+   "value": 104.12,
+   "prev_date": "2026-10-29",
+   "prev_value": 102.0
   },
   "kau": {
    "name": "배출권(KAU)",
