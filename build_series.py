@@ -7,7 +7,7 @@
 series/지표.json 형식: {"key","name","unit","source","updated","data":[["YYYY-MM-DD", 값(, 종목)], ...]} (날짜 오름차순)
 series/_status.json : 마지막 구축 결과(출처별 건수·기간·오류). 실행 로그를 볼 수 없을 때 점검용.
 """
-import os, re, io, csv, sys, json, time, urllib.request, urllib.parse, http.cookiejar
+import os, re, io, csv, sys, json, time, urllib.request, urllib.parse, urllib.error, http.cookiejar
 from datetime import datetime, timedelta, timezone, date
 
 KST = timezone(timedelta(hours=9))
@@ -276,44 +276,48 @@ def back_kau():
 
 
 def back_rec():
-    """REC 현물시장: 화·목(거래일)마다 날짜를 지정해 조회(동시 6건). 육지 평균가(landAvgPrc)."""
+    """REC 현물시장: 화·목(거래일)마다 날짜를 지정해 조회. 육지 평균가(landAvgPrc).
+    공공데이터포털이 동시·연속 호출을 '요청 과다(429)'로 막으므로 1건씩 간격을 두고, 이미 받은 날짜는 건너뛴다(여러 번 나눠 실행 가능)."""
     if not DATA_KEY:
         note("rec", err="DATA_GO_KR_KEY 없음"); return
-    import concurrent.futures as cf
     url = "https://apis.data.go.kr/B552115/RecMarketInfo2/getRecMarketInfo2"
+    have = {r[0] for r in (load("rec") or {}).get("data", [])}
     days, d, e = [], start_day(), now().date()
     while d <= e:
-        if d.weekday() in (1, 3):
+        if d.weekday() in (1, 3) and d.isoformat() not in have:
             days.append(d)
         d += timedelta(days=1)
-    res = {"sample": None, "fails": 0, "errs": []}
-
-    def one(d):
+    rows, sample, fails, empty, done = [], None, 0, 0, 0
+    for d in sorted(days, reverse=True):          # 최근부터
         if over():
-            return None
+            note("rec", err="시간 초과 - 받은 데까지 저장(다시 실행하면 이어서 받음)"); break
         q = {"serviceKey": DATA_KEY, "pageNo": 1, "numOfRows": 5, "dataType": "json", "bzDd": d.strftime("%Y%m%d")}
-        try:
-            items, _, _ = datago_items(url, q)
-            it = next((x for x in items if x.get("landAvgPrc") not in (None, "")), None)
-            if it:
-                res["sample"] = res["sample"] or it
-                return (d.isoformat(), float(str(it["landAvgPrc"]).replace(",", "")))
-        except Exception as ex:
-            res["fails"] += 1
-            if len(res["errs"]) < 3:
-                res["errs"].append(f"{d} {type(ex).__name__} {ex}")
-        return None
-
-    with cf.ThreadPoolExecutor(max_workers=6) as ex:
-        rows = [r for r in ex.map(one, days) if r]
-    for m in res["errs"]:
-        note("rec", err=m)
-    STATUS.setdefault("rec", {})["sample_fields"] = sorted(res["sample"].keys()) if res["sample"] else None
-    STATUS["rec"]["fails"] = res["fails"]; STATUS["rec"]["asked"] = len(days)
-    if over():
-        note("rec", err="시간 초과 - 받은 데까지 저장")
+        for attempt in range(4):
+            try:
+                items, _, _ = datago_items(url, q)
+                it = next((x for x in items if x.get("landAvgPrc") not in (None, "")), None)
+                if it:
+                    sample = sample or it
+                    rows.append((d.isoformat(), float(str(it["landAvgPrc"]).replace(",", ""))))
+                else:
+                    empty += 1
+                break
+            except urllib.error.HTTPError as ex:
+                if ex.code == 429:
+                    time.sleep(5 * (attempt + 1)); continue
+                fails += 1; break
+            except Exception as ex:
+                fails += 1
+                if fails <= 3:
+                    note("rec", err=f"{d} {type(ex).__name__} {ex}")
+                break
+        done += 1
+        time.sleep(0.7)
+    st = STATUS.setdefault("rec", {})
+    st.update({"sample_fields": sorted(sample.keys()) if sample else st.get("sample_fields"), "fails": fails, "empty": empty,
+               "asked": done, "left": len(days) - done})
     rows += collected("rec")
-    save("rec", rows, merge=False); note("rec", rows)
+    save("rec", rows, merge=True); note("rec", rows)
 
 
 def collected(key):
@@ -385,7 +389,7 @@ SOURCES = {"smp": back_smp, "fx": back_fx, "crude": back_crude, "kau": back_kau,
 def backfill(only=None):
     for name in (only or list(SOURCES)):
         t0 = time.time()
-        DEADLINE[0] = t0 + BUDGET
+        DEADLINE[0] = t0 + (1320 if name == "rec" else BUDGET)
         STATUS.setdefault(name, {})
         try:
             SOURCES[name]()

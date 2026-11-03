@@ -45,7 +45,7 @@ jobs:
       - name: REC
         if: ${{ env.ONLY == '' || contains(env.ONLY, 'rec') }}
         continue-on-error: true
-        timeout-minutes: 12
+        timeout-minutes: 25
         run: python build_series.py --backfill rec
       - name: JKM
         if: ${{ env.ONLY == '' || contains(env.ONLY, 'jkm') }}
