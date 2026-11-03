@@ -1,0 +1,80 @@
+{
+ "built": "2026-11-03 15:16",
+ "status": {
+  "smp": {
+   "sec": 0
+  },
+  "smp_avg": {
+   "rows": 1767,
+   "from": "2022-01-01",
+   "to": "2026-11-02"
+  },
+  "smp_max": {
+   "rows": 1767,
+   "from": "2022-01-01",
+   "to": "2026-11-02"
+  },
+  "smp_min": {
+   "rows": 1767,
+   "from": "2022-01-01",
+   "to": "2026-11-02"
+  },
+  "fx": {
+   "rows": 793,
+   "from": "2023-10-27",
+   "to": "2026-11-03",
+   "sec": 2
+  },
+  "fx_jpy": {
+   "rows": 793,
+   "from": "2023-10-27",
+   "to": "2026-11-03"
+  },
+  "crude": {
+   "sec": 15
+  },
+  "dubai": {
+   "rows": 736,
+   "from": "2023-10-30",
+   "to": "2026-11-02"
+  },
+  "brent": {
+   "rows": 736,
+   "from": "2023-10-30",
+   "to": "2026-11-02"
+  },
+  "wti": {
+   "rows": 736,
+   "from": "2023-10-30",
+   "to": "2026-11-02"
+  },
+  "kau": {
+   "total": 2367,
+   "rows": 756,
+   "from": "2023-10-30",
+   "to": "2026-11-03",
+   "sec": 37
+  },
+  "rec": {
+   "errors": [
+    "2023-11-09 HTTPError HTTP Error 429: Too Many Requests",
+    "2023-11-16 HTTPError HTTP Error 429: Too Many Requests",
+    "2023-11-14 HTTPError HTTP Error 429: Too Many Requests",
+    "시간 초과 - 받은 데까지 저장"
+   ],
+   "sample_fields": null,
+   "fails": 300,
+   "asked": 315,
+   "rows": 11,
+   "from": "2026-09-22",
+   "to": "2026-10-29",
+   "sec": 560
+  },
+  "jkm": {
+   "rows": 12,
+   "from": "2026-09-30",
+   "to": "2026-11-03",
+   "sec": 0
+  }
+ }
+}
