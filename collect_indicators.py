@@ -557,6 +557,12 @@ def main():
     with open(f"history/ind_{day}.json", "w", encoding="utf-8") as f:
         json.dump({"updated": datetime.now(KST).strftime("%Y-%m-%d %H:%M"), "items": items}, f, ensure_ascii=False, indent=1)
     print(f">> history/ind_{day}.json 보관 완료")
+    # 3년 추이 그래프용 시계열(series/)에 오늘 값을 이어 붙인다(실패해도 지표 수집에는 영향 없음)
+    try:
+        import build_series
+        build_series.daily()
+    except Exception as e:
+        print(f">> [series] 갱신 실패 {type(e).__name__}: {e}")
 
 
 if __name__ == "__main__":
