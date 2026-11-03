@@ -1,5 +1,5 @@
 {
- "built": "2026-11-03 15:16",
+ "built": "2026-11-03 15:40",
  "status": {
   "smp": {
    "sec": 0
@@ -57,18 +57,17 @@
   },
   "rec": {
    "errors": [
-    "2023-11-09 HTTPError HTTP Error 429: Too Many Requests",
-    "2023-11-16 HTTPError HTTP Error 429: Too Many Requests",
-    "2023-11-14 HTTPError HTTP Error 429: Too Many Requests",
-    "시간 초과 - 받은 데까지 저장"
+    "시간 초과 - 받은 데까지 저장(다시 실행하면 이어서 받음)"
    ],
    "sample_fields": null,
-   "fails": 300,
-   "asked": 315,
+   "fails": 0,
+   "empty": 0,
+   "asked": 15,
+   "left": 289,
    "rows": 11,
    "from": "2026-09-22",
    "to": "2026-10-29",
-   "sec": 560
+   "sec": 1387
   },
   "jkm": {
    "rows": 12,
