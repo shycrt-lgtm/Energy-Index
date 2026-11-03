@@ -20,14 +20,14 @@ KPX_FULL = "https://raw.githubusercontent.com/shycrt-lgtm/KPX-Daily-Report/main/
 KPX_RECENT = "https://raw.githubusercontent.com/shycrt-lgtm/KPX-Daily-Report/main/data_recent.json"
 
 META = {
-    "fx":      ("원/달러 환율", "원", "ECB 기준환율(과거) · 한국수출입은행 매매기준율(2026.10~ 수집분)"),
-    "fx_jpy":  ("원/100엔 환율", "원", "ECB 기준환율(과거) · 한국수출입은행 매매기준율(2026.10~ 수집분)"),
-    "dubai":   ("두바이유", "$/bbl", "한국석유공사 오피넷"),
-    "brent":   ("브렌트유", "$/bbl", "한국석유공사 오피넷"),
-    "wti":     ("WTI", "$/bbl", "한국석유공사 오피넷"),
-    "jkm":     ("JKM LNG", "USD/MMBtu", "OilPriceAPI (2026.10~ 사이트 수집분만 보유)"),
-    "kau":     ("배출권(KAU)", "원/톤", "금융위원회 배출권시세(공공데이터포털) · 한국거래소. 날짜별 거래량 최대 종목"),
-    "rec":     ("REC", "원/REC", "전력거래소 REC 현물시장(공공데이터포털 육지 평균가) · 전력거래소 홈페이지(수집분)"),
+    "fx":       ("원/달러 환율", "원", "ECB 기준환율(과거) · 한국수출입은행 매매기준율(2026.10~ 수집분)"),
+    "fx_jpy":   ("원/100엔 환율", "원", "ECB 기준환율(과거) · 한국수출입은행 매매기준율(2026.10~ 수집분)"),
+    "dubai":    ("두바이유", "$/bbl", "한국석유공사 오피넷"),
+    "brent":    ("브렌트유", "$/bbl", "한국석유공사 오피넷"),
+    "wti":      ("WTI", "$/bbl", "한국석유공사 오피넷"),
+    "jkm":      ("JKM LNG", "USD/MMBtu", "OilPriceAPI (2026.10~ 사이트 수집분만 보유)"),
+    "kau":      ("배출권(KAU)", "원/톤", "금융위원회 배출권시세(공공데이터포털) · 한국거래소. 날짜별 거래량 최대 종목"),
+    "rec":      ("REC", "원/REC", "전력거래소 REC 현물시장(공공데이터포털 육지 평균가) · 전력거래소 홈페이지(수집분)"),
     "smp_hourly": ("SMP 시간대별(육지)", "원/kWh", "전력거래소 육지 SMP 시간대별(2023~2026.11.3 엑셀 자료, 이후 매일 전력시장 전일실적 자료로 갱신)"),
 }
 STATUS = {}
@@ -170,7 +170,6 @@ def back_fx():
                     if v.get("JPY"):
                         jpy.append((d, float(v["KRW"]) / float(v["JPY"]) * 100))
         cur = nxt + timedelta(days=1)
-    # 사이트가 매일 모은 수출입은행 매매기준율(history/ind_*.json)이 있으면 그 날짜는 그 값으로
     usd += collected("fx"); jpy += collected("fx_jpy")
     save("fx", usd, merge=False); note("fx", usd)
     save("fx_jpy", jpy, merge=False); note("fx_jpy", jpy)
@@ -289,6 +288,19 @@ def back_kau():
     save("kau", rows, merge=False); note("kau", rows)
 
 
+def rec_csv(fn):
+    """data/rec_*.csv (날짜, 육지평균가) -> [(YYYY-MM-DD, 가격)]"""
+    rows = []
+    for r in list(csv.reader(open(fn, encoding="utf-8-sig")))[1:]:
+        if len(r) >= 2 and r[0].strip() and r[1].strip():
+            d = r[0].strip().replace("/", "-").replace(".", "-")
+            try:
+                rows.append((d, float(r[1].replace(",", ""))))
+            except ValueError:
+                pass
+    return rows
+
+
 def back_rec(limit=None, stop_on_429=False):
     """REC 현물시장: 화·목(거래일)마다 날짜를 지정해 조회. 육지 평균가(landAvgPrc).
     공공데이터포털이 동시·연속 호출을 '요청 과다(429)'로 막으므로 1건씩 간격을 두고, 이미 받은 날짜는 건너뛴다(여러 번 나눠 실행 가능)."""
@@ -296,12 +308,23 @@ def back_rec(limit=None, stop_on_429=False):
         note("rec", err="DATA_GO_KR_KEY 없음"); return
     url = "https://apis.data.go.kr/B552115/RecMarketInfo2/getRecMarketInfo2"
     have = {r[0] for r in (load("rec") or {}).get("data", [])}
+
+    rows, sample, fails, empty, done = [], None, 0, 0, 0
+
+    # data/rec_*.csv 과거자료가 있으면 먼저 적재
+    ddir = os.path.join(HERE, "data")
+    for fn in sorted(os.listdir(ddir)) if os.path.isdir(ddir) else []:
+        if fn.startswith("rec") and fn.endswith(".csv"):
+            for d_csv, v_csv in rec_csv(os.path.join(ddir, fn)):
+                rows.append((d_csv, v_csv))
+                have.add(d_csv)
+
     days, d, e = [], start_day(), now().date()
     while d <= e:
         if d.weekday() in (1, 3) and d.isoformat() not in have:
             days.append(d)
         d += timedelta(days=1)
-    rows, sample, fails, empty, done = [], None, 0, 0, 0
+
     stopped = False
     for d in sorted(days, reverse=True)[:limit]:  # 최근부터
         if stopped:
@@ -368,7 +391,6 @@ def collected(key):
         except Exception:
             continue
         if it and key == "jkm" and it.get("date") and it.get("basis") != "trade":
-            # 2026.11.3 이전 수집분은 OilPriceAPI 기록일(거래 다음 영업일)로 저장됨 → 직전 평일로 바로잡는다
             sh = lambda d: _prev_wd(d) if d else d
             it = dict(it, date=sh(it["date"]), prev_date=sh(it.get("prev_date")))
         if it and it.get("date") and it.get("value") is not None:
@@ -403,7 +425,6 @@ def daily():
             save_hourly(kpx_hourly(days))
     except Exception as e:
         print(f">> [series SMP] 최근값 실패 {type(e).__name__}: {e}")
-    # REC 과거자료는 공공데이터포털 호출 한도 때문에 매일 조금씩(최대 30거래일) 채운다
     if os.path.exists(path("rec")) and DATA_KEY:
         try:
             DEADLINE[0] = time.time() + 150
@@ -453,7 +474,7 @@ def backfill(only=None):
         except Exception as e:
             note(name, err=f"{type(e).__name__}: {e}")
         STATUS[name]["sec"] = int(time.time() - t0)
-        write_status()        # 출처마다 바로 기록(중간에 끊겨도 앞의 결과는 남게)
+        write_status()
 
 
 if __name__ == "__main__":
