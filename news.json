@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-03 08:23",
+ "updated": "2026-11-03 12:33",
  "items": [
   {
    "title": "가스·석탄값 뛰는데 전기요금은 동결… 한전, 55조 전력망 투자 괜찮나",
@@ -9,18 +9,18 @@
    "more": 0
   },
   {
-   "title": "스파이어, 미주리 가스요금 인상 신청..서부 11%·동부 15%",
-   "source": "매일경제 마켓",
-   "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTFBoTXEweG1FbG9UZUhuNHJOQjFIcDdIQ3NSbVh0S3dpenQ0WDM3Nk51OEJnc2dYRW1IN19sVEt4a3NKUGU1VWRlRjRQTnZaRG1GV1E?oc=5",
-   "pub": "2026-11-03 07:00",
-   "more": 0
-  },
-  {
    "title": "대우건설 \"체코 원전 시공계약 재협상 요청…산업부 중재해달라\"",
    "source": "매일경제 마켓",
    "link": "https://news.google.com/rss/articles/CBMiUkFVX3lxTFBlZnpzcUNRM0tiLWdUMV9RTHExLVA4NEJsUkZMX2JsMk5RZE03UXhabEx3R0xiRlJpRzI0RG95M2RiNHlKVzdmdlE4ZU0yNDc4bGc?oc=5",
    "pub": "2026-11-02 13:40",
-   "more": 8
+   "more": 5
+  },
+  {
+   "title": "에이치에너지, ESS·단기 PPA로 ‘누구나 참여하는 재생에너지 시장’ 연다",
+   "source": "전기신문",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE1SSnhsNHpzaGQwYWFqN3RaT3VKa2ZmSGxyVTFUaGtCNno0N0FTdERhX1RueDlYV0I2bF9GNHNpWGY3Zm81ZTZPQ3FfU0x0UmkzbjZQaFZOQ3FfNWtLR3lydmlWaXk5UzBRQnpjQQ?oc=5",
+   "pub": "2026-11-03 09:25",
+   "more": 1
   },
   {
    "title": "충전기 53만기에 ‘주유소식 가격판’?…요금 표시제 실효성 논란",
@@ -30,25 +30,46 @@
    "more": 2
   },
   {
+   "title": "전력거래소-동서발전-생기硏, ‘그리드포밍 ESS’ 실계통 실증 추진",
+   "source": "인사이트N파워",
+   "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTE9PNk9KT3QtMllJeVhBQU44UnlwNnY2Mzl0a3p0MlRKZnhIV1FzUG5ZeE82eFVxdERUWGRacXVwUzdrV0lkaUhzWUtSSTVxa3pObkJiWFV4NUUwWnJ1ckttNFNINTJpUQ?oc=5",
+   "pub": "2026-11-03 11:19",
+   "more": 0
+  },
+  {
+   "title": "\"가구당 전기요금 8000원 절약…LH, 태양광 요금상계거래 첫 도입",
+   "source": "아시아경제",
+   "link": "https://news.google.com/rss/articles/CBMiYEFVX3lxTE1wOTFzN1F3bmxtcDQ2WnVwb255OUFYa01Ed28tUl93cUcxYnQwTmRRSVpIM1hXTFBneTMxc1NoUTB0Q2syX19ncEt6MHllZzBLdE84ZDZrWTJsZkl2em9Zcw?oc=5",
+   "pub": "2026-11-03 09:33",
+   "more": 0
+  },
+  {
+   "title": "제주 에너지전환 '요금 장벽'… 위성곤 지사, 히트펌프·ESS 제도개편 촉구",
+   "source": "파이낸셜뉴스",
+   "link": "https://news.google.com/rss/articles/CBMiWkFVX3lxTE1DUTFXU05mMXExRTVFMTRycmZtbUFOZEV2aVJHbEtNOEpVWUdIQXZoRDExamFtLW9LeWFpWlg1S2c5TmhwWGJaTWNVVHE2N2I2cERucFRWb1BSZw?oc=5",
+   "pub": "2026-11-03 09:21",
+   "more": 0
+  },
+  {
+   "title": "LH, 공동주택 최초 태양광 잉여전력 요금상계거래 시행",
+   "source": "BBS불교방송",
+   "link": "https://news.google.com/rss/articles/CBMia0FVX3lxTE9pVjUzOTZ6Q05KMmdRTmprakJXckJ0YXNjcEM4TUVhSU1FclZsZHBoTFBEcmUyUk9ReUhMM3ZNWkhFZGhELWdjbVgxSXdCRmJiZXFnQUtZUzRUS1JsbzNjN2N2YTBjZ2N6M0hj?oc=5",
+   "pub": "2026-11-03 09:04",
+   "more": 6
+  },
+  {
+   "title": "RE100 \"12차 전기본에 재생에너지 확대·기업 조달 대책 담아야\"",
+   "source": "한스경제",
+   "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTE1OaWRXZVhlN1Qtei0tbFhhcDV2NHdVNGYzYloycGIxM1FldGs4MVNqSWUxbXJ5bTVWRm1ueDlJcmI1SkFvTXJLa0xuVWdoRUVBMkdMM1U0cnNnQVJla1c5UG9ibDhhS1o5SU1wbQ?oc=5",
+   "pub": "2026-11-03 08:26",
+   "more": 5
+  },
+  {
    "title": "“전기요금이 재생에너지 확대 걸림돌...제도 개선 필요”",
    "source": "삼다일보",
    "link": "https://news.google.com/rss/articles/CBMibEFVX3lxTFBseThzQk9JUFc3Y3J2YVhfRFQtM0dsX193dVNXN3Iyand2TU1Xa2lJYVFSUnJtWHBVMEFoOC1VaFBWQmprVktNMDJrbXJSMVJXQjVocHprc3RuOEVzMVh3aWYyVzdobUNNYXh6RQ?oc=5",
    "pub": "2026-11-02 18:15",
-   "more": 0
-  },
-  {
-   "title": "충남도의회, 에너지전환·탄소중립 제도적 기반 추진",
-   "source": "뉴시스",
-   "link": "https://news.google.com/rss/articles/CBMieEFVX3lxTFBnT2FneEVoWkhudFZRNzd1Wk5zZzJhUmI3dnlyN3RuaEN1ZXFRZEV4bDhka01MRk9iX0pNTWFnNDF3VGlJRUp4QXNtaTFCVW5UQXEtRnphdGlBdF9FbEY1MWxxM28xbmdSOWVUTVVleEdITHQ5cDg0N9IBeEFVX3lxTFBnT2FneEVoWkhudFZRNzd1Wk5zZzJhUmI3dnlyN3RuaEN1ZXFRZEV4bDhka01MRk9iX0pNTWFnNDF3VGlJRUp4QXNtaTFCVW5UQXEtRnphdGlBdF9FbEY1MWxxM28xbmdSOWVUTVVleEdITHQ5cDg0Nw?oc=5",
-   "pub": "2026-11-02 17:03",
-   "more": 0
-  },
-  {
-   "title": "위성곤 제주지사 \"히트펌프 전기요금 부담…전용 요금제 필요\"",
-   "source": "뉴스1",
-   "link": "https://news.google.com/rss/articles/CBMiUEFVX3lxTFBHZE85d3BIb3FvQnhOVkYxWHF1cnVycG5heWc0UjRyRkl1aVE1d1dmcHZsTl9NbGkwcF9vNkIwMUdiSXFmTTBBZVgySFl4b2s2?oc=5",
-   "pub": "2026-11-02 16:13",
-   "more": 3
+   "more": 1
   },
   {
    "title": "[전력시장의 녹색전환]⑤ 가격 신호 이용해 송전망 부족 해결",
@@ -65,18 +86,11 @@
    "more": 1
   },
   {
-   "title": "GIST 김윤수 교수 연구팀, 태양광·ESS 계통 운전 여유량 실시간 산정 기술 개발",
-   "source": "솔라투데이",
-   "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTE5BLURicDRCb01nQkhBUzVJR2dpOVM4RGU5cm41aW9VOVNqMTZEU2UtaVlJVjY5SFhwSU4wRFlreXJsdTE5M3U0VGgwUFJveUNZZ0ctQ2hQV3dqSVRtMHhKazdPUVRjdXZaX3FFSHQzekg?oc=5",
-   "pub": "2026-11-02 08:40",
-   "more": 0
-  },
-  {
    "title": "'집단에너지사업 확대·재생전력 1GW 확보' 경영전략 고도화",
    "source": "이투뉴스",
-   "link": "https://news.google.com/rss/articles/CBMiaEFVX3lxTE9kUXdxOW5BQm91YnVxY0lyaVVQOTlhUkNCZDhkb1pLMFh5b2R1bnlkSmQ3MTB2QTF5QTJLYlNTVi1FNnRoLWh2b0p3Z2RpT2hSYjVNS3hCOHM2UjA0b3Z1NHk2cy1Fa0RS0gFrQVVfeXFMT0tCRGY1TVRFUEF5NjA0REI4UEhNY3d1dVdINUJtVm9UV3FBS01EQUl6aGg0VVNDZHRkX2p4NHFNQzFLdnJkNl9VZFhKQnZMYzI0U3g3ejdXOWdEdGVOVWFOeFZ5NVd0SWJsczQ?oc=5",
+   "link": "https://news.google.com/rss/articles/CBMiZ0FVX3lxTE53RVFhLXZPNnJrbzBKYkJLU1Z4U3ZTYlVaTTNGMHJGZ3ZSNzZTSlhsZ0dpd0pKZmNiNWF5Y3dpbmppTzltWEp0RURtNWpUYjV3b0w3ZmxZbzhCYk5Sc1RGdkhZdVIwc0XSAWtBVV95cUxPS0JEZjVNVEVQQXk2MDREQjhQSE1jd3V1V0g1Qm1Wb1RXcUFLTURBSXpoaDRVU0NkdGRfang0cU1DMUt2cmQ2X1VkWEpCdkxjMjRTeDd6N1c5Z0R0ZU5VYU54Vnk1V3RJYmxzNA?oc=5",
    "pub": "2026-11-02 11:05",
-   "more": 1
+   "more": 2
   },
   {
    "title": "가스공사 홍의락 사장, 취임 첫 ‘현장 이사회'",
@@ -84,20 +98,6 @@
    "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE10QUlzMWJJRENhY3FKUXFiakU2UjlaSWZsOVZ6dkhGYk5fTUVHMm5teWcwVHVFOU9hNEdOZk91NlF6MzhxZDRfRWJzcXF0b1k1N1BqNFdBdDVYU3VTcmVuVm9zT1VocHBFU0VmdjVB?oc=5",
    "pub": "2026-11-02 08:46",
    "more": 4
-  },
-  {
-   "title": "새만금 태양광 발전사업, 수익 기대에도 민간 참여 저조 왜",
-   "source": "전라매일",
-   "link": "https://news.google.com/rss/articles/CBMif0FVX3lxTFBpZl95T2d3VXhNS2pUcF9DekpOR0NYSVVkTGlTM1EyNUJoRDlMdk1UckNTTU4tSWl4MzJOTzFxUXdTcWduZGdxbTN5cFF3cUNtLUU3ZkFCeHh5MXFxVFY4YThDbXh5NmQ0N19QNHJ1NXNHS2ROWWF4ZlFSUzkzMXc?oc=5",
-   "pub": "2026-11-02 17:16",
-   "more": 1
-  },
-  {
-   "title": "부산항만공사, 분산에너지 특화지역 지정 추진…태양광 확대·풍력 검토",
-   "source": "국토일보",
-   "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE1VT2E2bWNmUXVpVGJ2ZHpGaG9SNFFHV3JBdURLUVNTY1E3cm1xSkh6QUtaQ0d5MHVyd1hYdndvamtGR3FXTWlyalZHTnhMekNOTHF3R050OTRHY1pGMU1IbWVBRTU?oc=5",
-   "pub": "2026-11-02 12:52",
-   "more": 1
   },
   {
    "title": "가스공사 이사회 현장으로…천연가스 생산·공급시설 점검",
