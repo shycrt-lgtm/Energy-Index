@@ -28,9 +28,7 @@ META = {
     "jkm":     ("JKM LNG", "USD/MMBtu", "OilPriceAPI (2026.10~ 사이트 수집분만 보유)"),
     "kau":     ("배출권(KAU)", "원/톤", "금융위원회 배출권시세(공공데이터포털) · 한국거래소. 날짜별 거래량 최대 종목"),
     "rec":     ("REC", "원/REC", "전력거래소 REC 현물시장(공공데이터포털 육지 평균가) · 전력거래소 홈페이지(수집분)"),
-    "smp_avg": ("SMP 가중평균", "원/kWh", "전력거래소(육지)"),
-    "smp_max": ("SMP 최고", "원/kWh", "전력거래소(육지)"),
-    "smp_min": ("SMP 최저", "원/kWh", "전력거래소(육지)"),
+    "smp_hourly": ("SMP 시간대별(육지)", "원/kWh", "전력거래소 육지 SMP 시간대별(2023~2026.11.3 엑셀 자료, 이후 매일 전력시장 전일실적 자료로 갱신)"),
 }
 STATUS = {}
 BUDGET = 540          # 초. 출처 하나에 쓰는 최대 시간(넘으면 받은 데까지 저장)
@@ -109,27 +107,43 @@ def note(key, rows=None, err=None):
 
 
 # ---------------------------------------------------------------- 출처별 과거자료
-def smp_rows(days):
-    out = {"smp_avg": [], "smp_max": [], "smp_min": []}
+def save_hourly(new, recent_days=3):
+    """시간대별 SMP: series/smp_hourly.json = {"days":[["YYYY-MM-DD",[1~24시]],...]}.
+    기존에 있는 날짜는 유지하고(엑셀 기준값 보존), 없는 날짜와 최근 recent_days 일만 새 값으로 넣는다."""
+    os.makedirs(SDIR, exist_ok=True)
+    name, unit, src = META["smp_hourly"]
+    old = load("smp_hourly") or {}
+    by = {d: h for d, h in old.get("days", [])}
+    keep_from = (now() - timedelta(days=recent_days)).date().isoformat()
+    for d, h in new.items():
+        if (d not in by or d >= keep_from) and isinstance(h, list) and len(h) == 24:
+            by[d] = [round(float(x), 2) for x in h]
+    cut = start_day().isoformat()
+    days = [[d, by[d]] for d in sorted(by) if d >= cut]
+    out = {"key": "smp_hourly", "name": name, "unit": unit, "source": src, "updated": now().strftime("%Y-%m-%d %H:%M"), "days": days}
+    with open(path("smp_hourly"), "w", encoding="utf-8") as f:
+        json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
+    return len(days)
+
+
+def kpx_hourly(days):
+    out = {}
     for k, d in days.items():
-        if not re.fullmatch(r"\d{8}", k):
-            continue
-        day = f"{k[:4]}-{k[4:6]}-{k[6:]}"
-        for key, f in (("smp_avg", "smp_avg"), ("smp_max", "smp_max"), ("smp_min", "smp_min")):
-            if isinstance(d, dict) and d.get(f) is not None:
-                out[key].append((day, d[f]))
+        if re.fullmatch(r"\d{8}", k) and isinstance(d, dict) and isinstance(d.get("smp_hourly"), list):
+            out[f"{k[:4]}-{k[4:6]}-{k[6:]}"] = d["smp_hourly"]
     return out
 
 
 def back_smp():
+    """복구용: 전력시장 전일실적 저장소(data.json)에서 시간대별 SMP. 이미 있는 날짜(엑셀 기준값)는 바꾸지 않는다."""
     days = json.loads(retry(lambda: get(KPX_FULL, timeout=120)).decode("utf-8")).get("days", {})
     try:
         days.update(json.loads(get(KPX_RECENT).decode("utf-8")).get("days", {}))
     except Exception as e:
-        note("smp_avg", err=f"data_recent 실패 {e}")
-    for key, rows in smp_rows(days).items():
-        save(key, rows, merge=False)
-        note(key, rows)
+        note("smp_hourly", err=f"data_recent 실패 {e}")
+    n = save_hourly(kpx_hourly(days), recent_days=0)
+    STATUS.setdefault("smp_hourly", {})["days"] = n
+    print(f">> [smp_hourly] {n}일")
 
 
 def back_fx():
@@ -362,10 +376,9 @@ def daily():
                 rows.append((it["prev_date"], it["prev_value"]))
         save(key, rows)
     try:
-        days = json.loads(get(KPX_RECENT).decode("utf-8")).get("days", {})
-        for key, rows in smp_rows(days).items():
-            if os.path.exists(path(key)):
-                save(key, rows)
+        if os.path.exists(path("smp_hourly")):
+            days = json.loads(get(KPX_RECENT).decode("utf-8")).get("days", {})
+            save_hourly(kpx_hourly(days))
     except Exception as e:
         print(f">> [series SMP] 최근값 실패 {type(e).__name__}: {e}")
     # REC 과거자료는 공공데이터포털 호출 한도 때문에 매일 조금씩(최대 30거래일) 채운다

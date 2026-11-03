@@ -81,6 +81,11 @@
   table.ind tr.clk td.nm::after { content:''; display:inline-block; width:14px; height:14px; margin-left:6px; vertical-align:-2px; opacity:.55;
     background:no-repeat center/14px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23001f3f' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 17l6-6 4 4 8-8'/%3E%3Cpath d='M15 7h6v6'/%3E%3C/svg%3E"); }
   table.ind tr.clk:hover td.nm::after { opacity:1; }
+  table.ind td.gclk { cursor:pointer; }
+  table.ind td.gclk:hover { background:#e2e8f0; }
+  table.ind td.gclk::after { content:''; display:block; width:16px; height:16px; margin:4px auto 0; opacity:.6;
+    background:no-repeat center/16px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23001f3f' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 17l6-6 4 4 8-8'/%3E%3Cpath d='M15 7h6v6'/%3E%3C/svg%3E"); }
+  table.ind td.gclk:hover::after { opacity:1; }
   .hint { margin-top:6px; font-size:12px; color:#001f3f; font-weight:700; }
   .cmodal { position:fixed; inset:0; z-index:300; background:rgba(15,23,42,.55); display:none; align-items:center; justify-content:center; padding:16px; }
   .cmodal.on { display:flex; }
@@ -99,6 +104,7 @@
   .csum b { display:block; font-size:16px; color:#0f172a; font-weight:800; margin-top:2px; }
   .csum b.up { color:#d93f3c; } .csum b.dn { color:#005587; }
   .csum i { font-style:normal; font-size:11px; color:var(--mute); }
+  .csum .sq { display:inline-block; width:10px; height:10px; margin-right:5px; vertical-align:-1px; }
   .cwrap { position:relative; height:360px; }
   .cmsg { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--mute); font-size:14px; font-weight:700; text-align:center; padding:0 20px; }
   .csrc { margin-top:8px; font-size:12px; color:var(--mute); line-height:1.6; }
@@ -142,7 +148,7 @@
     <thead><tr><th>분류</th><th>지표</th><th>가격</th><th>기준일</th><th>전일 대비</th></tr></thead>
     <tbody id="indBody"><tr><td colspan="5" class="fl">불러오는 중...</td></tr></tbody>
   </table>
-  <div class="hint">지표를 누르면 최근 3년 추이 그래프가 열립니다.</div>
+  <div class="hint">지표나 분류(환율·국제유가·SMP)를 누르면 최근 3년 추이 그래프가 열립니다.</div>
   <div class="note">출처 : 환율은 한국수출입은행 매매기준율(영업일 기준, 조회 불가 시 ECB 기준환율로 대체하며 지표명 옆에 출처 표기). JKM 및 국제유가(두바이·브렌트·WTI)는 OilPriceAPI. 배출권은 한국거래소, REC는 전력거래소이며 거래일(화·목)에만 값이 있어 기준일이 며칠 전일 수 있음. SMP는 육지 기준 하루전시장 결과로서 자정에 오늘 값으로 변경. 지표별로 기준일이 다를 수 있으며(배출권·국제유가는 거래 다음 영업일에 공표되어 공표 전에는 직전 값 표시) 휴장일에는 직전 영업일 값을 표시. 자료 갱신: <span id="indUpdated">-</span></div>
 
   <h2>에너지 뉴스<small id="newsUpd"></small></h2>
@@ -243,10 +249,12 @@
     const seen = {};
     document.getElementById('indBody').innerHTML = IND_ORDER.map(([grp, k, nm, unit]) => {
       const first = !seen[grp]; seen[grp] = true;
-      const g = first ? `<td class="grp" rowspan="${span[grp]}">${grp}</td>` : '';
+      const gc = GROUP_CHART[grp];
+      const g = first ? `<td class="grp${gc ? ' gclk' : ''}"${gc ? ` data-c="${gc}" title="${grp} 최근 3년 추이 보기"` : ''} rowspan="${span[grp]}">${grp}</td>` : '';
       const it = items[k];
       const head = `${g}<td class="nm">${nm}<small>${[unit === '원' ? '' : unit, it && it.item ? it.item : '', it && it.hr ? it.hr + '시' : ''].filter(Boolean).join(' · ')}</small></td>`;
-      const tr = `<tr class="clk" data-k="${k}" data-nm="${grp === 'SMP' ? 'SMP ' + nm : nm}" data-u="${unit}" title="최근 3년 추이 보기">`;
+      const rc = ROW_CHART[k];
+      const tr = rc ? `<tr class="clk" data-c="${rc}" title="최근 3년 추이 보기">` : '<tr>';
       if (!it) return `${tr}${head}<td colspan="3" class="fl">자료 없음</td></tr>`;
       let chg = '<span class="fl">-</span>';
       if (it.prev_value != null) {
@@ -272,6 +280,17 @@
   }
 
   // ---------------- 지표 3년 추이 팝업 ----------------
+  // 그래프 정의: 여러 지표를 한 그래프에 색을 달리해 표시. smp 는 시간대별(1~24시) 자료.
+  const CHARTS = {
+    fx:    { title: '환율', unit: '원', series: [['fx', '원/달러', '#001f3f'], ['fx_jpy', '원/100엔', '#d97706']] },
+    crude: { title: '국제유가', unit: '$/bbl', series: [['dubai', '두바이유', '#001f3f'], ['brent', '브렌트유', '#d93f3c'], ['wti', 'WTI', '#0f766e']] },
+    jkm:   { title: 'JKM', unit: 'USD/MMBtu', series: [['jkm', 'JKM', '#001f3f']] },
+    kau:   { title: '배출권', unit: '원/톤', series: [['kau', '배출권', '#001f3f']] },
+    rec:   { title: 'REC', unit: '원/REC', series: [['rec', 'REC', '#001f3f']] },
+    smp:   { title: 'SMP 시간대별(육지)', unit: '원/kWh', hourly: true, series: [['smp_hourly', 'SMP', '#001f3f']] }
+  };
+  const GROUP_CHART = { '환율': 'fx', '국제유가': 'crude', 'SMP': 'smp' };
+  const ROW_CHART = { fx: 'fx', fx_jpy: 'fx', dubai: 'crude', brent: 'crude', wti: 'crude', jkm: 'jkm', kau: 'kau', rec: 'rec' };
   const RANGES = [['1개월', 31], ['3개월', 92], ['6개월', 183], ['1년', 366], ['3년', 1100]];
   const SER = {};
   let CHART = null, CK = null, CR = 1100, chartJsP = null;
@@ -280,68 +299,97 @@
     const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js';
     sc.onload = ok; sc.onerror = () => { chartJsP = null; no(new Error('chart.js')); }; document.head.appendChild(sc);
   }));
+  const iso = ms => new Date(ms).toISOString().slice(0, 10);
   const dShort = d => `${d.slice(2, 4)}.${d.slice(5, 7)}.${d.slice(8, 10)}`;
-  function openChart(k, nm, unit) {
-    CK = k; CR = 1100;
-    document.getElementById('cTitle').innerHTML = `${esc(nm)}<small>${esc(unit)} · 최근 3년 추이</small>`;
-    document.getElementById('cRange').innerHTML = RANGES.map(([t, n]) => `<button type="button" data-n="${n}" class="${n === CR ? 'on' : ''}">${t}</button>`).join('');
+  const dLong = d => `${d.slice(0, 4)}.${d.slice(5, 7)}.${d.slice(8, 10)}(${dow(d.replace(/-/g, ''))})`;
+  const H = 3600e3;
+  // 시리즈 파일 → [{x(ms), y, d(날짜), h(시, 시간대별만), it(종목)}]
+  function toPts(j, hourly) {
+    if (hourly) { const o = []; (j.days || []).forEach(([d, hs]) => { const b = Date.parse(d); hs.forEach((v, i) => o.push({ x: b + i * H, y: v, d, h: i + 1 })); }); return o; }
+    return (j.data || []).map(r => ({ x: Date.parse(r[0]), y: r[1], d: r[0], it: r[2] }));
+  }
+  function openChart(c) {
+    const cf = CHARTS[c]; if (!cf) return;
+    CK = c; CR = 1100;
+    document.getElementById('cTitle').innerHTML = `${esc(cf.title)}<small>${esc(cf.unit)} · 최근 3년 추이</small>`;
+    const rg = cf.hourly ? [['1주', 7]].concat(RANGES) : RANGES;
+    document.getElementById('cRange').innerHTML = rg.map(([t, n]) => `<button type="button" data-n="${n}" class="${n === CR ? 'on' : ''}">${t}</button>`).join('');
     document.getElementById('cSum').innerHTML = ''; document.getElementById('cSrc').textContent = '';
     const msg = document.getElementById('cMsg'); msg.style.display = 'flex'; msg.textContent = '불러오는 중...';
     if (CHART) { CHART.destroy(); CHART = null; }
     document.getElementById('cModal').classList.add('on'); document.body.style.overflow = 'hidden';
-    Promise.all([loadChartJs(), SER[k] ? Promise.resolve(SER[k]) : getJson(`series/${k}.json`).then(j => SER[k] = j)])
-      .then(() => { if (CK === k) drawChart(); })
-      .catch(() => { if (CK === k) msg.textContent = '그래프 자료를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'; });
+    Promise.all([loadChartJs()].concat(cf.series.map(([k]) => SER[k] ? Promise.resolve(SER[k]) : getJson(`series/${k}.json`).then(j => SER[k] = j))))
+      .then(() => { if (CK === c) drawChart(); })
+      .catch(() => { if (CK === c) msg.textContent = '그래프 자료를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'; });
   }
   function closeChart() { document.getElementById('cModal').classList.remove('on'); document.body.style.overflow = ''; CK = null; if (CHART) { CHART.destroy(); CHART = null; } }
   function drawChart() {
-    const s = SER[CK], unit = s.unit, msg = document.getElementById('cMsg');
-    document.getElementById('cSrc').textContent = '출처: ' + (s.source || '-') + (s.updated ? ` · 갱신 ${s.updated}` : '');
-    const all = s.data || [];
-    const last = all.length ? all[all.length - 1][0] : null;
-    const from = last ? new Date(Date.parse(last) - CR * 864e5).toISOString().slice(0, 10) : '';
-    const rows = all.filter(r => r[0] >= from);
+    const cf = CHARTS[CK], unit = cf.unit, msg = document.getElementById('cMsg'), multi = cf.series.length > 1;
+    const srcs = [...new Set(cf.series.map(([k]) => SER[k].source).filter(Boolean))];
+    const upd = cf.series.map(([k]) => SER[k].updated).filter(Boolean).sort().pop();
+    document.getElementById('cSrc').textContent = '출처: ' + (srcs.join(' / ') || '-') + (upd ? ` · 갱신 ${upd}` : '');
+    const allPts = cf.series.map(([k]) => toPts(SER[k], cf.hourly));
+    const lastX = Math.max(...allPts.map(p => p.length ? p[p.length - 1].x : -Infinity));
+    const fromX = lastX - CR * 864e5;
+    const sets = allPts.map(p => p.filter(q => q.x > fromX));
     document.querySelectorAll('#cRange button').forEach(b => b.classList.toggle('on', +b.dataset.n === CR));
     if (CHART) { CHART.destroy(); CHART = null; }
-    if (rows.length < 2) {
+    const n = Math.max(...sets.map(p => p.length));
+    if (!isFinite(lastX) || n < 2) {
       msg.style.display = 'flex'; document.getElementById('cSum').innerHTML = '';
-      msg.textContent = all.length ? '이 기간에는 표시할 자료가 부족합니다. 기간을 넓혀 보세요.' : '아직 쌓인 자료가 없습니다.';
+      msg.textContent = isFinite(lastX) ? '이 기간에는 표시할 자료가 부족합니다. 기간을 넓혀 보세요.' : '아직 쌓인 자료가 없습니다.';
       return;
     }
     msg.style.display = 'none';
-    const vals = rows.map(r => r[1]);
-    let mx = 0, mn = 0; vals.forEach((v, i) => { if (v > vals[mx]) mx = i; if (v < vals[mn]) mn = i; });
-    const chg = (vals[vals.length - 1] - vals[0]) / vals[0] * 100, cc = chg > 0 ? 'up' : chg < 0 ? 'dn' : '';
-    const fmtD = r => `<i>${dShort(r[0])}</i>`;
-    document.getElementById('cSum').innerHTML =
-      `<div>최근값<b>${fmtI(vals[vals.length - 1], unit)}</b>${fmtD(rows[rows.length - 1])}</div>` +
-      `<div>기간 최고<b>${fmtI(vals[mx], unit)}</b>${fmtD(rows[mx])}</div>` +
-      `<div>기간 최저<b>${fmtI(vals[mn], unit)}</b>${fmtD(rows[mn])}</div>` +
-      `<div>기간 변동<b class="${cc}">${chg >= 0 ? '+' : ''}${chg.toFixed(1)}%</b><i>${dShort(rows[0][0])} 대비</i></div>`;
-    const span = Date.parse(rows[rows.length - 1][0]) - Date.parse(rows[0][0]);
-    const iso = ms => new Date(ms).toISOString().slice(0, 10);
+    const when = q => cf.hourly ? `${dShort(q.d)} ${q.h}시` : dShort(q.d);
+    const sum = document.getElementById('cSum');
+    if (multi) {
+      sum.style.gridTemplateColumns = `repeat(${cf.series.length},1fr)`;
+      sum.innerHTML = cf.series.map(([k, nm, col], i) => {
+        const p = sets[i]; if (!p.length) return `<div><span class="sq" style="background:${col}"></span>${nm}<b>-</b></div>`;
+        const a = p[0], z = p[p.length - 1], chg = (z.y - a.y) / a.y * 100, cc = chg > 0 ? 'up' : chg < 0 ? 'dn' : '';
+        return `<div><span class="sq" style="background:${col}"></span>${nm}<b>${fmtI(z.y, unit)} <span class="${cc}" style="font-size:12px">${chg >= 0 ? '+' : ''}${chg.toFixed(1)}%</span></b><i>${dShort(z.d)} · ${dShort(a.d)} 대비</i></div>`;
+      }).join('');
+    } else {
+      sum.style.gridTemplateColumns = '';
+      const p = sets[0], vals = p.map(q => q.y);
+      let mx = 0, mn = 0; vals.forEach((v, i) => { if (v > vals[mx]) mx = i; if (v < vals[mn]) mn = i; });
+      const z = p[p.length - 1];
+      const last4 = cf.hourly
+        ? `<div>기간 평균<b>${fmtI(vals.reduce((a, v) => a + v, 0) / vals.length, unit)}</b><i>${dShort(p[0].d)} ~ ${dShort(z.d)}</i></div>`
+        : (() => { const chg = (z.y - p[0].y) / p[0].y * 100, cc = chg > 0 ? 'up' : chg < 0 ? 'dn' : ''; return `<div>기간 변동<b class="${cc}">${chg >= 0 ? '+' : ''}${chg.toFixed(1)}%</b><i>${dShort(p[0].d)} 대비</i></div>`; })();
+      sum.innerHTML =
+        `<div>최근값<b>${fmtI(z.y, unit)}</b><i>${when(z)}</i></div>` +
+        `<div>기간 최고<b>${fmtI(vals[mx], unit)}</b><i>${when(p[mx])}</i></div>` +
+        `<div>기간 최저<b>${fmtI(vals[mn], unit)}</b><i>${when(p[mn])}</i></div>` + last4;
+    }
+    const x0 = Math.min(...sets.map(p => p.length ? p[0].x : Infinity));
+    const span = lastX - x0;
     const tick = ms => { const d = iso(ms); return span > 400 * 864e5 ? `${d.slice(2, 4)}.${d.slice(5, 7)}` : `${+d.slice(5, 7)}.${+d.slice(8, 10)}`; };
-    // 가로축은 실제 날짜 간격. 자료가 10일 넘게 빈 구간은 선을 끊어 이어진 것처럼 보이지 않게 한다.
-    const pts = [];
-    rows.forEach((r, i) => {
-      const x = Date.parse(r[0]);
-      if (i && x - Date.parse(rows[i - 1][0]) > 10 * 864e5) pts.push({ x: x - 864e5, y: null });
-      pts.push({ x, y: r[1], r });
-    });
+    const dense = n > 60;
+    const maps = sets.map(p => new Map(p.map(q => [q.d, q.y])));
     CHART = new Chart(document.getElementById('cCanvas'), {
       type: 'line',
-      data: { datasets: [{ data: pts, borderColor: '#001f3f', backgroundColor: 'rgba(0,31,63,.07)', fill: true,
-        borderWidth: 1.8, pointRadius: rows.length > 60 ? 0 : 2, pointHoverRadius: 4, tension: 0, spanGaps: false }] },
+      data: { datasets: cf.series.map(([k, nm, col], i) => ({
+        label: nm, data: sets[i], borderColor: col, backgroundColor: multi ? col : 'rgba(0,31,63,.07)', fill: !multi,
+        borderWidth: cf.hourly && n > 2000 ? 1 : 1.8, pointRadius: dense ? 0 : 2, pointHoverRadius: 4, pointHitRadius: 6, tension: 0,
+        spanGaps: (cf.hourly ? 2 : 10) * 864e5 })) },     // 자료가 10일(시간대별은 2일) 넘게 빈 구간은 선을 끊는다
       options: {
-        responsive: true, maintainAspectRatio: false, animation: false, parsing: false,
+        responsive: true, maintainAspectRatio: false, animation: false, parsing: false, normalized: true,
         interaction: { mode: 'nearest', axis: 'x', intersect: false },
-        plugins: { legend: { display: false },
-          tooltip: { displayColors: false, backgroundColor: '#0f172a', titleFont: { weight: '700' },
-            filter: it => it.raw && it.raw.y != null,
-            callbacks: { title: it => { const d = iso(it[0].raw.x); return `${d.slice(0, 4)}.${d.slice(5, 7)}.${d.slice(8, 10)}(${dow(d.replace(/-/g, ''))})`; },
-              label: it => { const r = it.raw.r; return `${fmtI(r[1], unit)} ${unit}${r[2] ? ' · ' + r[2] : ''}`; } } } },
+        plugins: {
+          decimation: { enabled: !!cf.hourly, algorithm: 'lttb', samples: 1600, threshold: 2000 },
+          legend: { display: multi, position: 'top', align: 'start', labels: { boxWidth: 12, boxHeight: 12, color: '#334155', font: { size: 12, weight: '700' } } },
+          // 가장 가까운 날짜 하나를 잡고, 여러 지표면 같은 날짜의 값을 지표별로 함께 보여준다
+          tooltip: { backgroundColor: '#0f172a', titleFont: { weight: '700' }, displayColors: false,
+            filter: (it, i) => !multi || i === 0,
+            callbacks: {
+              title: it => { const q = it[0].raw; return dLong(q.d) + (q.h ? ` ${q.h}시` : ''); },
+              label: it => { const q = it.raw;
+                if (!multi) return `${fmtI(q.y, unit)} ${unit}${q.it ? ' · ' + q.it : ''}`;
+                return cf.series.map(([k, nm], i) => { const v = maps[i].get(q.d); return `${nm}  ${v == null ? '-' : fmtI(v, unit)}`; }); } } } },
         scales: {
-          x: { type: 'linear', min: pts[0].x, max: pts[pts.length - 1].x, grid: { display: false },
+          x: { type: 'linear', min: x0, max: lastX, grid: { display: false },
             ticks: { maxTicksLimit: 8, maxRotation: 0, color: '#64748b', font: { size: 11 }, callback: v => tick(v) } },
           y: { grid: { color: '#eef2f6' }, ticks: { color: '#64748b', font: { size: 11 }, callback: v => Number(v).toLocaleString('ko-KR', { maximumFractionDigits: 2 }) } }
         }
@@ -349,7 +397,7 @@
     });
   }
   document.getElementById('indBody').addEventListener('click', e => {
-    const tr = e.target.closest('tr.clk'); if (tr) openChart(tr.dataset.k, tr.dataset.nm, tr.dataset.u);
+    const el = e.target.closest('[data-c]'); if (el) openChart(el.dataset.c);
   });
   document.getElementById('cRange').addEventListener('click', e => { const b = e.target.closest('button'); if (b && CK) { CR = +b.dataset.n; drawChart(); } });
   document.getElementById('cClose').addEventListener('click', closeChart);
