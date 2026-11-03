@@ -339,6 +339,24 @@ def back_rec(limit=None, stop_on_429=False):
     save("rec", rows, merge=True); note("rec", rows)
 
 
+def _prev_wd(d):
+    x = date.fromisoformat(d) - timedelta(days=1)
+    while x.weekday() >= 5:
+        x -= timedelta(days=1)
+    return x.isoformat()
+
+
+def jkm_csv(fn):
+    """Investing.com 'LNG Japan Korea Marker PLATTS Future 과거 데이터' CSV → [(날짜, 종가)]"""
+    rows = []
+    for r in list(csv.reader(open(fn, encoding="utf-8-sig")))[1:]:
+        d = re.sub(r"\s", "", r[0])
+        m = re.fullmatch(r"(\d{4})\D(\d{1,2})\D(\d{1,2})\D?", d)
+        if m:
+            rows.append((f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}", float(r[1].replace(",", ""))))
+    return rows
+
+
 def collected(key):
     """사이트가 매일 모아 둔 history/ind_*.json 에서 해당 지표의 (날짜, 값) — 같은 날짜는 마지막 파일 값."""
     by = {}
@@ -349,6 +367,10 @@ def collected(key):
             it = json.load(open(os.path.join(HERE, "history", fn), encoding="utf-8")).get("items", {}).get(key)
         except Exception:
             continue
+        if it and key == "jkm" and it.get("date") and it.get("basis") != "trade":
+            # 2026.11.3 이전 수집분은 OilPriceAPI 기록일(거래 다음 영업일)로 저장됨 → 직전 평일로 바로잡는다
+            sh = lambda d: _prev_wd(d) if d else d
+            it = dict(it, date=sh(it["date"]), prev_date=sh(it.get("prev_date")))
         if it and it.get("date") and it.get("value") is not None:
             by[it["date"]] = (it["date"], it["value"]) + ((it["item"],) if key == "kau" and it.get("item") else ())
             if it.get("prev_date") and it.get("prev_value") is not None and it["prev_date"] not in by:
@@ -405,8 +427,17 @@ def write_status():
 
 
 def back_jkm():
-    rows = collected("jkm")          # 무료 과거자료가 없어 사이트 수집분만
-    save("jkm", rows, merge=True); note("jkm", rows)
+    """JKM: 무료 과거자료가 없어 data/jkm_*.csv(Investing.com 내려받기)와 사이트 수집분을 합친다. 같은 날짜는 CSV 우선."""
+    by = {}
+    for d, v, *_ in collected("jkm"):
+        by[d] = v
+    ddir = os.path.join(HERE, "data")
+    for fn in sorted(os.listdir(ddir)) if os.path.isdir(ddir) else []:
+        if fn.startswith("jkm") and fn.endswith(".csv"):
+            for d, v in jkm_csv(os.path.join(ddir, fn)):
+                by[d] = v
+    rows = sorted(by.items())
+    save("jkm", rows, merge=False); note("jkm", rows)
 
 
 SOURCES = {"smp": back_smp, "fx": back_fx, "crude": back_crude, "kau": back_kau, "rec": back_rec, "jkm": back_jkm}

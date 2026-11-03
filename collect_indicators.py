@@ -81,9 +81,10 @@ def fetch_jkm(prev=None):
         price = float(d["price"])
     except (KeyError, TypeError, ValueError):
         raise ValueError(f"JKM 최신값 없음 ({why}) - 응답 {str(j)[:150]}")
-    day = ts[:10]
-    if len(day) != 10:
+    if len(ts[:10]) != 10:
         raise ValueError(f"JKM 최신값 날짜 없음 - 응답 {str(j)[:150]}")
+    # OilPriceAPI 기록 시각은 거래 다음 영업일로 찍힌다(Investing.com JKM 선물 종가와 대조 확인) → 직전 평일을 거래일로 본다
+    day = _prev_weekday(datetime.strptime(ts[:10], "%Y-%m-%d").date()).isoformat()
     prev = prev or {}
     if prev.get("date") and prev["date"] < day:          # 새 날짜면 직전 저장값이 전일 값
         pd_, pv = prev["date"], prev.get("value")
@@ -94,7 +95,7 @@ def fetch_jkm(prev=None):
     if pd_ and (datetime.strptime(day, "%Y-%m-%d") - datetime.strptime(pd_, "%Y-%m-%d")).days > 7:
         pd_, pv = None, None                              # 7일 넘게 떨어진 값은 전일 비교에 쓰지 않음
     print(f">> [JKM] 과거조회 불가({why}) → 최신값 사용")
-    return {"jkm": {"name": "JKM LNG", "unit": "USD/MMBtu", "date": day, "value": price, "prev_date": pd_, "prev_value": pv}}
+    return {"jkm": {"name": "JKM LNG", "unit": "USD/MMBtu", "date": day, "value": price, "prev_date": pd_, "prev_value": pv, "basis": "trade"}}
 
 
 # 두바이·브렌트·WTI: JKM 과 같은 OilPriceAPI 에서 가져옴(빠름). 코드는 후보를 차례로 시도
