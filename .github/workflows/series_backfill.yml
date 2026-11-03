@@ -1,23 +1,59 @@
 name: Series Backfill
 # 주요 시장지표 3년 시계열(series/)을 출처에서 새로 받아 만든다. 최초 1회 또는 복구가 필요할 때 수동 실행.
+# 출처마다 따로 실행하고(각 최대 12분), 일부가 실패해도 받은 결과는 저장한다. 결과 요약: series/_status.json
 on:
   workflow_dispatch:
+    inputs:
+      only:
+        description: '특정 출처만(공백 구분: smp fx crude kau rec jkm). 비우면 전체'
+        required: false
+        default: ''
 permissions:
   contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 80
+    env:
+      DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
+      ONLY: ${{ inputs.only }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: 3년 시계열 구축
-        env:
-          DATA_GO_KR_KEY: ${{ secrets.DATA_GO_KR_KEY }}
-        run: python build_series.py --backfill
+      - name: SMP
+        if: ${{ env.ONLY == '' || contains(env.ONLY, 'smp') }}
+        continue-on-error: true
+        timeout-minutes: 12
+        run: python build_series.py --backfill smp
+      - name: 환율
+        if: ${{ env.ONLY == '' || contains(env.ONLY, 'fx') }}
+        continue-on-error: true
+        timeout-minutes: 12
+        run: python build_series.py --backfill fx
+      - name: 국제유가
+        if: ${{ env.ONLY == '' || contains(env.ONLY, 'crude') }}
+        continue-on-error: true
+        timeout-minutes: 12
+        run: python build_series.py --backfill crude
+      - name: 배출권
+        if: ${{ env.ONLY == '' || contains(env.ONLY, 'kau') }}
+        continue-on-error: true
+        timeout-minutes: 12
+        run: python build_series.py --backfill kau
+      - name: REC
+        if: ${{ env.ONLY == '' || contains(env.ONLY, 'rec') }}
+        continue-on-error: true
+        timeout-minutes: 12
+        run: python build_series.py --backfill rec
+      - name: JKM
+        if: ${{ env.ONLY == '' || contains(env.ONLY, 'jkm') }}
+        continue-on-error: true
+        timeout-minutes: 12
+        run: python build_series.py --backfill jkm
       - name: 변경 저장
+        if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

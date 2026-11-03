@@ -33,6 +33,12 @@ META = {
     "smp_min": ("SMP 최저", "원/kWh", "전력거래소(육지)"),
 }
 STATUS = {}
+BUDGET = 540          # 초. 출처 하나에 쓰는 최대 시간(넘으면 받은 데까지 저장)
+DEADLINE = [None]
+
+
+def over():
+    return DEADLINE[0] is not None and time.time() > DEADLINE[0]
 
 
 def now():
@@ -43,7 +49,7 @@ def start_day():
     return (now() - timedelta(days=365 * YEARS + 7)).date()
 
 
-def retry(fn, tries=3, wait=4):
+def retry(fn, tries=2, wait=3):
     last = None
     for i in range(tries):
         try:
@@ -54,7 +60,7 @@ def retry(fn, tries=3, wait=4):
     raise last
 
 
-def get(url, headers=None, timeout=60):
+def get(url, headers=None, timeout=30):
     return urllib.request.urlopen(urllib.request.Request(url, headers=headers or UA), timeout=timeout).read()
 
 
@@ -131,7 +137,7 @@ def back_fx():
     s, e = start_day(), now().date()
     usd, jpy = [], []
     cur = s
-    while cur <= e:
+    while cur <= e and not over():
         nxt = min(cur + timedelta(days=364), e)
         q = urllib.parse.urlencode({"base": "USD", "symbols": "KRW,JPY"})
         j, last = None, None
@@ -199,7 +205,7 @@ def back_crude():
         return raw.decode("utf-8", "ignore")
 
     rows, cur, e = [], start_day(), now().date()
-    while cur <= e:
+    while cur <= e and not over():
         nxt = min(cur + timedelta(days=180), e)
         try:
             txt = retry(lambda: post(cur.strftime("%Y%m%d"), nxt.strftime("%Y%m%d")))
@@ -218,7 +224,7 @@ def back_crude():
 
 
 def datago_items(url, q):
-    j = json.loads(retry(lambda: get(url + "?" + urllib.parse.urlencode(q), timeout=90)).decode("utf-8"))
+    j = json.loads(retry(lambda: get(url + "?" + urllib.parse.urlencode(q), timeout=40)).decode("utf-8"))
     root = j.get("response", j)
     body = root.get("body", {}) if isinstance(root, dict) else {}
     items = body.get("items", {}) if isinstance(body, dict) else {}
@@ -237,7 +243,7 @@ def back_kau():
     url = "https://apis.data.go.kr/1160100/service/GetGeneralProductInfoService_V2/getCertifiedEmissionReductionPriceInfo_V2"
     alt = "https://apis.data.go.kr/1160100/GetGeneralProductInfoService_V2/getCertifiedEmissionReductionPriceInfo_V2"
     allrows, page = [], 1
-    while page < 60:
+    while page < 60 and not over():
         q = {"serviceKey": DATA_KEY, "pageNo": page, "numOfRows": 1000, "resultType": "json",
              "beginBasDt": start_day().strftime("%Y%m%d"), "likeItmsNm": "KAU"}
         try:
@@ -270,28 +276,42 @@ def back_kau():
 
 
 def back_rec():
-    """REC 현물시장: 화·목(거래일)마다 날짜를 지정해 조회. 육지 평균가(landAvgPrc)."""
+    """REC 현물시장: 화·목(거래일)마다 날짜를 지정해 조회(동시 6건). 육지 평균가(landAvgPrc)."""
     if not DATA_KEY:
         note("rec", err="DATA_GO_KR_KEY 없음"); return
+    import concurrent.futures as cf
     url = "https://apis.data.go.kr/B552115/RecMarketInfo2/getRecMarketInfo2"
-    rows, d, e, sample, fails = [], start_day(), now().date(), None, 0
+    days, d, e = [], start_day(), now().date()
     while d <= e:
         if d.weekday() in (1, 3):
-            q = {"serviceKey": DATA_KEY, "pageNo": 1, "numOfRows": 5, "dataType": "json", "bzDd": d.strftime("%Y%m%d")}
-            try:
-                items, _, _ = datago_items(url, q)
-                it = next((x for x in items if x.get("landAvgPrc") not in (None, "")), None)
-                if it:
-                    sample = sample or it
-                    rows.append((d.isoformat(), float(str(it["landAvgPrc"]).replace(",", ""))))
-            except Exception as ex:
-                fails += 1
-                if fails <= 3:
-                    note("rec", err=f"{d} {type(ex).__name__} {ex}")
-            time.sleep(0.15)
+            days.append(d)
         d += timedelta(days=1)
-    STATUS.setdefault("rec", {})["sample_fields"] = sorted(sample.keys()) if sample else None
-    STATUS["rec"]["fails"] = fails
+    res = {"sample": None, "fails": 0, "errs": []}
+
+    def one(d):
+        if over():
+            return None
+        q = {"serviceKey": DATA_KEY, "pageNo": 1, "numOfRows": 5, "dataType": "json", "bzDd": d.strftime("%Y%m%d")}
+        try:
+            items, _, _ = datago_items(url, q)
+            it = next((x for x in items if x.get("landAvgPrc") not in (None, "")), None)
+            if it:
+                res["sample"] = res["sample"] or it
+                return (d.isoformat(), float(str(it["landAvgPrc"]).replace(",", "")))
+        except Exception as ex:
+            res["fails"] += 1
+            if len(res["errs"]) < 3:
+                res["errs"].append(f"{d} {type(ex).__name__} {ex}")
+        return None
+
+    with cf.ThreadPoolExecutor(max_workers=6) as ex:
+        rows = [r for r in ex.map(one, days) if r]
+    for m in res["errs"]:
+        note("rec", err=m)
+    STATUS.setdefault("rec", {})["sample_fields"] = sorted(res["sample"].keys()) if res["sample"] else None
+    STATUS["rec"]["fails"] = res["fails"]; STATUS["rec"]["asked"] = len(days)
+    if over():
+        note("rec", err="시간 초과 - 받은 데까지 저장")
     rows += collected("rec")
     save("rec", rows, merge=False); note("rec", rows)
 
@@ -342,22 +362,42 @@ def daily():
     print(">> series 갱신 완료")
 
 
-def backfill():
-    for fn in (back_smp, back_fx, back_crude, back_kau, back_rec):
-        try:
-            fn()
-        except Exception as e:
-            note(fn.__name__.replace("back_", ""), err=f"{type(e).__name__}: {e}")
-    # JKM: 무료 과거자료가 없어 사이트 수집분만
-    rows = collected("jkm")
-    save("jkm", rows, merge=True); note("jkm", rows)
+def write_status():
     os.makedirs(SDIR, exist_ok=True)
-    with open(os.path.join(SDIR, "_status.json"), "w", encoding="utf-8") as f:
-        json.dump({"built": now().strftime("%Y-%m-%d %H:%M"), "status": STATUS}, f, ensure_ascii=False, indent=1)
+    p = os.path.join(SDIR, "_status.json")
+    try:
+        old = json.load(open(p, encoding="utf-8")).get("status", {})
+    except Exception:
+        old = {}
+    old.update(STATUS)
+    with open(p, "w", encoding="utf-8") as f:
+        json.dump({"built": now().strftime("%Y-%m-%d %H:%M"), "status": old}, f, ensure_ascii=False, indent=1)
+
+
+def back_jkm():
+    rows = collected("jkm")          # 무료 과거자료가 없어 사이트 수집분만
+    save("jkm", rows, merge=True); note("jkm", rows)
+
+
+SOURCES = {"smp": back_smp, "fx": back_fx, "crude": back_crude, "kau": back_kau, "rec": back_rec, "jkm": back_jkm}
+
+
+def backfill(only=None):
+    for name in (only or list(SOURCES)):
+        t0 = time.time()
+        DEADLINE[0] = t0 + BUDGET
+        STATUS.setdefault(name, {})
+        try:
+            SOURCES[name]()
+        except Exception as e:
+            note(name, err=f"{type(e).__name__}: {e}")
+        STATUS[name]["sec"] = int(time.time() - t0)
+        write_status()        # 출처마다 바로 기록(중간에 끊겨도 앞의 결과는 남게)
 
 
 if __name__ == "__main__":
     if "--backfill" in sys.argv:
-        backfill()
+        only = [a for a in sys.argv[1:] if not a.startswith("--")]
+        backfill(only or None)
     else:
         daily()
