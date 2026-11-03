@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-03 12:02",
+ "updated": "2026-11-03 16:10",
  "items": {
   "jkm": {
    "name": "JKM LNG",
@@ -71,5 +71,7 @@
    "prev_value": 848.21
   }
  },
- "errors": {}
+ "errors": {
+  "REC": "HTTPError: HTTP Error 429: Too Many Requests"
+ }
 }
