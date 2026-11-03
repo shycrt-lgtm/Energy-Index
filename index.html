@@ -290,7 +290,7 @@
     smp:   { title: 'SMP 시간대별(육지)', unit: '원/kWh', hourly: true, series: [['smp_hourly', 'SMP', '#001f3f']] }
   };
   const GROUP_CHART = { '환율': 'fx', '국제유가': 'crude', 'SMP': 'smp' };
-  const ROW_CHART = { fx: 'fx', fx_jpy: 'fx', dubai: 'crude', brent: 'crude', wti: 'crude', jkm: 'jkm', kau: 'kau', rec: 'rec' };
+  const ROW_CHART = { jkm: 'jkm', kau: 'kau', rec: 'rec' };   // 환율·국제유가·SMP는 분류 칸에서 연다
   const RANGES = [['1개월', 31], ['3개월', 92], ['6개월', 183], ['1년', 366], ['3년', 1100]];
   const SER = {};
   let CHART = null, CK = null, CR = 1100, chartJsP = null;
