@@ -75,6 +75,34 @@
   table.ind td.v { font-weight:800; font-size:16px; }
   .up { color:#d93f3c; font-weight:700; } .dn { color:#005587; font-weight:700; } .fl { color:var(--mute); }
   .foot { margin-top:36px; font-size:12px; color:#94a3b8; }
+  /* 지표 3년 추이 팝업 */
+  table.ind tr.clk { cursor:pointer; }
+  table.ind tr.clk:hover td:not(.grp) { background:#f1f5f9; }
+  table.ind tr.clk td.nm::after { content:''; display:inline-block; width:14px; height:14px; margin-left:6px; vertical-align:-2px; opacity:.55;
+    background:no-repeat center/14px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23001f3f' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 17l6-6 4 4 8-8'/%3E%3Cpath d='M15 7h6v6'/%3E%3C/svg%3E"); }
+  table.ind tr.clk:hover td.nm::after { opacity:1; }
+  .hint { margin-top:6px; font-size:12px; color:#001f3f; font-weight:700; }
+  .cmodal { position:fixed; inset:0; z-index:300; background:rgba(15,23,42,.55); display:none; align-items:center; justify-content:center; padding:16px; }
+  .cmodal.on { display:flex; }
+  .cbox { background:#fff; width:100%; max-width:920px; max-height:calc(100vh - 32px); overflow:auto; border-radius:2px; box-shadow:0 20px 40px rgba(0,0,0,.25); }
+  .chead { display:flex; align-items:center; justify-content:space-between; gap:12px; background:#001f3f; color:#fff; padding:12px 16px; }
+  .chead h3 { margin:0; font-size:17px; font-weight:800; }
+  .chead h3 small { font-size:12px; font-weight:500; color:#b6c2d1; margin-left:6px; }
+  .chead button { background:transparent; border:0; color:#fff; font-size:22px; line-height:1; cursor:pointer; padding:2px 6px; }
+  .cbody { padding:14px 16px 16px; }
+  .crange { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+  .crange button { border:1px solid #cbd5e1; background:#fff; color:#334155; font:inherit; font-size:13px; font-weight:700; padding:5px 12px; cursor:pointer; border-radius:2px; }
+  .crange button.on { background:#001f3f; border-color:#001f3f; color:#fff; }
+  .csum { display:grid; grid-template-columns:repeat(4,1fr); border:1px solid var(--line); margin-bottom:12px; }
+  .csum div { padding:8px 10px; border-right:1px solid var(--line); font-size:12px; color:var(--mute); }
+  .csum div:last-child { border-right:0; }
+  .csum b { display:block; font-size:16px; color:#0f172a; font-weight:800; margin-top:2px; }
+  .csum b.up { color:#d93f3c; } .csum b.dn { color:#005587; }
+  .csum i { font-style:normal; font-size:11px; color:var(--mute); }
+  .cwrap { position:relative; height:360px; }
+  .cmsg { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--mute); font-size:14px; font-weight:700; text-align:center; padding:0 20px; }
+  .csrc { margin-top:8px; font-size:12px; color:var(--mute); line-height:1.6; }
+  @media (max-width:640px){ .cmodal{padding:8px} .csum{grid-template-columns:repeat(2,1fr)} .csum div:nth-child(2){border-right:0} .csum div:nth-child(-n+2){border-bottom:1px solid var(--line)} .cwrap{height:280px} .chead h3{font-size:15px} }
   @media (max-width:640px){ table.ind th, table.ind td { padding:8px 6px; font-size:12px; } table.ind td.v { font-size:14px; } table.ind td.nm small { display:block; margin:0; } .wrap{padding-top:20px}
     .mb{display:inline} .menu a{text-align:center;line-height:1.25;gap:4px;height:48px!important;padding:0 6px!important} .menu a span{display:none} .site-header h1{font-size:22px} .menu{width:100%} .menu a{flex:1;width:auto;height:40px;padding:0 12px;font-size:13px} }
 </style>
@@ -114,6 +142,7 @@
     <thead><tr><th>분류</th><th>지표</th><th>가격</th><th>기준일</th><th>전일 대비</th></tr></thead>
     <tbody id="indBody"><tr><td colspan="5" class="fl">불러오는 중...</td></tr></tbody>
   </table>
+  <div class="hint">지표를 누르면 최근 3년 추이 그래프가 열립니다.</div>
   <div class="note">출처 : 환율은 한국수출입은행 매매기준율(영업일 기준, 조회 불가 시 ECB 기준환율로 대체하며 지표명 옆에 출처 표기). JKM 및 국제유가(두바이·브렌트·WTI)는 OilPriceAPI. 배출권은 한국거래소, REC는 전력거래소이며 거래일(화·목)에만 값이 있어 기준일이 며칠 전일 수 있음. SMP는 육지 기준 하루전시장 결과로서 자정에 오늘 값으로 변경. 지표별로 기준일이 다를 수 있으며(배출권·국제유가는 거래 다음 영업일에 공표되어 공표 전에는 직전 값 표시) 휴장일에는 직전 영업일 값을 표시. 자료 갱신: <span id="indUpdated">-</span></div>
 
   <h2>에너지 뉴스<small id="newsUpd"></small></h2>
@@ -121,6 +150,18 @@
   <div class="note">구글 뉴스에서 에너지 관련 키워드로 모은 최근 기사이며, 같은 내용의 기사는 하나로 합쳐 보여줍니다. 제목을 누르면 원문으로 이동합니다.</div>
 
   <div class="foot">출처: 한국전력거래소, 한국가스공사, 공공데이터포털</div>
+</div>
+
+<div class="cmodal" id="cModal" role="dialog" aria-modal="true" aria-labelledby="cTitle">
+  <div class="cbox">
+    <div class="chead"><h3 id="cTitle">-</h3><button type="button" id="cClose" aria-label="닫기">✕</button></div>
+    <div class="cbody">
+      <div class="crange" id="cRange"></div>
+      <div class="csum" id="cSum"></div>
+      <div class="cwrap"><canvas id="cCanvas"></canvas><div class="cmsg" id="cMsg">불러오는 중...</div></div>
+      <div class="csrc" id="cSrc"></div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -205,14 +246,15 @@
       const g = first ? `<td class="grp" rowspan="${span[grp]}">${grp}</td>` : '';
       const it = items[k];
       const head = `${g}<td class="nm">${nm}<small>${[unit === '원' ? '' : unit, it && it.item ? it.item : '', it && it.hr ? it.hr + '시' : ''].filter(Boolean).join(' · ')}</small></td>`;
-      if (!it) return `<tr>${head}<td colspan="3" class="fl">자료 없음</td></tr>`;
+      const tr = `<tr class="clk" data-k="${k}" data-nm="${grp === 'SMP' ? 'SMP ' + nm : nm}" data-u="${unit}" title="최근 3년 추이 보기">`;
+      if (!it) return `${tr}${head}<td colspan="3" class="fl">자료 없음</td></tr>`;
       let chg = '<span class="fl">-</span>';
       if (it.prev_value != null) {
         const d = it.value - it.prev_value, p = d / it.prev_value * 100, c = d > 0 ? 'up' : d < 0 ? 'dn' : 'fl', ar = d > 0 ? '▲' : d < 0 ? '▼' : '-';
         chg = `<span class="${c}">${ar} ${fmtI(Math.abs(d), unit)} (${p >= 0 ? '+' : ''}${p.toFixed(1)}%)</span>`;
       }
       const dd = it.date ? it.date.replace(/-/g, '') : '';
-      return `<tr>${head}<td class="v">${fmtI(it.value, unit)}</td><td>${dd ? fmtShort(dd) : '-'}</td><td>${chg}</td></tr>`;
+      return `${tr}${head}<td class="v">${fmtI(it.value, unit)}</td><td>${dd ? fmtShort(dd) : '-'}</td><td>${chg}</td></tr>`;
     }).join('');
   }
   async function loadNews(key) {
@@ -228,6 +270,91 @@
       return `<li><a href="${esc(x.link)}" target="_blank" rel="noopener noreferrer">${esc(x.title)}</a><span class="meta">${esc(x.source || '')}${t ? ' · ' + t : ''}${more}</span></li>`;
     }).join('');
   }
+
+  // ---------------- 지표 3년 추이 팝업 ----------------
+  const RANGES = [['1개월', 31], ['3개월', 92], ['6개월', 183], ['1년', 366], ['3년', 1100]];
+  const SER = {};
+  let CHART = null, CK = null, CR = 1100, chartJsP = null;
+  const loadChartJs = () => chartJsP || (chartJsP = new Promise((ok, no) => {
+    if (window.Chart) return ok();
+    const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js';
+    sc.onload = ok; sc.onerror = () => { chartJsP = null; no(new Error('chart.js')); }; document.head.appendChild(sc);
+  }));
+  const dShort = d => `${d.slice(2, 4)}.${d.slice(5, 7)}.${d.slice(8, 10)}`;
+  function openChart(k, nm, unit) {
+    CK = k; CR = 1100;
+    document.getElementById('cTitle').innerHTML = `${esc(nm)}<small>${esc(unit)} · 최근 3년 추이</small>`;
+    document.getElementById('cRange').innerHTML = RANGES.map(([t, n]) => `<button type="button" data-n="${n}" class="${n === CR ? 'on' : ''}">${t}</button>`).join('');
+    document.getElementById('cSum').innerHTML = ''; document.getElementById('cSrc').textContent = '';
+    const msg = document.getElementById('cMsg'); msg.style.display = 'flex'; msg.textContent = '불러오는 중...';
+    if (CHART) { CHART.destroy(); CHART = null; }
+    document.getElementById('cModal').classList.add('on'); document.body.style.overflow = 'hidden';
+    Promise.all([loadChartJs(), SER[k] ? Promise.resolve(SER[k]) : getJson(`series/${k}.json`).then(j => SER[k] = j)])
+      .then(() => { if (CK === k) drawChart(); })
+      .catch(() => { if (CK === k) msg.textContent = '그래프 자료를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.'; });
+  }
+  function closeChart() { document.getElementById('cModal').classList.remove('on'); document.body.style.overflow = ''; CK = null; if (CHART) { CHART.destroy(); CHART = null; } }
+  function drawChart() {
+    const s = SER[CK], unit = s.unit, msg = document.getElementById('cMsg');
+    document.getElementById('cSrc').textContent = '출처: ' + (s.source || '-') + (s.updated ? ` · 갱신 ${s.updated}` : '');
+    const all = s.data || [];
+    const last = all.length ? all[all.length - 1][0] : null;
+    const from = last ? new Date(Date.parse(last) - CR * 864e5).toISOString().slice(0, 10) : '';
+    const rows = all.filter(r => r[0] >= from);
+    document.querySelectorAll('#cRange button').forEach(b => b.classList.toggle('on', +b.dataset.n === CR));
+    if (CHART) { CHART.destroy(); CHART = null; }
+    if (rows.length < 2) {
+      msg.style.display = 'flex'; document.getElementById('cSum').innerHTML = '';
+      msg.textContent = all.length ? '이 기간에는 표시할 자료가 부족합니다. 기간을 넓혀 보세요.' : '아직 쌓인 자료가 없습니다.';
+      return;
+    }
+    msg.style.display = 'none';
+    const vals = rows.map(r => r[1]);
+    let mx = 0, mn = 0; vals.forEach((v, i) => { if (v > vals[mx]) mx = i; if (v < vals[mn]) mn = i; });
+    const chg = (vals[vals.length - 1] - vals[0]) / vals[0] * 100, cc = chg > 0 ? 'up' : chg < 0 ? 'dn' : '';
+    const fmtD = r => `<i>${dShort(r[0])}</i>`;
+    document.getElementById('cSum').innerHTML =
+      `<div>최근값<b>${fmtI(vals[vals.length - 1], unit)}</b>${fmtD(rows[rows.length - 1])}</div>` +
+      `<div>기간 최고<b>${fmtI(vals[mx], unit)}</b>${fmtD(rows[mx])}</div>` +
+      `<div>기간 최저<b>${fmtI(vals[mn], unit)}</b>${fmtD(rows[mn])}</div>` +
+      `<div>기간 변동<b class="${cc}">${chg >= 0 ? '+' : ''}${chg.toFixed(1)}%</b><i>${dShort(rows[0][0])} 대비</i></div>`;
+    const span = Date.parse(rows[rows.length - 1][0]) - Date.parse(rows[0][0]);
+    const iso = ms => new Date(ms).toISOString().slice(0, 10);
+    const tick = ms => { const d = iso(ms); return span > 400 * 864e5 ? `${d.slice(2, 4)}.${d.slice(5, 7)}` : `${+d.slice(5, 7)}.${+d.slice(8, 10)}`; };
+    // 가로축은 실제 날짜 간격. 자료가 10일 넘게 빈 구간은 선을 끊어 이어진 것처럼 보이지 않게 한다.
+    const pts = [];
+    rows.forEach((r, i) => {
+      const x = Date.parse(r[0]);
+      if (i && x - Date.parse(rows[i - 1][0]) > 10 * 864e5) pts.push({ x: x - 864e5, y: null });
+      pts.push({ x, y: r[1], r });
+    });
+    CHART = new Chart(document.getElementById('cCanvas'), {
+      type: 'line',
+      data: { datasets: [{ data: pts, borderColor: '#001f3f', backgroundColor: 'rgba(0,31,63,.07)', fill: true,
+        borderWidth: 1.8, pointRadius: rows.length > 60 ? 0 : 2, pointHoverRadius: 4, tension: 0, spanGaps: false }] },
+      options: {
+        responsive: true, maintainAspectRatio: false, animation: false, parsing: false,
+        interaction: { mode: 'nearest', axis: 'x', intersect: false },
+        plugins: { legend: { display: false },
+          tooltip: { displayColors: false, backgroundColor: '#0f172a', titleFont: { weight: '700' },
+            filter: it => it.raw && it.raw.y != null,
+            callbacks: { title: it => { const d = iso(it[0].raw.x); return `${d.slice(0, 4)}.${d.slice(5, 7)}.${d.slice(8, 10)}(${dow(d.replace(/-/g, ''))})`; },
+              label: it => { const r = it.raw.r; return `${fmtI(r[1], unit)} ${unit}${r[2] ? ' · ' + r[2] : ''}`; } } } },
+        scales: {
+          x: { type: 'linear', min: pts[0].x, max: pts[pts.length - 1].x, grid: { display: false },
+            ticks: { maxTicksLimit: 8, maxRotation: 0, color: '#64748b', font: { size: 11 }, callback: v => tick(v) } },
+          y: { grid: { color: '#eef2f6' }, ticks: { color: '#64748b', font: { size: 11 }, callback: v => Number(v).toLocaleString('ko-KR', { maximumFractionDigits: 2 }) } }
+        }
+      }
+    });
+  }
+  document.getElementById('indBody').addEventListener('click', e => {
+    const tr = e.target.closest('tr.clk'); if (tr) openChart(tr.dataset.k, tr.dataset.nm, tr.dataset.u);
+  });
+  document.getElementById('cRange').addEventListener('click', e => { const b = e.target.closest('button'); if (b && CK) { CR = +b.dataset.n; drawChart(); } });
+  document.getElementById('cClose').addEventListener('click', closeChart);
+  document.getElementById('cModal').addEventListener('click', e => { if (e.target.id === 'cModal') closeChart(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && CK) closeChart(); });
 
   let SEL = TODAY, SEQ = 0;
   async function show(key) {

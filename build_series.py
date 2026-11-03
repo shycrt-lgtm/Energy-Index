@@ -275,7 +275,7 @@ def back_kau():
     save("kau", rows, merge=False); note("kau", rows)
 
 
-def back_rec():
+def back_rec(limit=None, stop_on_429=False):
     """REC 현물시장: 화·목(거래일)마다 날짜를 지정해 조회. 육지 평균가(landAvgPrc).
     공공데이터포털이 동시·연속 호출을 '요청 과다(429)'로 막으므로 1건씩 간격을 두고, 이미 받은 날짜는 건너뛴다(여러 번 나눠 실행 가능)."""
     if not DATA_KEY:
@@ -288,7 +288,10 @@ def back_rec():
             days.append(d)
         d += timedelta(days=1)
     rows, sample, fails, empty, done = [], None, 0, 0, 0
-    for d in sorted(days, reverse=True):          # 최근부터
+    stopped = False
+    for d in sorted(days, reverse=True)[:limit]:  # 최근부터
+        if stopped:
+            break
         if over():
             note("rec", err="시간 초과 - 받은 데까지 저장(다시 실행하면 이어서 받음)"); break
         q = {"serviceKey": DATA_KEY, "pageNo": 1, "numOfRows": 5, "dataType": "json", "bzDd": d.strftime("%Y%m%d")}
@@ -304,6 +307,8 @@ def back_rec():
                 break
             except urllib.error.HTTPError as ex:
                 if ex.code == 429:
+                    if stop_on_429:
+                        note("rec", err=f"{d} 요청 과다(429) - 오늘은 중단, 다음 실행에서 이어 받음"); stopped = True; break
                     time.sleep(5 * (attempt + 1)); continue
                 fails += 1; break
             except Exception as ex:
@@ -363,6 +368,14 @@ def daily():
                 save(key, rows)
     except Exception as e:
         print(f">> [series SMP] 최근값 실패 {type(e).__name__}: {e}")
+    # REC 과거자료는 공공데이터포털 호출 한도 때문에 매일 조금씩(최대 30거래일) 채운다
+    if os.path.exists(path("rec")) and DATA_KEY:
+        try:
+            DEADLINE[0] = time.time() + 150
+            back_rec(limit=30, stop_on_429=True)
+            write_status()
+        except Exception as e:
+            print(f">> [series REC 채우기] 실패 {type(e).__name__}: {e}")
     print(">> series 갱신 완료")
 
 
