@@ -1,46 +1,46 @@
 {
- "updated": "2026-11-03 03:43",
+ "updated": "2026-11-03 12:02",
  "items": {
   "jkm": {
    "name": "JKM LNG",
    "unit": "USD/MMBtu",
-   "date": "2026-10-31",
-   "value": 32.84,
-   "prev_date": "2026-10-30",
-   "prev_value": 32.03
+   "date": "2026-11-03",
+   "value": 31.7,
+   "prev_date": "2026-10-31",
+   "prev_value": 32.84
   },
   "dubai": {
    "name": "두바이유",
    "unit": "$/bbl",
-   "date": "2026-10-30",
-   "value": 118.7,
-   "prev_date": "2026-10-29",
-   "prev_value": 114.2
+   "date": "2026-11-02",
+   "value": 105.3,
+   "prev_date": "2026-10-30",
+   "prev_value": 118.7
   },
   "brent": {
    "name": "브렌트유",
    "unit": "$/bbl",
-   "date": "2026-10-30",
-   "value": 117.64,
-   "prev_date": "2026-10-29",
-   "prev_value": 114.88
+   "date": "2026-11-02",
+   "value": 104.77,
+   "prev_date": "2026-10-30",
+   "prev_value": 117.64
   },
   "wti": {
    "name": "WTI",
    "unit": "$/bbl",
-   "date": "2026-10-30",
-   "value": 104.12,
-   "prev_date": "2026-10-29",
-   "prev_value": 102.0
+   "date": "2026-11-02",
+   "value": 96.46,
+   "prev_date": "2026-10-30",
+   "prev_value": 104.12
   },
   "kau": {
    "name": "배출권(KAU)",
    "item": "KAU26",
    "unit": "원/톤",
-   "date": "2026-11-02",
+   "date": "2026-11-03",
    "value": 30000.0,
-   "prev_date": "2026-10-30",
-   "prev_value": 30250.0
+   "prev_date": "2026-11-02",
+   "prev_value": 30000.0
   },
   "rec": {
    "name": "REC(육지)",
@@ -55,19 +55,19 @@
    "name": "원/달러 환율",
    "item": "매매기준율",
    "unit": "원",
-   "date": "2026-11-02",
-   "value": 1337.2,
-   "prev_date": "2026-10-30",
-   "prev_value": 1335.3
+   "date": "2026-11-03",
+   "value": 1341.0,
+   "prev_date": "2026-11-02",
+   "prev_value": 1337.2
   },
   "fx_jpy": {
    "name": "원/100엔 환율",
    "item": "매매기준율",
    "unit": "원",
-   "date": "2026-11-02",
-   "value": 848.21,
-   "prev_date": "2026-10-30",
-   "prev_value": 846.41
+   "date": "2026-11-03",
+   "value": 849.03,
+   "prev_date": "2026-11-02",
+   "prev_value": 848.21
   }
  },
  "errors": {}
