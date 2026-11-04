@@ -1,5 +1,5 @@
 {
- "built": "2026-11-04 10:37",
+ "built": "2026-11-04 15:57",
  "status": {
   "fx": {
    "rows": 793,
@@ -38,39 +38,12 @@
    "sec": 37
   },
   "rec": {
-   "sample_fields": [
-    "bidTrdVal",
-    "bzDd",
-    "clsPrc",
-    "jejuAvgPrc",
-    "jejuHgPrc",
-    "jejuLwPrc",
-    "jejuLwlmtPrc",
-    "jejuOrdCnt",
-    "jejuOrdRecValue",
-    "jejuTrdCnt",
-    "jejuTrdRecValue",
-    "jejuUplmtPrc",
-    "landAvgPrc",
-    "landHgPrc",
-    "landLwPrc",
-    "landLwlmtPrc",
-    "landOrdCnt",
-    "landOrdRecValue",
-    "landTrdCnt",
-    "landTrdRecValue",
-    "landUplmtPrc",
-    "rn",
-    "totCnt",
-    "totRecValue",
-    "trdCnt",
-    "trdRecValue"
-   ],
+   "sample_fields": null,
    "fails": 0,
-   "empty": 10,
-   "asked": 30,
-   "left": 7,
-   "rows": 369,
+   "empty": 17,
+   "asked": 17,
+   "left": 0,
+   "rows": 349,
    "from": "2022-11-01",
    "to": "2026-11-03"
   },
