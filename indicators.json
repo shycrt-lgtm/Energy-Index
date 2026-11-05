@@ -1,47 +1,47 @@
 {
- "updated": "2026-11-05 01:31",
+ "updated": "2026-11-05 10:41",
  "items": {
   "jkm": {
    "name": "JKM LNG",
    "unit": "USD/MMBtu",
-   "date": "2026-11-03",
-   "value": 31.76,
-   "prev_date": "2026-11-02",
-   "prev_value": 31.7,
+   "date": "2026-11-04",
+   "value": 31.62,
+   "prev_date": "2026-11-03",
+   "prev_value": 31.76,
    "basis": "trade"
   },
   "dubai": {
    "name": "두바이유",
    "unit": "$/bbl",
-   "date": "2026-11-03",
-   "value": 102.16,
-   "prev_date": "2026-11-02",
-   "prev_value": 105.3
+   "date": "2026-11-04",
+   "value": 100.89,
+   "prev_date": "2026-11-03",
+   "prev_value": 102.16
   },
   "brent": {
    "name": "브렌트유",
    "unit": "$/bbl",
-   "date": "2026-11-03",
-   "value": 103.6,
-   "prev_date": "2026-11-02",
-   "prev_value": 104.77
+   "date": "2026-11-04",
+   "value": 94.62,
+   "prev_date": "2026-11-03",
+   "prev_value": 103.6
   },
   "wti": {
    "name": "WTI",
    "unit": "$/bbl",
-   "date": "2026-11-03",
-   "value": 96.09,
-   "prev_date": "2026-11-02",
-   "prev_value": 96.46
+   "date": "2026-11-04",
+   "value": 88.12,
+   "prev_date": "2026-11-03",
+   "prev_value": 96.09
   },
   "kau": {
    "name": "배출권(KAU)",
    "item": "KAU26",
    "unit": "원/톤",
-   "date": "2026-11-04",
-   "value": 29650.0,
-   "prev_date": "2026-11-03",
-   "prev_value": 30000.0
+   "date": "2026-11-05",
+   "value": 29350.0,
+   "prev_date": "2026-11-04",
+   "prev_value": 29650.0
   },
   "rec": {
    "name": "REC(육지)",
@@ -56,19 +56,19 @@
    "name": "원/달러 환율",
    "item": "매매기준율",
    "unit": "원",
-   "date": "2026-11-04",
-   "value": 1341.2,
-   "prev_date": "2026-11-03",
-   "prev_value": 1341.0
+   "date": "2026-11-05",
+   "value": 1340.7,
+   "prev_date": "2026-11-04",
+   "prev_value": 1341.2
   },
   "fx_jpy": {
    "name": "원/100엔 환율",
    "item": "매매기준율",
    "unit": "원",
-   "date": "2026-11-04",
-   "value": 845.17,
-   "prev_date": "2026-11-03",
-   "prev_value": 849.03
+   "date": "2026-11-05",
+   "value": 846.35,
+   "prev_date": "2026-11-04",
+   "prev_value": 845.17
   }
  },
  "errors": {}
