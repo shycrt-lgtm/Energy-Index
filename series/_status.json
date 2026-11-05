@@ -1,5 +1,5 @@
 {
- "built": "2026-11-05 18:49",
+ "built": "2026-11-05 22:33",
  "status": {
   "fx": {
    "rows": 793,
@@ -38,11 +38,15 @@
    "sec": 37
   },
   "rec": {
+   "errors": [
+    "2026-11-05 URLError <urlopen error timed out>",
+    "시간 초과 - 받은 데까지 저장(다시 실행하면 이어서 받음)"
+   ],
    "sample_fields": null,
-   "fails": 0,
-   "empty": 18,
-   "asked": 18,
-   "left": 0,
+   "fails": 1,
+   "empty": 1,
+   "asked": 2,
+   "left": 16,
    "rows": 349,
    "from": "2022-11-01",
    "to": "2026-11-03"

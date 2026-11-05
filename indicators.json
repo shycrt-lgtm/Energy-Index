@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-05 18:48",
+ "updated": "2026-11-05 22:30",
  "items": {
   "jkm": {
    "name": "JKM LNG",
@@ -71,5 +71,7 @@
    "prev_value": 845.17
   }
  },
- "errors": {}
+ "errors": {
+  "REC": "URLError: <urlopen error timed out>"
+ }
 }
