@@ -1,5 +1,5 @@
 {
- "built": "2026-11-06 01:42",
+ "built": "2026-11-06 10:46",
  "status": {
   "fx": {
    "rows": 793,
@@ -40,12 +40,12 @@
   "rec": {
    "sample_fields": null,
    "fails": 0,
-   "empty": 18,
-   "asked": 18,
+   "empty": 17,
+   "asked": 17,
    "left": 0,
-   "rows": 349,
+   "rows": 350,
    "from": "2022-11-01",
-   "to": "2026-11-03"
+   "to": "2026-11-05"
   },
   "jkm": {
    "rows": 964,
