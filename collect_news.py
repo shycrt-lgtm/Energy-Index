@@ -86,6 +86,9 @@ TOP_N = 15
 # ▼▼ 고정 기사: 수집 범위(최근 30시간)나 점수와 관계없이 지정한 순위에 넣는 기사. 전일 노출 제외 규칙도 적용하지 않음. ▼▼
 # until(KST) 이후 실행부터는 자동으로 빠집니다. rank 는 화면 순위(1부터). 지난 항목은 지워도 됩니다.
 PINNED = [
+    {"title": "서울 마곡동 온수관 파열로 8,965세대 난방 중단…12시간 만에 복구", "source": "SBS",
+     "link": "https://news.sbs.co.kr/news/endPage.do?news_id=N1008835138",
+     "pub": "2026-11-07 18:00", "until": "2026-11-08 12:00", "rank": 1},
     {"title": "[단독] 삼성전자, 지역별 전기요금제에 RE100 계약 ‘멈칫’", "source": "에너지경제신문",
      "link": "https://news.google.com/rss/articles/CBMiW0FVX3lxTE03Qnl1WmUtTW1vNmpsZWlFOVN2cTYwbE1YZV9VZDllQklGVk1HNnRSdUszUlBHYnVBbF8yQlItR3psYkNUZXFFSkE3Z2R0TTdYNE9pMFdFdTB6MVk?oc=5",
      "pub": "2026-10-21 13:20", "until": "2026-10-22 12:00", "rank": 1},
