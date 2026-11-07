@@ -20,14 +20,14 @@ KPX_FULL = "https://raw.githubusercontent.com/shycrt-lgtm/KPX-Daily-Report/main/
 KPX_RECENT = "https://raw.githubusercontent.com/shycrt-lgtm/KPX-Daily-Report/main/data_recent.json"
 
 META = {
-    "fx":       ("원/달러 환율", "원", "ECB 기준환율(과거) · 한국수출입은행 매매기준율(2026.10~ 수집분)"),
-    "fx_jpy":   ("원/100엔 환율", "원", "ECB 기준환율(과거) · 한국수출입은행 매매기준율(2026.10~ 수집분)"),
-    "dubai":    ("두바이유", "$/bbl", "한국석유공사 오피넷"),
-    "brent":    ("브렌트유", "$/bbl", "한국석유공사 오피넷"),
-    "wti":      ("WTI", "$/bbl", "한국석유공사 오피넷"),
-    "jkm":      ("JKM LNG", "USD/MMBtu", "OilPriceAPI (2026.10~ 사이트 수집분만 보유)"),
-    "kau":      ("배출권(KAU)", "원/톤", "금융위원회 배출권시세(공공데이터포털) · 한국거래소. 날짜별 거래량 최대 종목"),
-    "rec":      ("REC", "원/REC", "전력거래소 REC 현물시장(공공데이터포털 육지 평균가) · 전력거래소 홈페이지(수집분)"),
+    "fx":      ("원/달러 환율", "원", "ECB 기준환율(과거) · 한국수출입은행 매매기준율(2026.10~ 수집분)"),
+    "fx_jpy":  ("원/100엔 환율", "원", "ECB 기준환율(과거) · 한국수출입은행 매매기준율(2026.10~ 수집분)"),
+    "dubai":   ("두바이유", "$/bbl", "한국석유공사 오피넷"),
+    "brent":   ("브렌트유", "$/bbl", "한국석유공사 오피넷"),
+    "wti":     ("WTI", "$/bbl", "한국석유공사 오피넷"),
+    "jkm":     ("JKM LNG", "USD/MMBtu", "OilPriceAPI (2026.10~ 사이트 수집분만 보유)"),
+    "kau":     ("배출권(KAU)", "원/톤", "금융위원회 배출권시세(공공데이터포털) · 한국거래소. 날짜별 거래량 최대 종목"),
+    "rec":     ("REC", "원/REC", "RE100정보플랫폼 RPS 시장 REC 가격(현물시장 평균가, 2026.10.29까지) · 이후 전력거래소 홈페이지 수집분"),
     "smp_hourly": ("SMP 시간대별(육지)", "원/kWh", "전력거래소 육지 SMP 시간대별(2023~2026.11.3 엑셀 자료, 이후 매일 전력시장 전일실적 자료로 갱신)"),
 }
 STATUS = {}
@@ -302,64 +302,19 @@ def rec_csv(fn):
 
 
 def back_rec(limit=None, stop_on_429=False):
-    """REC 현물시장: 화·목(거래일)마다 날짜를 지정해 조회. 육지 평균가(landAvgPrc).
-    공공데이터포털이 동시·연속 호출을 '요청 과다(429)'로 막으므로 1건씩 간격을 두고, 이미 받은 날짜는 건너뛴다(여러 번 나눠 실행 가능)."""
-    if not DATA_KEY:
-        note("rec", err="DATA_GO_KR_KEY 없음"); return
-    url = "https://apis.data.go.kr/B552115/RecMarketInfo2/getRecMarketInfo2"
-    have = {r[0] for r in (load("rec") or {}).get("data", [])}
-
-    rows, sample, fails, empty, done = [], None, 0, 0, 0
-
-    # data/rec_*.csv 과거자료가 있으면 먼저 적재
+    """REC 현물시장 평균가: data/rec_*.csv(RE100정보플랫폼 '가격 동향' 표에서 받은 값) + 사이트 수집분(전력거래소 홈페이지, 같은 평균가).
+    같은 날짜는 수집분이 있으면 그 값(같은 출처 기준)으로 둔다."""
+    by = {}
     ddir = os.path.join(HERE, "data")
     for fn in sorted(os.listdir(ddir)) if os.path.isdir(ddir) else []:
         if fn.startswith("rec") and fn.endswith(".csv"):
-            for d_csv, v_csv in rec_csv(os.path.join(ddir, fn)):
-                rows.append((d_csv, v_csv))
-                have.add(d_csv)
-
-    days, d, e = [], start_day(), now().date()
-    while d <= e:
-        if d.weekday() in (1, 3) and d.isoformat() not in have:
-            days.append(d)
-        d += timedelta(days=1)
-
-    stopped = False
-    for d in sorted(days, reverse=True)[:limit]:  # 최근부터
-        if stopped:
-            break
-        if over():
-            note("rec", err="시간 초과 - 받은 데까지 저장(다시 실행하면 이어서 받음)"); break
-        q = {"serviceKey": DATA_KEY, "pageNo": 1, "numOfRows": 5, "dataType": "json", "bzDd": d.strftime("%Y%m%d")}
-        for attempt in range(4):
-            try:
-                items, _, _ = datago_items(url, q)
-                it = next((x for x in items if x.get("landAvgPrc") not in (None, "")), None)
-                if it:
-                    sample = sample or it
-                    rows.append((d.isoformat(), float(str(it["landAvgPrc"]).replace(",", ""))))
-                else:
-                    empty += 1
-                break
-            except urllib.error.HTTPError as ex:
-                if ex.code == 429:
-                    if stop_on_429:
-                        note("rec", err=f"{d} 요청 과다(429) - 오늘은 중단, 다음 실행에서 이어 받음"); stopped = True; break
-                    time.sleep(5 * (attempt + 1)); continue
-                fails += 1; break
-            except Exception as ex:
-                fails += 1
-                if fails <= 3:
-                    note("rec", err=f"{d} {type(ex).__name__} {ex}")
-                break
-        done += 1
-        time.sleep(0.7)
-    st = STATUS.setdefault("rec", {})
-    st.update({"sample_fields": sorted(sample.keys()) if sample else st.get("sample_fields"), "fails": fails, "empty": empty,
-               "asked": done, "left": len(days) - done})
-    rows += collected("rec")
-    save("rec", rows, merge=True); note("rec", rows)
+            for r in list(csv.reader(open(os.path.join(ddir, fn), encoding="utf-8")))[1:]:
+                if len(r) >= 2 and re.fullmatch(r"\d{4}-\d{2}-\d{2}", r[0]):
+                    by[r[0]] = float(r[1])
+    for d, v, *_ in collected("rec"):
+        by.setdefault(d, v)
+    rows = sorted(by.items())
+    save("rec", rows, merge=False); note("rec", rows)
 
 
 def _prev_wd(d):
@@ -425,13 +380,6 @@ def daily():
             save_hourly(kpx_hourly(days))
     except Exception as e:
         print(f">> [series SMP] 최근값 실패 {type(e).__name__}: {e}")
-    if os.path.exists(path("rec")) and DATA_KEY:
-        try:
-            DEADLINE[0] = time.time() + 150
-            back_rec(limit=30, stop_on_429=True)
-            write_status()
-        except Exception as e:
-            print(f">> [series REC 채우기] 실패 {type(e).__name__}: {e}")
     print(">> series 갱신 완료")
 
 
