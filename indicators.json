@@ -1,47 +1,47 @@
 {
- "updated": "2026-11-12 01:30",
+ "updated": "2026-11-12 11:25",
  "items": {
   "jkm": {
    "name": "JKM LNG",
    "unit": "USD/MMBtu",
-   "date": "2026-11-10",
-   "value": 31.34,
-   "prev_date": "2026-11-09",
-   "prev_value": 31.35,
+   "date": "2026-11-11",
+   "value": 31.33,
+   "prev_date": "2026-11-10",
+   "prev_value": 31.34,
    "basis": "trade"
   },
   "dubai": {
    "name": "두바이유",
    "unit": "$/bbl",
-   "date": "2026-11-10",
-   "value": 87.82,
-   "prev_date": "2026-11-06",
-   "prev_value": 96.3
+   "date": "2026-11-11",
+   "value": 89.0,
+   "prev_date": "2026-11-10",
+   "prev_value": 87.82
   },
   "brent": {
    "name": "브렌트유",
    "unit": "$/bbl",
-   "date": "2026-11-10",
-   "value": 91.49,
-   "prev_date": "2026-11-06",
-   "prev_value": 98.32
+   "date": "2026-11-11",
+   "value": 92.76,
+   "prev_date": "2026-11-10",
+   "prev_value": 91.49
   },
   "wti": {
    "name": "WTI",
    "unit": "$/bbl",
-   "date": "2026-11-10",
-   "value": 86.04,
-   "prev_date": "2026-11-06",
-   "prev_value": 90.83
+   "date": "2026-11-11",
+   "value": 86.53,
+   "prev_date": "2026-11-10",
+   "prev_value": 86.04
   },
   "kau": {
    "name": "배출권(KAU)",
    "item": "KAU26",
    "unit": "원/톤",
-   "date": "2026-11-11",
-   "value": 29400.0,
-   "prev_date": "2026-11-10",
-   "prev_value": 29200.0
+   "date": "2026-11-12",
+   "value": 30000.0,
+   "prev_date": "2026-11-11",
+   "prev_value": 29400.0
   },
   "rec": {
    "name": "REC(육지)",
@@ -56,19 +56,19 @@
    "name": "원/달러 환율",
    "item": "매매기준율",
    "unit": "원",
-   "date": "2026-11-11",
-   "value": 1343.3,
-   "prev_date": "2026-11-10",
-   "prev_value": 1355.7
+   "date": "2026-11-12",
+   "value": 1336.7,
+   "prev_date": "2026-11-11",
+   "prev_value": 1343.3
   },
   "fx_jpy": {
    "name": "원/100엔 환율",
    "item": "매매기준율",
    "unit": "원",
-   "date": "2026-11-11",
-   "value": 846.44,
-   "prev_date": "2026-11-10",
-   "prev_value": 858.42
+   "date": "2026-11-12",
+   "value": 837.45,
+   "prev_date": "2026-11-11",
+   "prev_value": 846.44
   }
  },
  "errors": {}
