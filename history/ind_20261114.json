@@ -1,0 +1,74 @@
+{
+ "updated": "2026-11-14 01:41",
+ "items": {
+  "jkm": {
+   "name": "JKM LNG",
+   "unit": "USD/MMBtu",
+   "date": "2026-11-12",
+   "value": 31.37,
+   "prev_date": "2026-11-11",
+   "prev_value": 31.33,
+   "basis": "trade"
+  },
+  "dubai": {
+   "name": "두바이유",
+   "unit": "$/bbl",
+   "date": "2026-11-12",
+   "value": 90.1,
+   "prev_date": "2026-11-11",
+   "prev_value": 89.0
+  },
+  "brent": {
+   "name": "브렌트유",
+   "unit": "$/bbl",
+   "date": "2026-11-12",
+   "value": 95.82,
+   "prev_date": "2026-11-11",
+   "prev_value": 92.76
+  },
+  "wti": {
+   "name": "WTI",
+   "unit": "$/bbl",
+   "date": "2026-11-12",
+   "value": 88.74,
+   "prev_date": "2026-11-11",
+   "prev_value": 86.53
+  },
+  "kau": {
+   "name": "배출권(KAU)",
+   "item": "KAU26",
+   "unit": "원/톤",
+   "date": "2026-11-13",
+   "value": 29900.0,
+   "prev_date": "2026-11-12",
+   "prev_value": 30000.0
+  },
+  "rec": {
+   "name": "REC",
+   "item": "평균가",
+   "unit": "원/REC",
+   "date": "2026-11-12",
+   "value": 71137.0,
+   "prev_date": "2026-11-10",
+   "prev_value": 71281.0
+  },
+  "fx": {
+   "name": "원/달러 환율",
+   "item": "매매기준율",
+   "unit": "원",
+   "date": "2026-11-13",
+   "value": 1332.4,
+   "prev_date": "2026-11-12",
+   "prev_value": 1336.7
+  },
+  "fx_jpy": {
+   "name": "원/100엔 환율",
+   "item": "매매기준율",
+   "unit": "원",
+   "date": "2026-11-13",
+   "value": 833.45,
+   "prev_date": "2026-11-12",
+   "prev_value": 837.45
+  }
+ }
+}
