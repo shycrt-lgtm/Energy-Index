@@ -1,38 +1,38 @@
 {
- "updated": "2026-11-14 01:41",
+ "updated": "2026-11-14 10:36",
  "items": {
   "jkm": {
    "name": "JKM LNG",
    "unit": "USD/MMBtu",
-   "date": "2026-11-12",
-   "value": 31.37,
-   "prev_date": "2026-11-11",
-   "prev_value": 31.33,
+   "date": "2026-11-13",
+   "value": 29.6,
+   "prev_date": "2026-11-12",
+   "prev_value": 31.37,
    "basis": "trade"
   },
   "dubai": {
    "name": "두바이유",
    "unit": "$/bbl",
-   "date": "2026-11-12",
-   "value": 90.1,
-   "prev_date": "2026-11-11",
-   "prev_value": 89.0
+   "date": "2026-11-13",
+   "value": 92.04,
+   "prev_date": "2026-11-12",
+   "prev_value": 90.1
   },
   "brent": {
    "name": "브렌트유",
    "unit": "$/bbl",
-   "date": "2026-11-12",
-   "value": 95.82,
-   "prev_date": "2026-11-11",
-   "prev_value": 92.76
+   "date": "2026-11-13",
+   "value": 95.84,
+   "prev_date": "2026-11-12",
+   "prev_value": 95.82
   },
   "wti": {
    "name": "WTI",
    "unit": "$/bbl",
-   "date": "2026-11-12",
-   "value": 88.74,
-   "prev_date": "2026-11-11",
-   "prev_value": 86.53
+   "date": "2026-11-13",
+   "value": 88.56,
+   "prev_date": "2026-11-12",
+   "prev_value": 88.74
   },
   "kau": {
    "name": "배출권(KAU)",
