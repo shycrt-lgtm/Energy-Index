@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-15 16:03",
+ "updated": "2026-11-15 18:49",
  "items": {
   "jkm": {
    "name": "JKM LNG",
@@ -54,21 +54,21 @@
   },
   "fx": {
    "name": "원/달러 환율",
-   "item": "ECB 기준",
+   "item": "매매기준율",
    "unit": "원",
    "date": "2026-11-13",
-   "value": 1337.13,
+   "value": 1332.4,
    "prev_date": "2026-11-12",
-   "prev_value": 1334.1
+   "prev_value": 1336.7
   },
   "fx_jpy": {
    "name": "원/100엔 환율",
-   "item": "ECB 기준",
+   "item": "매매기준율",
    "unit": "원",
    "date": "2026-11-13",
-   "value": 835.7062500000002,
+   "value": 833.45,
    "prev_date": "2026-11-12",
-   "prev_value": 835.3788353162179
+   "prev_value": 837.45
   }
  }
 }
