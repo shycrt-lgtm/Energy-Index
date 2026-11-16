@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-16 22:58",
+ "updated": "2026-11-17 03:48",
  "items": {
   "jkm": {
    "name": "JKM LNG",
@@ -44,13 +44,13 @@
    "prev_value": 29900.0
   },
   "rec": {
-   "name": "REC",
+   "name": "REC(육지)",
    "item": "평균가",
    "unit": "원/REC",
    "date": "2026-11-12",
-   "value": 71137.0,
+   "value": 71016.0,
    "prev_date": "2026-11-10",
-   "prev_value": 71281.0
+   "prev_value": 71284.0
   },
   "fx": {
    "name": "원/달러 환율",
