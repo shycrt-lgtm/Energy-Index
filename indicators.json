@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-23 01:33",
+ "updated": "2026-11-23 10:56",
  "items": {
   "jkm": {
    "name": "JKM LNG",
@@ -38,9 +38,9 @@
    "name": "배출권(KAU)",
    "item": "KAU26",
    "unit": "원/톤",
-   "date": "2026-11-20",
-   "value": 29550.0,
-   "prev_date": "2026-11-19",
+   "date": "2026-11-23",
+   "value": 29450.0,
+   "prev_date": "2026-11-20",
    "prev_value": 29550.0
   },
   "rec": {
@@ -56,19 +56,19 @@
    "name": "원/달러 환율",
    "item": "매매기준율",
    "unit": "원",
-   "date": "2026-11-20",
-   "value": 1330.8,
-   "prev_date": "2026-11-19",
-   "prev_value": 1331.1
+   "date": "2026-11-23",
+   "value": 1337.3,
+   "prev_date": "2026-11-20",
+   "prev_value": 1330.8
   },
   "fx_jpy": {
    "name": "원/100엔 환율",
    "item": "매매기준율",
    "unit": "원",
-   "date": "2026-11-20",
-   "value": 833.73,
-   "prev_date": "2026-11-19",
-   "prev_value": 835.23
+   "date": "2026-11-23",
+   "value": 842.95,
+   "prev_date": "2026-11-20",
+   "prev_value": 833.73
   }
  },
  "errors": {}
