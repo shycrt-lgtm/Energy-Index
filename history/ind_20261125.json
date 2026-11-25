@@ -1,74 +1,74 @@
 {
- "updated": "2026-11-25 04:40",
+ "updated": "2026-11-25 13:30",
  "items": {
   "jkm": {
    "name": "JKM LNG",
    "unit": "USD/MMBtu",
-   "date": "2026-11-23",
-   "value": 28.64,
-   "prev_date": "2026-11-20",
-   "prev_value": 28.42,
+   "date": "2026-11-24",
+   "value": 28.81,
+   "prev_date": "2026-11-23",
+   "prev_value": 28.64,
    "basis": "trade"
   },
   "dubai": {
    "name": "두바이유",
    "unit": "$/bbl",
-   "date": "2026-11-23",
-   "value": 87.04,
-   "prev_date": "2026-11-20",
-   "prev_value": 87.41
+   "date": "2026-11-24",
+   "value": 82.6,
+   "prev_date": "2026-11-23",
+   "prev_value": 87.04
   },
   "brent": {
    "name": "브렌트유",
    "unit": "$/bbl",
-   "date": "2026-11-23",
-   "value": 89.37,
-   "prev_date": "2026-11-20",
-   "prev_value": 92.57
+   "date": "2026-11-24",
+   "value": 91.4,
+   "prev_date": "2026-11-23",
+   "prev_value": 89.37
   },
   "wti": {
    "name": "WTI",
    "unit": "$/bbl",
-   "date": "2026-11-23",
-   "value": 80.17,
-   "prev_date": "2026-11-20",
-   "prev_value": 83.98
+   "date": "2026-11-24",
+   "value": 82.05,
+   "prev_date": "2026-11-23",
+   "prev_value": 80.17
   },
   "kau": {
    "name": "배출권(KAU)",
    "item": "KAU26",
    "unit": "원/톤",
-   "date": "2026-11-24",
-   "value": 29300.0,
-   "prev_date": "2026-11-23",
-   "prev_value": 29500.0
+   "date": "2026-11-25",
+   "value": 29450.0,
+   "prev_date": "2026-11-24",
+   "prev_value": 29300.0
   },
   "rec": {
    "name": "REC",
    "item": "평균가",
    "unit": "원/REC",
-   "date": "2026-11-19",
-   "value": 71010.0,
-   "prev_date": "2026-11-17",
-   "prev_value": 71065.0
+   "date": "2026-11-24",
+   "value": 70953.0,
+   "prev_date": "2026-11-19",
+   "prev_value": 71010.0
   },
   "fx": {
    "name": "원/달러 환율",
    "item": "매매기준율",
    "unit": "원",
-   "date": "2026-11-24",
-   "value": 1346.6,
-   "prev_date": "2026-11-23",
-   "prev_value": 1337.3
+   "date": "2026-11-25",
+   "value": 1343.6,
+   "prev_date": "2026-11-24",
+   "prev_value": 1346.6
   },
   "fx_jpy": {
    "name": "원/100엔 환율",
    "item": "매매기준율",
    "unit": "원",
-   "date": "2026-11-24",
-   "value": 846.76,
-   "prev_date": "2026-11-23",
-   "prev_value": 842.95
+   "date": "2026-11-25",
+   "value": 843.41,
+   "prev_date": "2026-11-24",
+   "prev_value": 846.76
   }
  }
 }
