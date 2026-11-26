@@ -1,47 +1,47 @@
 {
- "updated": "2026-11-26 03:48",
+ "updated": "2026-11-26 12:44",
  "items": {
   "jkm": {
    "name": "JKM LNG",
    "unit": "USD/MMBtu",
-   "date": "2026-11-24",
-   "value": 28.81,
-   "prev_date": "2026-11-23",
-   "prev_value": 28.64,
+   "date": "2026-11-25",
+   "value": 28.07,
+   "prev_date": "2026-11-24",
+   "prev_value": 28.81,
    "basis": "trade"
   },
   "dubai": {
    "name": "두바이유",
    "unit": "$/bbl",
-   "date": "2026-11-24",
-   "value": 82.6,
-   "prev_date": "2026-11-23",
-   "prev_value": 87.04
+   "date": "2026-11-25",
+   "value": 84.19,
+   "prev_date": "2026-11-24",
+   "prev_value": 82.6
   },
   "brent": {
    "name": "브렌트유",
    "unit": "$/bbl",
-   "date": "2026-11-24",
-   "value": 91.4,
-   "prev_date": "2026-11-23",
-   "prev_value": 89.37
+   "date": "2026-11-25",
+   "value": 94.61,
+   "prev_date": "2026-11-24",
+   "prev_value": 91.4
   },
   "wti": {
    "name": "WTI",
    "unit": "$/bbl",
-   "date": "2026-11-24",
-   "value": 82.05,
-   "prev_date": "2026-11-23",
-   "prev_value": 80.17
+   "date": "2026-11-25",
+   "value": 83.68,
+   "prev_date": "2026-11-24",
+   "prev_value": 82.05
   },
   "kau": {
    "name": "배출권(KAU)",
    "item": "KAU26",
    "unit": "원/톤",
-   "date": "2026-11-25",
-   "value": 29450.0,
-   "prev_date": "2026-11-24",
-   "prev_value": 29300.0
+   "date": "2026-11-26",
+   "value": 29400.0,
+   "prev_date": "2026-11-25",
+   "prev_value": 29450.0
   },
   "rec": {
    "name": "REC(육지)",
@@ -56,19 +56,19 @@
    "name": "원/달러 환율",
    "item": "매매기준율",
    "unit": "원",
-   "date": "2026-11-25",
-   "value": 1343.6,
-   "prev_date": "2026-11-24",
-   "prev_value": 1346.6
+   "date": "2026-11-26",
+   "value": 1343.9,
+   "prev_date": "2026-11-25",
+   "prev_value": 1343.6
   },
   "fx_jpy": {
    "name": "원/100엔 환율",
    "item": "매매기준율",
    "unit": "원",
-   "date": "2026-11-25",
-   "value": 843.41,
-   "prev_date": "2026-11-24",
-   "prev_value": 846.76
+   "date": "2026-11-26",
+   "value": 844.37,
+   "prev_date": "2026-11-25",
+   "prev_value": 843.41
   }
  }
 }
