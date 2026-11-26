@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-26 08:23",
+ "updated": "2026-11-26 13:15",
  "items": [
   {
    "title": "[단독] \"덩치 클수록 재생에너지 늘려라\"…정부 할당제에 대형발전사 고심",
@@ -9,18 +9,46 @@
    "more": 0
   },
   {
-   "title": "동서발전, 정부혁신 박람회서 ‘AI 기반 에너지 기술’ 선봬",
-   "source": "투데이에너지",
-   "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE1jZHlDdGIxaFVMOUVKWlFYLWJPUkZtNWVXVGs3TFE5cEhLall3aFh1TkFZVWhublRKOG9xanBIZkVRSlZ5ZjZCdDBHYnlfX0tZRGV5eTU3Q3o2X3VsVmZEdTlHOERGd3ZTdFV1MEJ3?oc=5",
-   "pub": "2026-11-25 16:40",
-   "more": 2
+   "title": "[태양광 시장조사] RPS 폐지 앞둔 태양광 업계, 기대보다 우려… ‘계약가격·수익성’ 최대 변수",
+   "source": "인더스트리뉴스",
+   "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE9WbHRFNXJtOWtPck90V3BUcjNROWl0R3VDVGdJT1hmdTFoSHNjMGhvTTY1ZlJtcjFaTU9ZSXNpRVo4UlhuWC1BR2xiaXQzdHAtVmJFNTVXWllEYU85U3k5X3dSajFnZWw3b0RHSnlNcklkUQ?oc=5",
+   "pub": "2026-11-26 12:12",
+   "more": 0
   },
   {
-   "title": "국제전기, 전력시장 대응 리더십 워크숍 개최",
-   "source": "뉴스핌",
-   "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE04c3VodWFGRlpRbVRXV0VPanltNkpTY3lodW4wVFVTVXpjQUhNZE16WThlSXA2T1dONTg4QlF1TE5EdFBHUjlYUDZ5SkxHNWJNelhUWGw4dHJPSWJR?oc=5",
-   "pub": "2026-11-25 16:27",
-   "more": 1
+   "title": "[스페셜리포트] RPS 시대의 종언… 새로운 경쟁 질서 마주한 태양광",
+   "source": "인더스트리뉴스",
+   "link": "https://news.google.com/rss/articles/CBMickFVX3lxTE8wUXZVenlzZE5TVkQyX1lERXVzclpZRmFvUEotRGNrSU1qSkRCR1dsS1ZSYW0xRDFBQ0JBbzlaS1NNbFZXdnpoLTkzU09vTmgxRDhkdTB0RXpMOHNUZTY2S19Ya2ZmMmZQelNBSjNySjhFUQ?oc=5",
+   "pub": "2026-11-26 12:07",
+   "more": 0
+  },
+  {
+   "title": "[IMO 탄소규제②] 세계 선박 평균 선령 22.2년...LNG 이후에도 먹거리 있다",
+   "source": "미디어펜",
+   "link": "https://news.google.com/rss/articles/CBMiWEFVX3lxTE9udjdEN1hyT3k2c3hDM3FyYTJCZERJTzRTOXhxbFVwOW9FdDBiQXZPeDBYOFlFMDZuYlJNQnhfcFZDUDNYMlV1THY3a1A0X0lTa3pvY2F1TjM?oc=5",
+   "pub": "2026-11-26 10:30",
+   "more": 0
+  },
+  {
+   "title": "히타치(6501 JP), 美 블룸에너지와 日 데이터센터 전력시장 공략…연료전지 부상",
+   "source": "알파경제",
+   "link": "https://news.google.com/rss/articles/CBMibkFVX3lxTE9kWEpMWnA3SEVVekhLclJuVDUxR0tqdkVmMkpFY25YbVJCVENFdEkzYTA1OGNEeGxBX00wVmhLXzB4d0FkVWZRTFBrM3NfdXZyMmt0NlQxRmctSXJ3Y0pOX0R5UkxHcURrQUdzVmdn?oc=5",
+   "pub": "2026-11-26 10:16",
+   "more": 0
+  },
+  {
+   "title": "[태양광 기획] 햇빛소득마을, 선정 넘어 실질적 수익 창출로…정부·지자체·한전 협력 절실",
+   "source": "코리아투데이뉴스",
+   "link": "https://news.google.com/rss/articles/CBMiR0FVX3lxTE9WTWpRZ3VUWVRQeTUwWHRQNU1jODZmZF9NY0NIbGxMYVVzM1FZYjhjMHJHOENtTGpUeGQ2YVNSWDk3UGpHTDA4?oc=5",
+   "pub": "2026-11-26 10:05",
+   "more": 0
+  },
+  {
+   "title": "한화솔루션, 에어프로덕츠코리아와 PPA 체결…전력거래 신사업 확대",
+   "source": "더구루",
+   "link": "https://news.google.com/rss/articles/CBMiZkFVX3lxTFA4T2l5NmJrcW84OHJMSV8ySTMxNWpVaWEwS0dza095WGZiOUdOUXF3TW9JSGdtdk95anFXcFdxQnNJaEU3Nmh5c0ZLSGVISzd0d0djdHA5cHVwb0VkbUFZYWxJRlZLUQ?oc=5",
+   "pub": "2026-11-26 09:33",
+   "more": 0
   },
   {
    "title": "한국가스공사 조직 개편에 경쟁력 확보 기대감, 홍의락 LNG 부담 낮출 '트레이딩' 주목",
@@ -44,39 +72,11 @@
    "more": 0
   },
   {
-   "title": "전력거래소, 재생에너지 확대 대응 전력시장 개편 방향 모색",
-   "source": "이뉴스투데이",
-   "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTFBac2pGTXpLaXJIdjhWSURVTGNJTU81Rk0wS2pDemlGLVF6UFR1ZlRvM19MRGE4bEVocU53LUxDLVFtVGVvV05xNnE5cEZwWXVFTWNPU1RNM19SVVBOSkZxbmhBQTY0WnFQMlVzaC1qQS3SAXRBVV95cUxPdE5VT0Z3NHJMRDROd0R0OUhwN3lmZVJrVTJKcElpZ1lSUlhYbEEzMEMxOEFPNlJVQ0dTdkctQ3VheWM3WDZCdDgydjNSeVJ3dFN2Qjc1VHBLRDZmYU9wbFduNGd3YS1hMm1ncnRHS2J4UzIxWA?oc=5",
-   "pub": "2026-11-25 10:55",
-   "more": 0
-  },
-  {
-   "title": "기후장관 \"유럽 탈원전 이후 전기요금 올라…산업경쟁력 고려 필요\" - 머니투데이",
-   "source": "머니투데이",
-   "link": "https://news.google.com/rss/articles/CBMicEFVX3lxTFBvQmlVZDlabE90LWM3TDJkRkRnYTlkdlgyaExUQmRPdWRYZmFKSl9BZU8yVi1hZmxkcDJ2QktiM2hSbGxpVGxxNFZPRTdSUHJ0T25kMEg2bkFzY0tSRExyZHRUTDMyLXNlTnh5bWxpVEnSAXBBVV95cUxQb0JpVWQ5WmxPdC1jN0wyZEZEZ2E5ZHZYMmhMVEJkT3VkWGZhSkpfQWVPMlYtYWZsZHAydkJLYjNoUmxsaVRscTRWT0U3UlBydE9uZDBINm5Bc2NLUkRMcmR0VEwzMi1zZU54eW1saVRJ?oc=5",
-   "pub": "2026-11-25 10:52",
-   "more": 0
-  },
-  {
    "title": "전력시장 개편, 장기 계약·단기 현물시장 역할 정립 필요",
    "source": "국토일보",
    "link": "https://news.google.com/rss/articles/CBMiZEFVX3lxTE5weGZZUlRvT0xKcmtxeVdPTGNSMHNBNXdjelN3MnB3d3FQUlhEMWtoY1FiR3BaMDJ5elpoVnFGVDhfTzFCc196QXllaWJHY0lYNE8xM1N1Z2JlaGhLSklFNG12cDA?oc=5",
    "pub": "2026-11-25 10:15",
-   "more": 1
-  },
-  {
-   "title": "구로구, 이은형 건정연 연구위원에 감사장… \"탄소중립 정책 발전 기여\" - 머니투데이",
-   "source": "머니투데이",
-   "link": "https://news.google.com/rss/articles/CBMiakFVX3lxTFA5R2lTLURxVU9VekNDcURMeDBWdlVmOTNyd2J3SElBRVJLSk1VVEVrRXlTRy1UM1QtU1Nlak9ZSGcwTktJZnN1QzF0aEEzQmZTYnlhVXIxU3R5T3BwOGV1cjF4UTFaSzcxTEHSAW9BVV95cUxORmE3TDNVV1R5S0FIbXlPeHEtQVo0cEZHMmRBazBCSU5KNTJzUElsWk5fQkxMT1BTdU1taU02RTdNNHZoSEdUOU0zVjBMdDhIenZheHFqc0V2eEtFcjRKSHhYZ0xhYmpWRTRZQmhIb0U?oc=5",
-   "pub": "2026-11-25 10:08",
    "more": 2
-  },
-  {
-   "title": "'히트펌프 전용 전기요금제' 시간대별 차등요금 검토중",
-   "source": "뉴스;트리",
-   "link": "https://news.google.com/rss/articles/CBMiXEFVX3lxTE5xc3RBZWIyY3RKaHc0UXdUMHk3aFVsd0NIWkRodW5NdWJkX1dwVW5ZWTVhSzROamJjejlnN2M4WXlkcC14a2VCbHNkdllublFJYXdvRWRjX2lQai1h?oc=5",
-   "pub": "2026-11-25 10:00",
-   "more": 0
   },
   {
    "title": "[IMO 탄소규제①] LNG, 입지 좁아질까…조선업계, \"징검다리 역할, 20년은 더\"",
@@ -104,7 +104,7 @@
    "source": "매일경제",
    "link": "https://news.google.com/rss/articles/CBMiX0FVX3lxTE5tUGZnQk1va1luV0pTbnJtWkxtVklOTHVoV0t2bU04dzBVUmxIQlJJUGU4VjBZekhoX3hUQTJhSkFocFpEcUh5R0wxWG5tSDhwMzRqaGtrMnRQMmtrOTZj?oc=5",
    "pub": "2026-11-26 00:00",
-   "more": 1
+   "more": 0
   }
  ]
 }
